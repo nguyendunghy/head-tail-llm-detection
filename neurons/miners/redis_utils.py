@@ -59,13 +59,16 @@ def load(file_path):
             data = json.loads(line)
             token_list = index_data.index_data(data)
             for token in token_list:
-                m = hashlib.sha256(token.encode('UTF-8'))
-                sha256_hex = m.hexdigest()
-                hash_value = hash_code(sha256_hex)
-                db = hash_value % 100_0000_000
-                conn.select(db)
-                conn.set(sha256_hex[:8], "")
-                bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
+                try:
+                    m = hashlib.sha256(token.encode('UTF-8'))
+                    sha256_hex = m.hexdigest()
+                    hash_value = hash_code(sha256_hex)
+                    db = hash_value % 100_0000_000
+                    conn.select(db)
+                    conn.set(sha256_hex[:8], "")
+                    bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
+                except Exception as e:
+                    bt.logging.error(e)
 
 
 if __name__ == "__main__":
