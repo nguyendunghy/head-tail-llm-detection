@@ -98,7 +98,7 @@ def load(file_path):
 
 
 def test_thread(name):
-    time.sleep(10_000)
+    time.sleep(10)
     bt.logging.info("end thread: " + name)
 
 if __name__ == "__main__":
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     _thread.start_new_thread(test_thread, ("thread-1",))
     _thread.start_new_thread(test_thread, ("thread-2",))
-    time.sleep(3_000)
+    time.sleep(3)
     bt.logging.info("end main thread")
 
 
