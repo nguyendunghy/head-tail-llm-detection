@@ -63,7 +63,7 @@ def load(file_path):
                     m = hashlib.sha256(token.encode('UTF-8'))
                     sha256_hex = m.hexdigest()
                     hash_value = hash_code(sha256_hex)
-                    db = hash_value % 100_0000_000
+                    db = hash_value % 100_000_000
                     conn.select(db)
                     conn.set(sha256_hex[:8], "")
                     bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
