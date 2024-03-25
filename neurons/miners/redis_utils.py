@@ -109,9 +109,9 @@ if __name__ == "__main__":
     # bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
     thread1 = threading.Thread(target=test_thread('thread_1'))
-    thread1.daemon=True
-    thread2 = threading.Thread(target=test_thread('thread_1'))
-    thread2.daemon=True
+    thread1.daemon=False
+    thread2 = threading.Thread(target=test_thread('thread_2'))
+    thread2.daemon=False
 
     thread1.start()
     thread2.start()
