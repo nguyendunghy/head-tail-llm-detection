@@ -73,7 +73,6 @@ def load_record(conn, list_data):
 
 def load(file_path):
     with open(file_path, 'r') as file:
-        conn = get_conn()
         count = 0
         list_data = []
         for line in file:
@@ -82,7 +81,7 @@ def load(file_path):
             if count % 1000 == 0:
                 try:
                     tmp_list_data = copy.deepcopy(list_data)
-                    _thread.start_new_thread(load_record, (conn, tmp_list_data))
+                    _thread.start_new_thread(load_record, (get_conn(), tmp_list_data))
                 except Exception as e:
                     bt.logging.error(e)
                 list_data = []
