@@ -89,9 +89,28 @@ def load(file_path):
             count += 1
             bt.logging.info("---> upload line count: " + str(count))
 
+        if len(list_data) > 0:
+            try:
+                tmp_list_data = copy.deepcopy(list_data)
+                _thread.start_new_thread(load_record, (get_conn(), tmp_list_data))
+            except Exception as e:
+                bt.logging.error(e)
+
+
+def test_thread(name):
+    time.sleep(10_000)
+    bt.logging.info("end thread: " + name)
 
 if __name__ == "__main__":
-    start_time = time.time_ns()
-    file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    load(file_path)
-    bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
+    # start_time = time.time_ns()
+    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+    # load(file_path)
+    # bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
+
+    _thread.start_new_thread(test_thread, "thread-1")
+    _thread.start_new_thread(test_thread, "thread-2")
+    time.sleep(3_000)
+    bt.logging.info("end main thread")
+
+
+
