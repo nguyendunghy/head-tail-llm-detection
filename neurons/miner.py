@@ -18,7 +18,7 @@
 import time
 import typing
 import bittensor as bt
-
+import jackie_upgrade
 import random
 
 # Bittensor Miner Template:
@@ -29,6 +29,7 @@ from detection.base.miner import BaseMinerNeuron
 from miners.gpt_zero import PPLModel
 
 from transformers.utils import logging as hf_logging
+
 hf_logging.set_verbosity(40)
 
 
@@ -49,7 +50,7 @@ class Miner(BaseMinerNeuron):
         self.load_state()
 
     async def forward(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> detection.protocol.TextSynapse:
         """
         Processes the incoming 'TextSynapse' synapse by performing a predefined operation on the input data.
@@ -69,25 +70,47 @@ class Miner(BaseMinerNeuron):
         input_data = synapse.texts
         bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
 
-        preds = []
-        for text in input_data:
-            try:
-                pred_prob = self.model(text) > 0.5
-            except Exception as e:
-                pred_prob = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-
-            preds.append(pred_prob)
+        if len(input_data) == 50:
+            preds = self.jackie_model_pred(input_data)
+        else:
+            preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
 
         synapse.predictions = preds
         return synapse
 
+    def jackie_model_pred(self, input_data):
+        prob_list = []
+        for text in input_data:
+            try:
+                pred_prob = self.model(text)
+            except Exception as e:
+                pred_prob = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            prob_list.append(pred_prob)
+
+        bt.logging.info("jackie_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_model_pred pred_list: " + str(pred_list))
+        return pred_list
+
+    def standard_model_pred(self, input_data):
+        preds = []
+        for text in input_data:
+            try:
+                prob = self.model(text)
+                pred_prob = prob > 0.5
+            except Exception as e:
+                pred_prob = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            preds.append(pred_prob)
+        return preds
 
     async def blacklist(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
