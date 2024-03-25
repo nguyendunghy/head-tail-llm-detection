@@ -55,9 +55,12 @@ def exists(key) -> bool:
 def load(file_path):
     with open(file_path, 'r') as file:
         conn = get_conn()
+        count = 0
         for line in file:
             data = json.loads(line)
             token_list = index_data.index_data(data)
+            bt.logging.info("--- token_list: " + str(len(token_list)))
+
             for token in token_list:
                 try:
                     m = hashlib.sha256(token.encode('UTF-8'))
@@ -69,7 +72,8 @@ def load(file_path):
                     bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
                 except Exception as e:
                     bt.logging.error(e)
-
+            count += 1
+            bt.logging.info("===> upload line to redis success: " + str(count))
 
 if __name__ == "__main__":
     start_time = time.time_ns()
