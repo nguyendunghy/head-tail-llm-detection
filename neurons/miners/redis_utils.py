@@ -107,8 +107,8 @@ if __name__ == "__main__":
     # load(file_path)
     # bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
-    _thread.start_new_thread(test_thread, ("thread-1"))
-    _thread.start_new_thread(test_thread, ("thread-2"))
+    _thread.start_new_thread(test_thread, ("thread-1",))
+    _thread.start_new_thread(test_thread, ("thread-2",))
     time.sleep(3_000)
     bt.logging.info("end main thread")
 
