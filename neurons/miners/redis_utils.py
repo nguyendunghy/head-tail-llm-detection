@@ -1,3 +1,4 @@
+import copy
 import json
 import time
 import redis
@@ -53,32 +54,38 @@ def exists(key) -> bool:
     return ex
 
 
-def load_record(conn, record):
-    token_list = index_data.index_data(record)
-    for token in token_list:
-        try:
-            m = hashlib.sha256(token.encode('UTF-8'))
-            sha256_hex = m.hexdigest()
-            hash_value = hash_code(sha256_hex)
-            db = hash_value % 100_000_000
-            conn.select(db)
-            conn.set(sha256_hex[:8], "")
-            bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
-        except Exception as e:
-            bt.logging.error(e)
-    bt.logging.info("===> upload line to redis success: token_list: " + str(len(token_list)))
+def load_record(conn, list_data):
+    for data in list_data:
+        token_list = index_data.index_data(data)
+        for token in token_list:
+            try:
+                m = hashlib.sha256(token.encode('UTF-8'))
+                sha256_hex = m.hexdigest()
+                hash_value = hash_code(sha256_hex)
+                db = hash_value % 100_000_000
+                conn.select(db)
+                conn.set(sha256_hex[:8], "")
+                bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
+            except Exception as e:
+                bt.logging.error(e)
+        bt.logging.info("===> upload line to redis success: token_list: " + str(len(token_list)))
 
 
 def load(file_path):
     with open(file_path, 'r') as file:
         conn = get_conn()
         count = 0
+        list_data = []
         for line in file:
             data = json.loads(line)
-            try:
-                _thread.start_new_thread(load_record, (conn, data))
-            except Exception as e:
-                bt.logging.error(e)
+            list_data.append(data)
+            if count % 1000 == 0:
+                try:
+                    tmp_list_data = copy.deepcopy(list_data)
+                    _thread.start_new_thread(load_record, (conn, tmp_list_data))
+                except Exception as e:
+                    bt.logging.error(e)
+                list_data = []
 
             count += 1
             bt.logging.info("---> upload line count: " + str(count))
