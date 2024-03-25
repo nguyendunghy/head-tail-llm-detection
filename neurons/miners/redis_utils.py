@@ -6,6 +6,7 @@ import bittensor as bt
 import json
 import math
 import index_data
+import _thread
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 
@@ -52,28 +53,36 @@ def exists(key) -> bool:
     return ex
 
 
+def load_record(conn, record):
+    token_list = index_data.index_data(record)
+    for token in token_list:
+        try:
+            m = hashlib.sha256(token.encode('UTF-8'))
+            sha256_hex = m.hexdigest()
+            hash_value = hash_code(sha256_hex)
+            db = hash_value % 100_000_000
+            conn.select(db)
+            conn.set(sha256_hex[:8], "")
+            bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
+        except Exception as e:
+            bt.logging.error(e)
+    bt.logging.info("===> upload line to redis success: token_list: " + str(len(token_list)))
+
+
 def load(file_path):
     with open(file_path, 'r') as file:
         conn = get_conn()
         count = 0
         for line in file:
             data = json.loads(line)
-            token_list = index_data.index_data(data)
-            bt.logging.info("--- token_list: " + str(len(token_list)))
+            try:
+                _thread.start_new_thread(load_record, (conn, data))
+            except Exception as e:
+                bt.logging.error(e)
 
-            for token in token_list:
-                try:
-                    m = hashlib.sha256(token.encode('UTF-8'))
-                    sha256_hex = m.hexdigest()
-                    hash_value = hash_code(sha256_hex)
-                    db = hash_value % 100_000_000
-                    conn.select(db)
-                    conn.set(sha256_hex[:8], "")
-                    bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
-                except Exception as e:
-                    bt.logging.error(e)
             count += 1
-            bt.logging.info("===> upload line to redis success: " + str(count))
+            bt.logging.info("---> upload line count: " + str(count))
+
 
 if __name__ == "__main__":
     start_time = time.time_ns()
