@@ -1,5 +1,6 @@
 import copy
 import json
+import threading
 import time
 import redis
 import hashlib
@@ -107,8 +108,14 @@ if __name__ == "__main__":
     # load(file_path)
     # bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
-    _thread.start_new_thread(test_thread, ("thread-1",))
-    _thread.start_new_thread(test_thread, ("thread-2",))
+    thread1 = threading.Thread(target=test_thread('thread_1'))
+    thread1.daemon=True
+    thread2 = threading.Thread(target=test_thread('thread_1'))
+    thread2.daemon=True
+
+    thread1.start()
+    thread2.start()
+
     time.sleep(3)
     bt.logging.info("end main thread")
 
