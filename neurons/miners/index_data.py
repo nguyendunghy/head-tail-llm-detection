@@ -5,7 +5,7 @@ nltk.download('averaged_perceptron_tagger')
 
 from nltk.tokenize import sent_tokenize
 
-TOKEN_LENGTH = 5
+TOKEN_LENGTH = 10
 
 
 def process_word_longer_or_equal_token_length(words):

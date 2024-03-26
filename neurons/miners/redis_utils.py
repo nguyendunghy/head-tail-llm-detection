@@ -8,7 +8,6 @@ import bittensor as bt
 import json
 import math
 import index_data
-import _thread
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 
@@ -82,7 +81,7 @@ def load(file_path):
             if count % 1000 == 0:
                 try:
                     tmp_list_data = copy.deepcopy(list_data)
-                    _thread.start_new_thread(load_record, (get_conn(), tmp_list_data))
+                    threading.Thread(target=load_record, args=(get_conn(), tmp_list_data))
                 except Exception as e:
                     bt.logging.error(e)
                 list_data = []
@@ -92,32 +91,21 @@ def load(file_path):
 
         if len(list_data) > 0:
             try:
-                tmp_list_data = copy.deepcopy(list_data)
-                _thread.start_new_thread(load_record, (get_conn(), tmp_list_data))
+                load_record(get_conn(), list_data)
             except Exception as e:
                 bt.logging.error(e)
 
 
-def test_thread(name):
-    time.sleep(10)
-    bt.logging.info("end thread: " + name)
-
 if __name__ == "__main__":
-    # start_time = time.time_ns()
-    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    # load(file_path)
-    # bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
+    start_time = time.time_ns()
+    file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+    load(file_path)
+    bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
-    thread1 = threading.Thread(target=test_thread('thread_1'))
-    thread1.daemon=False
-    thread2 = threading.Thread(target=test_thread('thread_2'))
-    thread2.daemon=False
-
-    thread1.start()
-    thread2.start()
-
-    time.sleep(3)
-    bt.logging.info("end main thread")
-
-
-
+    # thread1 = threading.Thread(target=test_thread('thread_1'), daemon=False)
+    # thread2 = threading.Thread(target=test_thread('thread_2'), daemon=False)
+    #
+    # thread1.start()
+    # thread2.start()
+    #
+    # bt.logging.info("end main thread")
