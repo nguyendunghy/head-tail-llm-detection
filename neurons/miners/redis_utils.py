@@ -75,16 +75,18 @@ def load_record(conn, list_data, thread_name):
 def load(file_path):
     with open(file_path, 'r') as file:
         count = 0
+        thread_count = 0
         list_data = []
         for line in file:
             data = json.loads(line)
             list_data.append(data)
             if count % 1000 == 0:
                 try:
-                    thread_name = "thread-" + str(count % 1000)
+                    thread_name = "thread-" + str(thread_count)
                     tmp_list_data = copy.deepcopy(list_data)
                     my_thread = threading.Thread(target=load_record, args=(get_conn(), tmp_list_data, thread_name))
                     my_thread.start()
+                    thread_count += 1
                 except Exception as e:
                     bt.logging.error(e)
                 list_data = []
