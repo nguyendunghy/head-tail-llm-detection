@@ -130,6 +130,13 @@ def load(file_path):
             except Exception as e:
                 bt.logging.error(e)
 
+def check_db_size():
+    conn = get_conn()
+    for i in range(100_000_000):
+        conn.select(i)
+        size = conn.dbsize()
+        print(str(i) + ":" + str(size))
+
 
 if __name__ == "__main__":
     start_time = time.time_ns()
@@ -138,5 +145,6 @@ if __name__ == "__main__":
     file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
     # load(file_path)
 
-    verify_data(file_path)
+    # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
+    check_db_size()
