@@ -81,7 +81,7 @@ def load(file_path):
             list_data.append(data)
             if count % 1000 == 0:
                 try:
-                    thread_name = "thread-" + str(count%1000)
+                    thread_name = "thread-" + str(count % 1000)
                     tmp_list_data = copy.deepcopy(list_data)
                     my_thread = threading.Thread(target=load_record, args=(get_conn(), tmp_list_data, thread_name))
                     my_thread.start()
