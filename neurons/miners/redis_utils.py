@@ -54,7 +54,7 @@ def exists(key) -> bool:
     return ex
 
 
-def load_record(conn, list_data):
+def load_record(conn, list_data, thread_name):
     for data in list_data:
         token_list = index_data.index_data(data)
         for token in token_list:
@@ -65,10 +65,11 @@ def load_record(conn, list_data):
                 db = hash_value % 100_000_000
                 conn.select(db)
                 conn.set(sha256_hex[:8], "")
-                bt.logging.info("upload success key: " + sha256_hex[:8] + " : " + str(db))
+                bt.logging.info(
+                    "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
                 bt.logging.error(e)
-        bt.logging.info("===> upload line to redis success: token_list: " + str(len(token_list)))
+        bt.logging.info("===> upload line to redis success: thread_name: " + thread_name + " : " + str(len(token_list)))
 
 
 def load(file_path):
@@ -80,8 +81,9 @@ def load(file_path):
             list_data.append(data)
             if count % 1000 == 0:
                 try:
+                    thread_name = "thread-" + str(count%1000)
                     tmp_list_data = copy.deepcopy(list_data)
-                    my_thread = threading.Thread(target=load_record, args=(get_conn(), tmp_list_data))
+                    my_thread = threading.Thread(target=load_record, args=(get_conn(), tmp_list_data, thread_name))
                     my_thread.start()
                 except Exception as e:
                     bt.logging.error(e)
