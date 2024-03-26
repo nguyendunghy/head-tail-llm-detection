@@ -126,7 +126,7 @@ def load(file_path):
 
         if len(list_data) > 0:
             try:
-                load_record(get_conn(), list_data)
+                load_record(get_conn(), list_data, "thread-main")
             except Exception as e:
                 bt.logging.error(e)
 
@@ -140,5 +140,3 @@ if __name__ == "__main__":
 
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
-
-
