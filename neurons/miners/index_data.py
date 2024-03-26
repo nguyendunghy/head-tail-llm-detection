@@ -6,7 +6,7 @@ nltk.download('averaged_perceptron_tagger')
 from nltk.tokenize import sent_tokenize
 
 TOKEN_LENGTH = 10
-
+TOO_SHORT_TEXT = "TOO_SHORT_TEXT"
 
 def process_word_longer_or_equal_token_length(words):
     indexing_list = []
@@ -63,6 +63,14 @@ def process_tail(words, sentences, current_index):
         return tail
 
 
+def cut_head_tail(text):
+    words = text.split(' ')
+    if len(words) < TOKEN_LENGTH:
+        return [TOO_SHORT_TEXT]
+    else:
+        return [words[:TOKEN_LENGTH], words[len(words) - TOKEN_LENGTH:]]
+
+
 def index_data(el):
     text = el['text']
     indexing_list = []
@@ -95,10 +103,9 @@ def index_data(el):
     return indexing_list
 
 
-
 if __name__ == "__main__":
     text = "nguyen van. Toi dang code thuat toan. Toi muon. Toi muon kiem that nhieu tien. Toi muon nhieu thu!" \
            " what? I. nothing. mike"
-    el = {"text":text}
+    el = {"text": text}
     ind_lst = index_data(el)
     print(ind_lst)

@@ -1,13 +1,14 @@
 import copy
+import hashlib
 import json
 import threading
 import time
-import redis
-import hashlib
+
 import bittensor as bt
-import json
-import math
+import redis
+
 import index_data
+from detection.validator.data_augmentation import DataAugmentator
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 
@@ -52,6 +53,35 @@ def exists(key) -> bool:
     # bt.logging.info("time check exist: " + str(end_time - time_hash_sha256))
 
     return ex
+
+
+def verify_data(file_path):
+    # human_dataset = HumanDataset()
+    augmentator = DataAugmentator()
+    with open(file_path, 'r') as file:
+        for line in file:
+            el = json.loads(line)
+            augs = augmentator(el['text'])
+            text = augs['text']
+            list_token = index_data.cut_head_tail(text)
+            if len(list_token) == 1:
+                bt.logging.info("text too short" + text)
+            else:
+                list_result = []
+                for token in list_token:
+                    m = hashlib.sha256(token.encode('UTF-8'))
+                    sha256_hex = m.hexdigest()
+                    hash_value = hash_code(sha256_hex)
+                    db = hash_value % 100_000_000
+                    key = sha256_hex[:8]
+                    conn = get_conn()
+                    conn.select(db)
+                    re = conn.exists(key) == 1
+                    list_result.append(re)
+                if list_result.count(False) == 2:
+                    bt.logging.info("indexing<==>fail: " + text)
+                else:
+                    bt.logging.info("indexing success")
 
 
 def load_record(conn, list_data, thread_name):
@@ -104,13 +134,8 @@ def load(file_path):
 if __name__ == "__main__":
     start_time = time.time_ns()
     file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    load(file_path)
+    # load(file_path)
+    verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
-    # thread1 = threading.Thread(target=test_thread('thread_1'), daemon=False)
-    # thread2 = threading.Thread(target=test_thread('thread_2'), daemon=False)
-    #
-    # thread1.start()
-    # thread2.start()
-    #
-    # bt.logging.info("end main thread")
+
