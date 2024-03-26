@@ -8,6 +8,7 @@ from nltk.tokenize import sent_tokenize
 TOKEN_LENGTH = 10
 TOO_SHORT_TEXT = "TOO_SHORT_TEXT"
 
+
 def process_word_longer_or_equal_token_length(words):
     indexing_list = []
     tmp_head_list = take_head_longer_or_equal_token_length(words)
@@ -68,7 +69,9 @@ def cut_head_tail(text):
     if len(words) < TOKEN_LENGTH:
         return [TOO_SHORT_TEXT]
     else:
-        return [words[:TOKEN_LENGTH], words[len(words) - TOKEN_LENGTH:]]
+        head = ' '.join(words[:TOKEN_LENGTH])
+        tail = ' '.join(words[len(words) - TOKEN_LENGTH:])
+        return [head, tail]
 
 
 def index_data(el):
