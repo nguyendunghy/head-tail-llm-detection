@@ -134,10 +134,11 @@ def load(file_path):
 if __name__ == "__main__":
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    # load(file_path)
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
+    load(file_path)
 
-    verify_data(file_path)
+    # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
 
