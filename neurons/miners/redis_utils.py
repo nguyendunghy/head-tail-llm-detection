@@ -81,7 +81,8 @@ def load(file_path):
             if count % 1000 == 0:
                 try:
                     tmp_list_data = copy.deepcopy(list_data)
-                    threading.Thread(target=load_record, args=(get_conn(), tmp_list_data))
+                    my_thread = threading.Thread(target=load_record, args=(get_conn(), tmp_list_data))
+                    my_thread.start()
                 except Exception as e:
                     bt.logging.error(e)
                 list_data = []
