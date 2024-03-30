@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2023 Nikita Dilman
-
+import copy
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -29,6 +29,7 @@ from detection.base.miner import BaseMinerNeuron
 from miners.gpt_zero import PPLModel
 
 from transformers.utils import logging as hf_logging
+
 hf_logging.set_verbosity(40)
 
 
@@ -49,7 +50,7 @@ class Miner(BaseMinerNeuron):
         self.load_state()
 
     async def forward(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> detection.protocol.TextSynapse:
         """
         Processes the incoming 'TextSynapse' synapse by performing a predefined operation on the input data.
@@ -81,13 +82,21 @@ class Miner(BaseMinerNeuron):
             preds.append(pred_prob)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
-
+        self.accuracy_monitor(preds, 'current_model')
         synapse.predictions = preds
         return synapse
 
+    def accuracy_monitor(self, pred_list, log_prefix):
+        tmp_pred_list = copy.deepcopy(pred_list)
+        first_half = tmp_pred_list[:len(pred_list) // 2]
+        second_half = tmp_pred_list[len(pred_list) // 2:]
+        count_false = first_half.count(False)
+        count_true = second_half.count(True)
+        bt.logging.info(log_prefix + " wrong count_false: " + str(len(pred_list) // 2 - count_false))
+        bt.logging.info(log_prefix + " wrong count_true: " + str(len(pred_list) // 2 - count_true))
 
     async def blacklist(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -127,9 +136,9 @@ class Miner(BaseMinerNeuron):
 
         uid = self.metagraph.hotkeys.index(synapse.dendrite.hotkey)
 
-        stake = self.metagraph.S[uid].item()
-        if stake < self.config.blacklist.minimum_stake_requirement:
-            return True, "pubkey stake below min_allowed_stake"
+        # stake = self.metagraph.S[uid].item()
+        # if stake < self.config.blacklist.minimum_stake_requirement:
+        #     return True, "pubkey stake below min_allowed_stake"
 
         bt.logging.trace(
             f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
