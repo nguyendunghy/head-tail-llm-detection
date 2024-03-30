@@ -76,7 +76,7 @@ class Miner(BaseMinerNeuron):
             try:
                 prob = self.model(text)
                 pred_prob = prob > 0.5
-                file.write(text + "::" + str(prob))
+                file.write(text + "::" + str(prob) + "\n")
                 probs.append(prob)
             except Exception as e:
                 pred_prob = 0
