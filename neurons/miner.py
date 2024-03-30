@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2023 Nikita Dilman
-
+import copy
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -179,6 +179,7 @@ class Miner(BaseMinerNeuron):
         bt.logging.info("jackie_current_model_pred prob_list: " + str(prob_list))
         pred_list = jackie_upgrade.order_prob(prob_list)
         bt.logging.info("jackie_current_model_pred pred_list: " + str(pred_list))
+        self.accuracy_monitor(pred_list, 'jackie_current_model')
         return pred_list, prob_list
 
     def jackie_old_model_pred(self, input_data):
@@ -195,6 +196,7 @@ class Miner(BaseMinerNeuron):
         bt.logging.info("jackie_old_model_pred prob_list: " + str(prob_list))
         pred_list = jackie_upgrade.order_prob(prob_list)
         bt.logging.info("jackie_old_model_pred pred_list: " + str(pred_list))
+        self.accuracy_monitor(pred_list, 'jackie_old_model')
         return pred_list, prob_list
 
     def standard_model_pred(self, input_data):
@@ -228,8 +230,17 @@ class Miner(BaseMinerNeuron):
         for i in not_agree_list:
             curr_model_pred[i] = agree_pred[pt]
             pt += 1
-
+        self.accuracy_monitor(curr_model_pred, 'final_pred')
         return curr_model_pred
+
+    def accuracy_monitor(self, pred_list, log_prefix):
+        tmp_pred_list = copy.deepcopy(pred_list)
+        first_half = tmp_pred_list[:len(pred_list) // 2]
+        second_half = tmp_pred_list[len(pred_list) // 2:]
+        count_false = first_half.count(False)
+        count_true = second_half.count(True)
+        bt.logging.info(log_prefix + " wrong count_false: " + str(len(pred_list) // 2 - count_false))
+        bt.logging.info(log_prefix + " wrong count_true: " + str(len(pred_list) // 2 - count_true))
 
 
 # This is the main function, which runs the miner.

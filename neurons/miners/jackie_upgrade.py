@@ -31,10 +31,22 @@ def order_prob(prob_list):
                     pred_list[i] = True
                     num_update = num_update - 1
     return pred_list
-
+def accuracy_monitor(pred_list, log_prefix):
+    tmp_pred_list = copy.deepcopy(pred_list)
+    first_half = tmp_pred_list[:len(pred_list) // 2]
+    second_half = tmp_pred_list[len(pred_list) // 2:]
+    count_false = first_half.count(False)
+    count_true = second_half.count(True)
+    print(log_prefix + " wrong count_false: " + str(len(pred_list) // 2 - count_false))
+    print(log_prefix + " wrong count_true: " + str(len(pred_list) // 2 - count_true))
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
+    pred_list = [True, False, True, False, True, False]
+    accuracy_monitor(pred_list, 'test-test-accuracy_monitor')
+
+
+
     input_data = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
     curr_model_pred = [True, False, False, True, True, False, True, False]
     curr_model_prob = [0.3, 0.1, 0.15, 0.4, 0.45, 0.2, 0.5, 0.11]
