@@ -29,6 +29,10 @@ from detection.base.miner import BaseMinerNeuron
 from miners.gpt_zero import PPLModel
 
 from transformers.utils import logging as hf_logging
+
+from neurons.miners import jackie_upgrade
+from neurons.miners.old_gpt_zero import GPT2PPL
+
 hf_logging.set_verbosity(40)
 
 
@@ -46,10 +50,11 @@ class Miner(BaseMinerNeuron):
 
         self.model = PPLModel(device=self.device)
         self.model.load_pretrained('neurons/miners/ppl_model.pk')
+        self.old_model = GPT2PPL(device=self.device)
         self.load_state()
 
     async def forward(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> detection.protocol.TextSynapse:
         """
         Processes the incoming 'TextSynapse' synapse by performing a predefined operation on the input data.
@@ -70,24 +75,17 @@ class Miner(BaseMinerNeuron):
         bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
 
         preds = []
-        for text in input_data:
-            try:
-                pred_prob = self.model(text) > 0.5
-            except Exception as e:
-                pred_prob = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-
-            preds.append(pred_prob)
+        if len(input_data) == 50:
+            preds = self.calculate_pred(input_data)
+        else:
+            preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
-
         synapse.predictions = preds
         return synapse
 
-
     async def blacklist(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -166,6 +164,72 @@ class Miner(BaseMinerNeuron):
             f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
         )
         return prirority
+
+    def jackie_current_model_pred(self, input_data):
+        prob_list = []
+        for text in input_data:
+            try:
+                pred_prob = self.model(text)
+            except Exception as e:
+                pred_prob = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            prob_list.append(pred_prob)
+
+        bt.logging.info("jackie_current_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_current_model_pred pred_list: " + str(pred_list))
+        return pred_list, prob_list
+
+    def jackie_old_model_pred(self, input_data):
+        prob_list = []
+        for text in input_data:
+            try:
+                pred_prob = self.old_model(text)
+            except Exception as e:
+                pred_prob = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            prob_list.append(pred_prob)
+
+        bt.logging.info("jackie_old_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_old_model_pred pred_list: " + str(pred_list))
+        return pred_list, prob_list
+
+    def standard_model_pred(self, input_data):
+        preds = []
+        for text in input_data:
+            try:
+                prob = self.model(text)
+                pred_prob = prob > 0.5
+            except Exception as e:
+                pred_prob = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            preds.append(pred_prob)
+        return preds
+
+    def calculate_pred(self, input_data):
+        curr_model_pred, curr_model_prob = self.jackie_current_model_pred(input_data)
+        old_model_pred, old_model_prob = self.jackie_old_model_pred(input_data)
+        not_agree_list = []
+        not_agree_point = []
+        arr_len = len(input_data)
+        for i in range(arr_len):
+            if curr_model_pred[i] != old_model_pred[i]:
+                not_agree_list.append(i)
+                not_agree_point.append(curr_model_prob[i] + old_model_prob[i])
+        bt.logging.info("not_agree_list: " + str(not_agree_list))
+        bt.logging.info("not_agree_point: " + str(not_agree_point))
+
+        agree_pred = jackie_upgrade.order_prob(not_agree_point)
+        pt = 0
+        for i in not_agree_list:
+            curr_model_pred[i] = agree_pred[pt]
+            pt += 1
+
+        return curr_model_pred
 
 
 # This is the main function, which runs the miner.
