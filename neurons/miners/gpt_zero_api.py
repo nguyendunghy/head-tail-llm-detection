@@ -28,13 +28,13 @@ async def is_ai_generated(document):
         data = response.json()
         predicted_class = data['documents'][0]['predicted_class']
         if predicted_class == 'ai':
-            return True
+            return document, True
         elif predicted_class == 'human':
-            return False
+            return document, False
         else:
             ai_prob = data['documents'][0]['class_probabilities']['ai']
             human_prob = data['documents'][0]['class_probabilities']['human']
-            return float(ai_prob) > float(human_prob)
+            return document, float(ai_prob) > float(human_prob)
     else:
         print('Failed to post data:', response.status_code)
 
