@@ -1,3 +1,4 @@
+import asyncio
 import time
 
 import requests
@@ -5,7 +6,7 @@ import requests
 URL = 'https://api.gptzero.me/v2/predict/text'
 
 
-def is_ai_generated(document):
+async def is_ai_generated(document):
     """Return true if document is ai generated text, false if human written text"""
 
     body = {
@@ -38,7 +39,18 @@ def is_ai_generated(document):
         print('Failed to post data:', response.status_code)
 
 
+async def is_ai_generated_concurrent(input_data):
+    coroutines = [is_ai_generated(data) for data in input_data]
+    result = await asyncio.gather(*coroutines)
+    return result
+
+
 if __name__ == '__main__':
-    result = is_ai_generated(
-        'World War II: During WWII, the demand for crude oil increased dramatically. This boosted the local oil production in Texas, including areas such as Midland County where Plateau is situated. The town experienced economic growth due to increased oil extraction and related activities. 3. Civil Rights Movement (1950s-1960s): While Texas was at the forefront of segregation and racial inequality during this time, small towns like Plateau were also affected. African Americans and Latino residents struggled for rights, and local events might have reflected these national movements. 4.')
+    document1 = 'World War II: During WWII, the demand for crude oil increased dramatically.'
+    document2 = 'This boosted the local oil production in Texas, including areas such as Midland County where Plateau is situated.'
+    document3 = 'The town experienced economic growth due to increased oil extraction and related activities'
+    document4 = 'Civil Rights Movement (1950s-1960s): While Texas was at the forefront of segregation and racial inequality during this time, small towns like Plateau were also affected'
+    document5 = 'African Americans and Latino residents struggled for rights, and local events might have reflected these national movements'
+    input_data = [document1, document2, document3, document4, document5]
+    result = await is_ai_generated_concurrent(input_data)
     print("result::" + str(result))
