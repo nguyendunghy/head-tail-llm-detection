@@ -70,5 +70,8 @@ if __name__ == '__main__':
                   document1, document2, document3, document4, document5,
                   document1, document2, document3, document4, document5,
                   ]
+    start_time = time.time_ns()
     result = asyncio.run(is_ai_generated_concurrent(input_data))
+    end_time = time.time_ns()
+    print('time call async: ' + str(end_time - start_time) + " nanosecond")
     print("result::" + str(result))
