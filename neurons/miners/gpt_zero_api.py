@@ -115,25 +115,14 @@ def is_ai_generated_files(input_data):
 
 
 if __name__ == '__main__':
-    document1 = 'World War II: During WWII, the demand for crude oil increased dramatically.'
-    document2 = 'This boosted the local oil production in Texas, including areas such as Midland County where Plateau is situated.'
-    document3 = 'The town experienced economic growth due to increased oil extraction and related activities'
-    document4 = 'Civil Rights Movement (1950s-1960s): While Texas was at the forefront of segregation and racial inequality during this time, small towns like Plateau were also affected'
-    document5 = 'African Americans and Latino residents struggled for rights, and local events might have reflected these national movements'
-    input_data = [document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5
-                  ]
+    document1 = 'It first checks whether the specified path exists and is indeed a directory (and not, for example, a symbolic link or a file) to avoid unintended deletion'
+    document2 = 'If the check passes, shutil.rmtree() removes the directory and everything contained within it, including subdirectories and files'
+    document3 = 'Be very careful when using shutil.rmtree() because it irreversibly deletes data. Always ensure that the path is correct and that you indeed want to delete the directory and its contents'
+    # document4 = 'Civil Rights Movement (1950s-1960s): While Texas was at the forefront of segregation and racial inequality during this time, small towns like Plateau were also affected'
+    # document5 = 'African Americans and Latino residents struggled for rights, and local events might have reflected these national movements'
+    input_data = [document1, document2, document3]
     start_time = time.time_ns()
     result = is_ai_generated_files(input_data)
-    # postman()
     end_time = time.time_ns()
     print('time call async: ' + str(end_time - start_time) + " nanosecond")
     print("result::" + str(result))
