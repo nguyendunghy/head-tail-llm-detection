@@ -6,6 +6,8 @@ URL = 'https://api.gptzero.me/v2/predict/text'
 
 
 def post(document):
+    """Return true if document is ai generated text, false if human written text"""
+
     start_time = time.time_ns()
     body = {
         "document": document
