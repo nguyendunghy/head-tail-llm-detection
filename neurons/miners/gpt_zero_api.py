@@ -41,8 +41,11 @@ async def is_ai_generated(document):
 
 async def is_ai_generated_concurrent(input_data):
     coroutines = [is_ai_generated(data) for data in input_data]
-    result = await asyncio.gather(*coroutines)
-    return result
+    result_list = await asyncio.gather(*coroutines)
+    mydict = {}
+    for re in result_list:
+        mydict[re[0]] = re[1]
+    return mydict
 
 
 if __name__ == '__main__':
