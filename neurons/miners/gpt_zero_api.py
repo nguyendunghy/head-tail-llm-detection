@@ -57,7 +57,7 @@ async def is_ai_generated_concurrent(input_data):
 
 def gen_file(input_data):
     current_time = time.time_ns()
-    dir_path = "/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/test_data/" + str(current_time) + "/"
+    dir_path = "/root/head-tail-llm-detection/test_data/" + str(current_time) + "/"
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     for i in range(len(input_data)):
