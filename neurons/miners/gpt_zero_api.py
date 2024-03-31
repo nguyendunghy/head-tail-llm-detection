@@ -70,7 +70,7 @@ def gen_file(input_data):
     return dir_path
 
 
-async def is_ai_generated_files(input_data):
+def is_ai_generated_files(input_data):
     dir_path = gen_file(input_data)
     try:
         files = {}
@@ -127,7 +127,7 @@ if __name__ == '__main__':
                   document1, document2, document3, document4, document5,
                   ]
     start_time = time.time_ns()
-    result = await is_ai_generated_files(input_data)
+    result = is_ai_generated_files(input_data)
     end_time = time.time_ns()
     print('time call async: ' + str(end_time - start_time) + " nanosecond")
     print("result::" + str(result))
