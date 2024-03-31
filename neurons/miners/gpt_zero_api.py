@@ -1,4 +1,6 @@
 import asyncio
+import os
+import shutil
 import time
 
 import requests
@@ -53,6 +55,60 @@ async def is_ai_generated_concurrent(input_data):
     return pre_list
 
 
+def gen_file(input_data):
+    current_time = time.time_ns()
+    dir_path = "/root/head-tail-llm-detection/test_data/" + str(current_time) + "/"
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    for i in range(len(input_data)):
+        file_name = 'doc_' + str(i) + ".txt"
+        file_path = dir_path + file_name
+        with open(file_path, 'w') as file:
+            file.write(input_data[i])
+            print(f"Content written to {file_name}")
+
+    return dir_path
+
+
+async def is_ai_generated_files(input_data):
+    dir_path = gen_file(input_data)
+    try:
+        files = {}
+        for i in range(len(input_data)):
+            key = 'doc_' + str(i) + ".txt"
+            file_path = dir_path + key
+            files[key] = open(file_path, 'rb')
+
+        headers = {
+            'Accept': 'application/json',
+            'x-api-key': '61b48856c4af45e8b36723b4135254b5'
+        }
+        response = requests.post(URL, headers=headers, files=files)
+        if response.status_code == 200:
+            data = response.json()
+            result_list = []
+            for i in range(len(input_data)):
+                document = data['documents'][i]
+                predicted_class = document['predicted_class']
+                if predicted_class == 'ai':
+                    result_list.append(True)
+                elif predicted_class == 'human':
+                    result_list.append(False)
+                else:
+                    ai_prob = document['class_probabilities']['ai']
+                    human_prob = document['class_probabilities']['human']
+                    result_list.append(float(ai_prob) > float(human_prob))
+            return result_list
+        else:
+            print('Failed to post data:', response.status_code)
+            return []
+    except Exception as e:
+        print('Exception:' + str(e))
+    finally:
+        if os.path.exists(dir_path) and os.path.isdir(dir_path):
+            shutil.rmtree(dir_path)
+
+
 if __name__ == '__main__':
     document1 = 'World War II: During WWII, the demand for crude oil increased dramatically.'
     document2 = 'This boosted the local oil production in Texas, including areas such as Midland County where Plateau is situated.'
@@ -71,7 +127,7 @@ if __name__ == '__main__':
                   document1, document2, document3, document4, document5,
                   ]
     start_time = time.time_ns()
-    result = asyncio.run(is_ai_generated_concurrent(input_data))
+    result = await is_ai_generated_files(input_data)
     end_time = time.time_ns()
     print('time call async: ' + str(end_time - start_time) + " nanosecond")
     print("result::" + str(result))
