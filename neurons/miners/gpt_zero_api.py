@@ -57,7 +57,7 @@ async def is_ai_generated_concurrent(input_data):
 
 def gen_file(input_data):
     current_time = time.time_ns()
-    dir_path = "/root/head-tail-llm-detection/test_data/" + str(current_time) + "/"
+    dir_path = "/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/test_data/" + str(current_time) + "/"
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     for i in range(len(input_data)):
@@ -73,17 +73,20 @@ def gen_file(input_data):
 def is_ai_generated_files(input_data):
     dir_path = gen_file(input_data)
     try:
-        files = {}
+        files = []
         for i in range(len(input_data)):
             key = 'doc_' + str(i) + ".txt"
             file_path = dir_path + key
-            files[key] = open(file_path, 'rb')
+            file = ('files', (key, open(file_path, 'rb'), 'text/plain'))
+            files.append(file)
 
+        payload = {'version': ''}
         headers = {
             'Accept': 'application/json',
             'x-api-key': '61b48856c4af45e8b36723b4135254b5'
         }
-        response = requests.post('https://api.gptzero.me/v2/predict/files', headers=headers, files=files)
+        response = requests.request("POST", 'https://api.gptzero.me/v2/predict/files', headers=headers, data=payload,
+                                    files=files)
         if response.status_code == 200:
             data = response.json()
             result_list = []
@@ -101,14 +104,14 @@ def is_ai_generated_files(input_data):
             return result_list
         else:
             print('Failed to post data:status_code', response.status_code)
-            print('Failed to post data:', response)
+            print('Failed to post data:', response.content)
             return []
     except Exception as e:
         print('Exception:' + str(e))
+        return []
     finally:
         if os.path.exists(dir_path) and os.path.isdir(dir_path):
-            ...
-            #shutil.rmtree(dir_path)
+            shutil.rmtree(dir_path)
 
 
 if __name__ == '__main__':
@@ -126,10 +129,11 @@ if __name__ == '__main__':
                   document1, document2, document3, document4, document5,
                   document1, document2, document3, document4, document5,
                   document1, document2, document3, document4, document5,
-                  document1, document2, document3, document4, document5,
+                  document1, document2, document3, document4, document5
                   ]
     start_time = time.time_ns()
     result = is_ai_generated_files(input_data)
+    # postman()
     end_time = time.time_ns()
     print('time call async: ' + str(end_time - start_time) + " nanosecond")
     print("result::" + str(result))
