@@ -1,9 +1,12 @@
+import time
+
 import requests
 
 URL = 'https://api.gptzero.me/v2/predict/text'
 
 
 def post(document):
+    start_time = time.time_ns()
     body = {
         "document": document
     }
@@ -23,6 +26,9 @@ def post(document):
         print(data)
     else:
         print('Failed to post data:', response.status_code)
+
+    end_time = time.time_ns()
+    print('time processing: ' + str(end_time - start_time) + " nanosecond")
 
 
 if __name__ == '__main__':
