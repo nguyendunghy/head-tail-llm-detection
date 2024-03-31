@@ -45,7 +45,12 @@ async def is_ai_generated_concurrent(input_data):
     mydict = {}
     for re in result_list:
         mydict[re[0]] = re[1]
-    return mydict
+
+    pre_list = []
+    for data in input_data:
+        pred = mydict.get(data)
+        pre_list.append(pred)
+    return pre_list
 
 
 if __name__ == '__main__':
