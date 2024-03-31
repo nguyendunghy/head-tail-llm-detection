@@ -100,7 +100,8 @@ def is_ai_generated_files(input_data):
                     result_list.append(float(ai_prob) > float(human_prob))
             return result_list
         else:
-            print('Failed to post data:', response.status_code)
+            print('Failed to post data:status_code', response.status_code)
+            print('Failed to post data:', response)
             return []
     except Exception as e:
         print('Exception:' + str(e))
