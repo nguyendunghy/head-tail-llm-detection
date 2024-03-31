@@ -18,12 +18,15 @@ def post(document):
     }
 
     response = requests.post(URL, json=body, headers=headers)
-    # response = requests.request('POST', URL, json=body, headers=headers)
 
     # Checking if the request was successful
     if response.status_code == 200:
         data = response.json()
-        print(data)
+        print(data['documents'][0]['predicted_class'])
+        print(data['documents'][0]['class_probabilities']['ai'])
+        print(data['documents'][0]['class_probabilities']['human'])
+        print(data['documents'][0]['class_probabilities']['mixed'])
+
     else:
         print('Failed to post data:', response.status_code)
 
