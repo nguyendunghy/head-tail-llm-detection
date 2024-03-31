@@ -107,7 +107,7 @@ def is_ai_generated_files(input_data):
         print('Exception:' + str(e))
     finally:
         if os.path.exists(dir_path) and os.path.isdir(dir_path):
-            shutil.rmtree(dir_path)
+            #shutil.rmtree(dir_path)
 
 
 if __name__ == '__main__':
