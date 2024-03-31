@@ -8,7 +8,6 @@ URL = 'https://api.gptzero.me/v2/predict/text'
 def is_ai_generated(document):
     """Return true if document is ai generated text, false if human written text"""
 
-    start_time = time.time_ns()
     body = {
         "document": document
     }
@@ -18,8 +17,10 @@ def is_ai_generated(document):
         'Content-Type': 'application/json',
         'x-api-key': '61b48856c4af45e8b36723b4135254b5'
     }
-
+    start_time = time.time_ns()
     response = requests.post(URL, json=body, headers=headers)
+    end_time = time.time_ns()
+    print('time call api: ' + str(end_time - start_time) + " nanosecond")
 
     # Checking if the request was successful
     if response.status_code == 200:
@@ -35,9 +36,6 @@ def is_ai_generated(document):
             return float(ai_prob) > float(human_prob)
     else:
         print('Failed to post data:', response.status_code)
-
-    end_time = time.time_ns()
-    print('time processing: ' + str(end_time - start_time) + " nanosecond")
 
 
 if __name__ == '__main__':
