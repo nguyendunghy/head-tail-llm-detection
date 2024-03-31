@@ -83,7 +83,7 @@ def is_ai_generated_files(input_data):
             'Accept': 'application/json',
             'x-api-key': '61b48856c4af45e8b36723b4135254b5'
         }
-        response = requests.post(URL, headers=headers, files=files)
+        response = requests.post('https://api.gptzero.me/v2/predict/files', headers=headers, files=files)
         if response.status_code == 200:
             data = response.json()
             result_list = []
