@@ -52,5 +52,5 @@ if __name__ == '__main__':
     document4 = 'Civil Rights Movement (1950s-1960s): While Texas was at the forefront of segregation and racial inequality during this time, small towns like Plateau were also affected'
     document5 = 'African Americans and Latino residents struggled for rights, and local events might have reflected these national movements'
     input_data = [document1, document2, document3, document4, document5]
-    result = await is_ai_generated_concurrent(input_data)
+    result = is_ai_generated_concurrent(input_data)
     print("result::" + str(result))
