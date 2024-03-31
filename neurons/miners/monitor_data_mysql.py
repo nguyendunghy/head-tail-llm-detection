@@ -1,3 +1,5 @@
+import time
+
 import mysql.connector
 
 import mysql.connector
@@ -33,5 +35,8 @@ def insert(input_data):
 
 
 if __name__ == '__main__':
+    start_time = time.time_ns()
     input_data = [1, 'abcdef', 'standard', 10, 11]
     insert(input_data)
+    end_time = time.time_ns()
+    print("time processing ", str(end_time-start_time))
