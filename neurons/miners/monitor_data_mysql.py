@@ -30,7 +30,7 @@ def get_tunnel():
 
     global_tunnel = SSHTunnelForwarder(('70.48.87.64', 41264),
                                        ssh_username='root',
-                                       ssh_private_key='/root/head-tail-llm-detection/neurons/miners/fluidstack',
+                                       ssh_private_key='./fluidstack',
                                        remote_bind_address=('localhost', 8888),
                                        local_bind_address=('localhost', 8080)  #148.77.2.74:42601 -> 8080/tcp
                                        )
