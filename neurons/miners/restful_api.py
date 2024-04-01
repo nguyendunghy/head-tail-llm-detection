@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, request, jsonify
 import monitor_data_mysql
 
@@ -18,6 +19,11 @@ def insert():
         model_type = data['model_type']
         count_ai = data['count_ai']
         count_human = data['count_human']
+
+        if id is None:
+            now = datetime.now()
+            id = now.strftime('%Y%m%d%H%M%S%f')[:17]
+
         input_data = (id, text_hash, model_type, count_ai, count_human)
         print(input_data)
         db_connection = monitor_data_mysql.get_db_connection('localhost', '8888')
