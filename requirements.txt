@@ -22,3 +22,6 @@ sentencepiece
 tenacity
 wikipedia
 wikipedia_sections
+Flask
+mysql-connector-python
+sshtunnel
