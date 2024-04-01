@@ -8,14 +8,14 @@ global_tunnel = None
 global_db_connection = None
 
 
-def get_db_connection(port):
+def get_db_connection(ip, port):
     global global_db_connection
     if global_db_connection != None:
         return global_db_connection
 
     global_db_connection = mysql.connector.connect(
-        host="localhost",
-        port=8888,  # 8888
+        host=str(ip),
+        port=str(port),  # 8888
         user="jackie",
         password="jackie_password",
         database="ai_generated_text"
@@ -61,7 +61,7 @@ def tunnel_insert(input_data):
     ip = get_tunnel().local_bind_host
     print("tunnel ip: " + str(ip))
     print("tunnel port: " + str(port))
-    conn = get_db_connection(port)
+    conn = get_db_connection(ip, port)
     print("create conn success")
     insert(conn, input_data)
 
