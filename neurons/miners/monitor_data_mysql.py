@@ -32,7 +32,7 @@ def get_tunnel():
                                        ssh_username='root',
                                        ssh_private_key='./fluidstack',
                                        remote_bind_address=('localhost', 8888),
-                                       local_bind_address=('localhost', 8080)
+                                       local_bind_address=('localhost', 7106)
                                        )
     global_tunnel.start()
     return global_tunnel
