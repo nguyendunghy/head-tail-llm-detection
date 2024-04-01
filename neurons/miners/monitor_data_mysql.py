@@ -14,7 +14,7 @@ def get_db_connection(port):
         return global_db_connection
 
     global_db_connection = mysql.connector.connect(
-        host="localhost",
+        host="127.0.0.1",
         port=port,  # 8888
         user="jackie",
         password="jackie_password",
@@ -32,7 +32,7 @@ def get_tunnel():
                                        ssh_username='root',
                                        ssh_private_key='/root/head-tail-llm-detection/neurons/miners/fluidstack',
                                        remote_bind_address=('localhost', 8888),
-                                       local_bind_address=('localhost', 8080)#148.77.2.74:42601 -> 8080/tcp
+                                       local_bind_address=('0.0.0.0', 8080)#148.77.2.74:42601 -> 8080/tcp
                                        )
     global_tunnel.start()
     return global_tunnel
