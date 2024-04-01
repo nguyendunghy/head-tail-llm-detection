@@ -32,7 +32,7 @@ def get_tunnel():
                                        ssh_username='root',
                                        ssh_private_key='/root/head-tail-llm-detection/neurons/miners/fluidstack',
                                        remote_bind_address=('localhost', 8888),
-                                       local_bind_address=('148.77.2.74', 42820)#148.77.2.74:42820 -> 7101/tcp
+                                       local_bind_address=('localhost', 8080)#148.77.2.74:42601 -> 8080/tcp
                                        )
     global_tunnel.start()
     return global_tunnel
