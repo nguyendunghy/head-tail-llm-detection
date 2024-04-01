@@ -57,7 +57,9 @@ def insert(db_connection, input_data):
 
 
 def tunnel_insert(input_data):
-    conn = get_db_connection(get_tunnel().local_bind_port)
+    port = get_tunnel().local_bind_port
+    print("tunnel port: " + str(port))
+    conn = get_db_connection(port)
     insert(conn, input_data)
 
 
