@@ -20,7 +20,7 @@ def insert():
         count_human = data['count_human']
         input_data = (id, text_hash, model_type, count_ai, count_human)
         print(input_data)
-        db_connection = monitor_data_mysql.get_db_connection('localhost', '3306')
+        db_connection = monitor_data_mysql.get_db_connection('localhost', '8888')
         monitor_data_mysql.insert(db_connection, input_data)
 
         return jsonify({"insert success": True, "data": data}), 200
