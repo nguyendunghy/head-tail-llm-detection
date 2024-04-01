@@ -1,21 +1,43 @@
 import time
+import mysql.connector
+from sshtunnel import SSHTunnelForwarder
 
 import mysql.connector
 
-import mysql.connector
-
-# Connect to the database
-db_connection = mysql.connector.connect(
-    host="localhost",
-    port="8888",
-    user="jackie",
-    password="jackie_password",
-    database="ai_generated_text"
-)
+global_tunnel = None
+global_db_connection = None
 
 
-def insert(input_data):
-    # Create a cursor object
+def get_db_connection(port):
+    global global_db_connection
+    if global_db_connection != None:
+        return global_db_connection
+
+    global_db_connection = mysql.connector.connect(
+        host="localhost",
+        port=port,  # 8888
+        user="jackie",
+        password="jackie_password",
+        database="ai_generated_text"
+    )
+    return global_db_connection
+
+
+def get_tunnel():
+    global global_tunnel
+    if global_tunnel != None:
+        return global_tunnel
+
+    global_tunnel = SSHTunnelForwarder(('70.48.87.64', 41264),
+                                       ssh_username='root',
+                                       ssh_private_key='/Users/nannan/.ssh/fluidstack',
+                                       remote_bind_address=('localhost', 8888)
+                                       )
+    global_tunnel.start()
+    return global_tunnel
+
+
+def insert(db_connection, input_data):
     cursor = db_connection.cursor()
 
     # SQL query to insert a record
@@ -30,13 +52,19 @@ def insert(input_data):
 
     # Close the cursor and connection
     cursor.close()
-    db_connection.close()
+    # db_connection.close()
     print(cursor.rowcount, "record inserted.")
 
 
+def tunnel_insert(input_data):
+    conn = get_db_connection(get_tunnel().local_bind_port)
+    insert(conn, input_data)
+
+
 if __name__ == '__main__':
-    start_time = time.time_ns()
-    input_data = [1, 'abcdef', 'standard', 10, 11]
-    insert(input_data)
-    end_time = time.time_ns()
-    print("time processing ", str(end_time-start_time))
+    for i in range(5):
+        start_time = time.time_ns()
+        input_data = [start_time // 1_000_000, 'abcdef', 'standard', 10, 11]
+        tunnel_insert(input_data)
+        end_time = time.time_ns()
+        print("time processing ", str(end_time - start_time))
