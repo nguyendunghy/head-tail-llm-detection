@@ -5,7 +5,7 @@ import time
 
 import requests
 
-URL = 'https://api.gptzero.me/v2/predict/text'
+GPT_ZERO_URL = 'https://api.gptzero.me/v2/predict/text'
 
 
 async def is_ai_generated(document):
@@ -21,7 +21,7 @@ async def is_ai_generated(document):
         'x-api-key': '61b48856c4af45e8b36723b4135254b5'
     }
     start_time = time.time_ns()
-    response = requests.post(URL, json=body, headers=headers)
+    response = requests.post(GPT_ZERO_URL, json=body, headers=headers)
     end_time = time.time_ns()
     print('time call api: ' + str(end_time - start_time) + " nanosecond")
 
