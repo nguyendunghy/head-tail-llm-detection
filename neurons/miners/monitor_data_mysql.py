@@ -10,7 +10,7 @@ global_db_connection = None
 
 def get_db_connection(ip, port):
     global global_db_connection
-    if global_db_connection != None:
+    if global_db_connection is not None and global_db_connection.is_connected():
         return global_db_connection
 
     global_db_connection = mysql.connector.connect(
@@ -25,7 +25,7 @@ def get_db_connection(ip, port):
 
 def get_tunnel():
     global global_tunnel
-    if global_tunnel != None:
+    if global_tunnel is not None:
         return global_tunnel
 
     global_tunnel = SSHTunnelForwarder(('70.48.87.64', 41264),
