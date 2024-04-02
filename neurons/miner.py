@@ -80,7 +80,7 @@ class Miner(BaseMinerNeuron):
         if len(input_data) == 50:
             preds = self.calculate_pred(input_data)
             self.standard_current_model_pred(input_data)
-            self.gpt_zero_api_pred(input_data)
+            # self.gpt_zero_api_pred(input_data)
         else:
             preds = self.standard_model_pred(input_data)
 
