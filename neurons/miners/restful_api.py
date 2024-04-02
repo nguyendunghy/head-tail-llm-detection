@@ -36,9 +36,12 @@ def insert():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-def call_insert(text_hash, model_type, count_ai, count_human):
+def call_insert(text_hash, model_type, count_human, count_ai):
     url = "http://70.48.87.64:41365/insert"
 
+    headers = {
+        'Content-Type': 'application/json'
+    }
     payload = json.dumps({
         "id": None,
         "text_hash": text_hash,
@@ -46,9 +49,6 @@ def call_insert(text_hash, model_type, count_ai, count_human):
         "count_ai": count_ai,
         "count_human": count_human
     })
-    headers = {
-        'Content-Type': 'application/json'
-    }
 
     response = requests.request("POST", url, headers=headers, data=payload)
     if response.status_code == 200:

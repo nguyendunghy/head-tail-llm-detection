@@ -70,7 +70,7 @@ def gen_file(input_data):
     return dir_path
 
 
-def is_ai_generated_files(input_data):
+def is_human_generated_files(input_data):
     dir_path = gen_file(input_data)
     try:
         files = []
@@ -94,13 +94,13 @@ def is_ai_generated_files(input_data):
                 document = data['documents'][i]
                 predicted_class = document['predicted_class']
                 if predicted_class == 'ai':
-                    result_list.append(True)
-                elif predicted_class == 'human':
                     result_list.append(False)
+                elif predicted_class == 'human':
+                    result_list.append(True)
                 else:
                     ai_prob = document['class_probabilities']['ai']
                     human_prob = document['class_probabilities']['human']
-                    result_list.append(float(ai_prob) > float(human_prob))
+                    result_list.append(float(ai_prob) < float(human_prob))
             return result_list
         else:
             print('Failed to post data:status_code', response.status_code)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # document5 = 'African Americans and Latino residents struggled for rights, and local events might have reflected these national movements'
     input_data = [document1, document2, document3]
     start_time = time.time_ns()
-    result = is_ai_generated_files(input_data)
+    result = is_human_generated_files(input_data)
     end_time = time.time_ns()
     print('time call async: ' + str(end_time - start_time) + " nanosecond")
     print("result::" + str(result))
