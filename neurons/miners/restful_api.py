@@ -1,6 +1,8 @@
+import json
 from datetime import datetime
 from flask import Flask, request, jsonify
 import monitor_data_mysql
+import requests
 
 app = Flask(__name__)
 
@@ -34,5 +36,27 @@ def insert():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
+def call_insert(text_hash, model_type, count_ai, count_human):
+    url = "http://70.48.87.64:41365/insert"
+
+    payload = json.dumps({
+        "id": None,
+        "text_hash": text_hash,
+        "model_type": model_type,
+        "count_ai": count_ai,
+        "count_human": count_human
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    if response.status_code == 200:
+        ...
+    else:
+        print('Failed to post data:', response.status_code, response.content)
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8080)
+    # app.run(host='0.0.0.0', debug=True, port=8080)
+    call_insert(text_hash="abcdef", model_type='standard', count_ai=100, count_human=100)

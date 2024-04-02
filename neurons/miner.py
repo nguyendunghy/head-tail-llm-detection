@@ -243,6 +243,7 @@ class Miner(BaseMinerNeuron):
         bt.logging.info(log_prefix + " wrong count_true: " + str(len(pred_list) // 2 - count_true))
 
 
+
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
     with Miner() as miner:
