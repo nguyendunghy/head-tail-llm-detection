@@ -54,7 +54,9 @@ def is_ai_generated_list(doc_list):
         thread_list[i].start()
 
     while result.count(None) > 0:
-        pass
+        print("count: " + str(result.count(None)))
+        time.sleep(0.1)
+
     return result
 
 
