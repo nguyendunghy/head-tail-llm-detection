@@ -1,5 +1,6 @@
 import threading
 import time
+import concurrent.futures
 
 import requests
 
@@ -19,7 +20,7 @@ def is_ai_generated(document):
     }
 
     headers = {
-        'Authorization': 'Bearer UTNYlilT1ZhRpvhdpxIZHJAcF4iDTa5A7y0trPc5f6bd3906',
+        'Authorization': 'Bearer 8IMThzhxEKcq6pQh5moSUUQVIWiI32i3HHZTvz3Zd2e83a0b',
         'Content-Type': 'application/json'
     }
     start_time = time.time_ns()
@@ -60,6 +61,15 @@ def is_ai_generated_list(doc_list):
     return result
 
 
+def is_ai_generated_list_thread_pool(doc_list):
+    with concurrent.futures.ProcessPoolExecutor(max_workers=51) as executor:
+        results = executor.map(is_ai_generated, doc_list)
+        re_list = []
+        for result in results:
+            re_list.append(result)
+        return re_list
+
+
 if __name__ == "__main__":
     doc = ""
     short_doc = ""
@@ -71,9 +81,8 @@ if __name__ == "__main__":
     doc5 = "In terms of the rate of increase, Rice University (ranked 17th) has the highest tuition hike compared to last year, from $57,200 to $62,800, an increase of 9.9%. This is followed by Stanford University (ranked 3rd) and John Hopkins University (ranked 9th), both of which increased by about 5%, to $62,900 and $65,900 a year, respectively."
 
     start_time = time.time_ns()
-    input_data = [doc1, doc2, doc3, doc4, doc5] * 10
-    re = is_ai_generated_list(input_data)
+    input_data = [doc1, doc2, doc3, doc4, doc5] * 1
+    re = is_ai_generated_list_thread_pool(input_data)
     end_time = time.time_ns()
-    print("time processing millisecond: " + str((end_time - start_time)/1_000_000))
+    print("time processing millisecond: " + str((end_time - start_time) / 1_000_000))
     print("result:" + str(re))
-
