@@ -81,7 +81,7 @@ if __name__ == "__main__":
     doc5 = "In terms of the rate of increase, Rice University (ranked 17th) has the highest tuition hike compared to last year, from $57,200 to $62,800, an increase of 9.9%. This is followed by Stanford University (ranked 3rd) and John Hopkins University (ranked 9th), both of which increased by about 5%, to $62,900 and $65,900 a year, respectively."
 
     start_time = time.time_ns()
-    input_data = [doc1, doc2, doc3, doc4, doc5] * 1
+    input_data = [doc1, doc2, doc3, doc4, doc5] * 50
     re = is_ai_generated_list_thread_pool(input_data)
     end_time = time.time_ns()
     print("time processing millisecond: " + str((end_time - start_time) / 1_000_000))
