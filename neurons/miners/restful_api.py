@@ -1,8 +1,8 @@
 import json
 from datetime import datetime
 from flask import Flask, request, jsonify
-import monitor_data_mysql
 import requests
+from neurons.miners.monitor_data_mysql import get_db_connection, insert
 
 app = Flask(__name__)
 
@@ -13,7 +13,7 @@ def hello_world():
 
 
 @app.route('/insert', methods=['POST'])
-def insert():
+def insert_api():
     if request.is_json:
         data = request.get_json()
         id = data['id']
@@ -28,8 +28,8 @@ def insert():
 
         input_data = (id, text_hash, model_type, count_ai, count_human)
         print(input_data)
-        db_connection = monitor_data_mysql.get_db_connection('localhost', '8888')
-        monitor_data_mysql.insert(db_connection, input_data)
+        db_connection = get_db_connection('localhost', '8888')
+        insert(db_connection, input_data)
 
         return jsonify({"insert success": True, "data": data}), 200
     else:
