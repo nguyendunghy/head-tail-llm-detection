@@ -219,7 +219,7 @@ class Miner(BaseMinerNeuron):
                 bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
                 bt.logging.error(e)
             pred_list.append(pred)
-        bt.logging.info('short_text_list: ' + str(input_data) + str(len(input_data)))
+        bt.logging.info('short_text_list: ' + str(short_text_list) + str(len(short_text_list)))
         self.accuracy_monitor(pred_list, 'consider_text_length', input_data)
         return pred_list
 
