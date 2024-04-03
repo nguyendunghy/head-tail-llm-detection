@@ -80,6 +80,7 @@ class Miner(BaseMinerNeuron):
         if len(input_data) == 50:
             preds = self.calculate_pred(input_data)
             self.standard_current_model_pred(input_data)
+            self.consider_text_length(input_data)
             # self.gpt_zero_api_pred(input_data)
         else:
             preds = self.standard_model_pred(input_data)
@@ -199,6 +200,26 @@ class Miner(BaseMinerNeuron):
                 bt.logging.error(e)
             pred_list.append(pred)
 
+        self.accuracy_monitor(pred_list, 'standard_current_model', input_data)
+        return pred_list
+
+    def consider_text_length(self, input_data):
+        pred_list = []
+        short_text_list = []
+        for i in range(len(input_data)):
+            text = input_data[i]
+            try:
+                if len(text) < 250:
+                    short_text_list.append(i)
+                    pred = True
+                else:
+                    pred = self.model(text) > 0.5
+            except Exception as e:
+                pred = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            pred_list.append(pred)
+        bt.logging.info('short_text_list: ', str(input_data), str(len(input_data)))
         self.accuracy_monitor(pred_list, 'standard_current_model', input_data)
         return pred_list
 
