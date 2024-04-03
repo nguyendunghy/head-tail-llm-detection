@@ -191,7 +191,6 @@ def verify_data(file_path):
         db_conn.close()
 
 
-
 if __name__ == '__main__':
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
@@ -200,5 +199,6 @@ if __name__ == '__main__':
     # load(file_path)
     # create_all_table(10_000)
     # truncate_all_table(10_000)
-    verify_data(file_path)
+    # verify_data(file_path)
+    exist(get_db_connection(), 9991, 'ac2104be')
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
