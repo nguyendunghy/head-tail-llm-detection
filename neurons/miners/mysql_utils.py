@@ -128,7 +128,7 @@ def load(file_path):
         for line in file:
             data = json.loads(line)
             list_data.append(data)
-            if count % 100 == 0:
+            if count % 100 == 99:
                 try:
                     thread_name = "thread-" + str(thread_count)
                     tmp_list_data = copy.deepcopy(list_data)
@@ -149,7 +149,8 @@ def load(file_path):
             except Exception as e:
                 bt.logging.error(e)
 
-def load_range(file_path, start_line, end_line):
+
+def load_range_thread(file_path, start_line, end_line):
     with open(file_path, 'r') as file:
         count = 0
         thread_count = 0
@@ -158,7 +159,7 @@ def load_range(file_path, start_line, end_line):
             if start_line <= count < end_line:
                 data = json.loads(line)
                 list_data.append(data)
-                if count % 100 == 0:
+                if count % 100 == 99:
                     try:
                         thread_name = "thread-" + str(thread_count)
                         tmp_list_data = copy.deepcopy(list_data)
@@ -174,10 +175,37 @@ def load_range(file_path, start_line, end_line):
             count += 1
 
     if len(list_data) > 0:
+        try:
+            load_record(list_data, "thread-main")
+        except Exception as e:
+            bt.logging.error(e)
+
+
+def load_range_one_thread(file_path, start_line, end_line):
+    with open(file_path, 'r') as file:
+        count = 0
+        list_data = []
+        for line in file:
+            if start_line <= count < end_line:
+                data = json.loads(line)
+                list_data.append(data)
+                if count % 100 == 99:
+                    try:
+                        load_record(list_data, 'thread-main')
+                    except Exception as e:
+                        bt.logging.error(e)
+                    list_data = []
+
+                bt.logging.info("---> upload line count: " + str(count))
+            count += 1
+
+        if len(list_data) > 0:
             try:
                 load_record(list_data, "thread-main")
             except Exception as e:
                 bt.logging.error(e)
+
+
 def load_record(list_data, thread_name):
     my_conn = get_db_connection()
     for data in list_data:
@@ -251,7 +279,7 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
     if arg1 == 'load':
-        load_range(file_path, int(arg2), int(arg3))
+        load_range_one_thread(file_path, int(arg2), int(arg3))
     elif arg1 == 'verify':
         verify_data(file_path)
     elif arg1 == 'create_all':
@@ -260,6 +288,5 @@ if __name__ == '__main__':
         truncate_all_table(10_000)
     elif arg1 == 'drop_all':
         drop_all_table(10_000)
-
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
