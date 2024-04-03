@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+import sys
 import threading
 import time
 
@@ -213,6 +214,8 @@ def verify_data(file_path):
 
 
 if __name__ == '__main__':
+    arg1 = sys.argv[1]
+
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
@@ -221,6 +224,16 @@ if __name__ == '__main__':
     # create_all_table(10_000)
     # truncate_all_table(10_000)
     # drop_all_table(10_000)
-    verify_data(file_path)
+    if arg1 == 'load':
+        load(file_path)
+    elif arg1 == 'verify':
+        verify_data(file_path)
+    elif arg1 == 'create_all':
+        create_all_table(10_000)
+    elif arg1 == 'truncate_all':
+        truncate_all_table(10_000)
+    elif arg1 == 'drop_all':
+        drop_all_table(10_000)
+
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
