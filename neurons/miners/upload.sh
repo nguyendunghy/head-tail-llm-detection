@@ -1,7 +1,7 @@
-nohup python mysql_utils.py load 0 10000>> load_all.log &
-nohup python mysql_utils.py load 10000 20000 >> load_all.log &
-#nohup python mysql_utils.py load 20000 30000 >> load_all.log &
-#nohup python mysql_utils.py load 30000 40000 >> load_all.log &
+nohup python mysql_utils.py load 0 10000 >> load_all.log &
+#nohup python mysql_utils.py load 10000 20000 >> load_all.log &
+nohup python mysql_utils.py load 20000 30000 >> load_all.log &
+nohup python mysql_utils.py load 30000 40000 >> load_all.log &
 #nohup python mysql_utils.py load 40000 50000 >> load_all.log &
 #nohup python mysql_utils.py load 50000 60000 >> load_all.log &
 #nohup python mysql_utils.py load 60000 70000 >> load_all.log &
