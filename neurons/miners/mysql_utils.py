@@ -10,7 +10,7 @@ import index_data
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="jackie_pool",
-    pool_size=50,
+    pool_size=20,
     pool_reset_session=True,
     host='localhost',
     port='8888',
