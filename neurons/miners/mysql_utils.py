@@ -51,7 +51,6 @@ def create_table(db_connection, db):
         cursor.execute(sql)
         db_connection.commit()
         cursor.close()
-        db_connection.close()
         bt.logging.info("create table_{} success".format(str(db)))
     except Exception as e:
         bt.logging.error(e)
