@@ -176,7 +176,7 @@ def verify_data(file_path):
                     hash_value = hash_code(sha256_hex)
                     db = hash_value % 10_000
                     key = sha256_hex[:8]
-                    re = exist(get_db_connection(), db, key)
+                    re = exist(get_db_connection(), db, [key])
                     list_result.append(re)
                 if list_result.count(False) == 2:
                     bt.logging.info("indexing<==>fail: " + text)
