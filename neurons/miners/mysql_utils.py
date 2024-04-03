@@ -6,7 +6,7 @@ import bittensor as bt
 import mysql.connector
 import mysql.connector.pooling
 
-from neurons.miners import index_data
+import index_data
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="jackie_pool",
