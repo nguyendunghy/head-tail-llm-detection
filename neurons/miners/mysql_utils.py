@@ -149,7 +149,35 @@ def load(file_path):
             except Exception as e:
                 bt.logging.error(e)
 
+def load_range(file_path, start_line, end_line):
+    with open(file_path, 'r') as file:
+        count = 0
+        thread_count = 0
+        list_data = []
+        for line in file:
+            if start_line <= count < end_line:
+                data = json.loads(line)
+                list_data.append(data)
+                if count % 100 == 0:
+                    try:
+                        thread_name = "thread-" + str(thread_count)
+                        tmp_list_data = copy.deepcopy(list_data)
+                        my_thread = threading.Thread(target=load_record,
+                                                     args=(tmp_list_data, thread_name))
+                        my_thread.start()
+                        thread_count += 1
+                    except Exception as e:
+                        bt.logging.error(e)
+                    list_data = []
 
+                bt.logging.info("---> upload line count: " + str(count))
+            count += 1
+
+    if len(list_data) > 0:
+            try:
+                load_record(list_data, "thread-main")
+            except Exception as e:
+                bt.logging.error(e)
 def load_record(list_data, thread_name):
     my_conn = get_db_connection()
     for data in list_data:
@@ -215,13 +243,15 @@ def verify_data(file_path):
 
 if __name__ == '__main__':
     arg1 = sys.argv[1]
+    arg2 = sys.argv[2]
+    arg3 = sys.argv[3]
 
     start_time = time.time_ns()
-    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
     if arg1 == 'load':
-        load(file_path)
+        load_range(file_path, int(arg2), int(arg3))
     elif arg1 == 'verify':
         verify_data(file_path)
     elif arg1 == 'create_all':
