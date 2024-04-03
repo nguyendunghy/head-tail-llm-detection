@@ -9,6 +9,7 @@ import mysql.connector
 import mysql.connector.pooling
 
 import index_data
+from detection.validator.data_augmentation import DataAugmentator
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="jackie_pool",
@@ -24,6 +25,17 @@ connection_pool = mysql.connector.pooling.MySQLConnectionPool(
 
 def get_db_connection():
     return connection_pool.get_connection()
+
+
+def exist(db_connection, db, hash_value):
+    cursor = db_connection.cursor()
+    sql = "select * from table_{} where hash = (%s)".format(str(db))
+
+    cursor.execute(sql, tuple(hash_value))
+    count_result = cursor.fetchone()[0]
+
+    cursor.close()
+    return count_result > 0
 
 
 def insert(db_connection, db, hash_value):
@@ -145,13 +157,40 @@ def hash_code(string) -> int:
     return h
 
 
+def verify_data(file_path):
+    # human_dataset = HumanDataset()
+    augmentator = DataAugmentator()
+    with open(file_path, 'r') as file:
+        for line in file:
+            el = json.loads(line)
+            augs = augmentator(el['text'])
+            text = augs['text']
+            list_token = index_data.cut_head_tail(text)
+            if len(list_token) == 1:
+                bt.logging.info("text too short" + text)
+            else:
+                list_result = []
+                for token in list_token:
+                    m = hashlib.sha256(token.encode('UTF-8'))
+                    sha256_hex = m.hexdigest()
+                    hash_value = hash_code(sha256_hex)
+                    db = hash_value % 10_000
+                    key = sha256_hex[:8]
+                    re = exist(get_db_connection(), db, key)
+                    list_result.append(re)
+                if list_result.count(False) == 2:
+                    bt.logging.info("indexing<==>fail: " + text)
+                else:
+                    bt.logging.info("indexing success")
+
+
 if __name__ == '__main__':
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
-    load(file_path)
+    # load(file_path)
     # create_all_table(10_000)
     # truncate_all_table(10_000)
-    # verify_data(file_path)
+    verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
