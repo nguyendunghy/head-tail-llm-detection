@@ -69,7 +69,7 @@ def truncate_table(db_connection, db):
         cursor.execute(sql)
         db_connection.commit()
         cursor.close()
-        bt.logging.info("create table_{} success".format(str(db)))
+        bt.logging.info("truncate table_{} success".format(str(db)))
     except Exception as e:
         bt.logging.error(e)
     finally:
