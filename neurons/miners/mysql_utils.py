@@ -126,7 +126,7 @@ def load_record(list_data, thread_name):
                 sha256_hex = m.hexdigest()
                 hash_value = hash_code(sha256_hex)
                 db = hash_value % 10_000
-                insert(my_conn, db, sha256_hex[:8])
+                insert(my_conn, db, [sha256_hex[:8]])
                 bt.logging.info(
                     "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
