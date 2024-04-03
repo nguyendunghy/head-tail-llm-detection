@@ -2,6 +2,8 @@ import copy
 import hashlib
 import json
 import threading
+import time
+
 import bittensor as bt
 import mysql.connector
 import mysql.connector.pooling
@@ -10,7 +12,7 @@ import index_data
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="jackie_pool",
-    pool_size=20,
+    pool_size=32,
     pool_reset_session=True,
     host='localhost',
     port='8888',
@@ -58,6 +60,7 @@ def create_table(db_connection, db):
         if 'db_connection' in locals() and db_connection.is_connected():
             db_connection.close()
 
+
 def create_all_table(num_db):
     for i in range(num_db):
         create_table(get_db_connection(), i)
@@ -76,7 +79,7 @@ def load(file_path):
                     thread_name = "thread-" + str(thread_count)
                     tmp_list_data = copy.deepcopy(list_data)
                     my_thread = threading.Thread(target=load_record,
-                                                 args=(get_db_connection(), tmp_list_data, thread_name))
+                                                 args=(tmp_list_data, thread_name))
                     my_thread.start()
                     thread_count += 1
                 except Exception as e:
@@ -88,12 +91,13 @@ def load(file_path):
 
         if len(list_data) > 0:
             try:
-                load_record(get_db_connection(), list_data, "thread-main")
+                load_record(list_data, "thread-main")
             except Exception as e:
                 bt.logging.error(e)
 
 
-def load_record(conn, list_data, thread_name):
+def load_record(list_data, thread_name):
+    my_conn = get_db_connection()
     for data in list_data:
         token_list = index_data.index_data(data)
         for token in token_list:
@@ -102,13 +106,15 @@ def load_record(conn, list_data, thread_name):
                 sha256_hex = m.hexdigest()
                 hash_value = hash_code(sha256_hex)
                 db = hash_value % 10_000
-
+                insert(my_conn, db, sha256_hex[8])
                 bt.logging.info(
                     "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
                 bt.logging.error(e)
-        bt.logging.info("===> upload line to redis success: thread_name: " + thread_name + " : " + str(len(token_list)))
 
+        bt.logging.info("===> upload line to redis success: thread_name: " + thread_name + " : " + str(len(token_list)))
+    if 'my_conn' in locals() and my_conn.is_connected():
+        my_conn.close()
 
 def hash_code(string) -> int:
     h = 0
@@ -119,4 +125,12 @@ def hash_code(string) -> int:
 
 
 if __name__ == '__main__':
-    create_all_table(10_000)
+    start_time = time.time_ns()
+    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
+    load(file_path)
+
+    # verify_data(file_path)
+    bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
+    # create_all_table(10_000)
