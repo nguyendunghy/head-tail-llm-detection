@@ -29,7 +29,7 @@ def get_db_connection():
 
 def exist(db_connection, db, hash_value):
     cursor = db_connection.cursor()
-    sql = "select * from table_{} where hash = (%s)".format(str(db))
+    sql = "select count(*) from table_{} where hash = (%s)".format(str(db))
 
     cursor.execute(sql, tuple(hash_value))
     count_result = cursor.fetchone()[0]
