@@ -2,9 +2,6 @@ import copy
 import hashlib
 import json
 import threading
-import time
-import mysql.connector
-from sshtunnel import SSHTunnelForwarder
 import bittensor as bt
 import mysql.connector
 import mysql.connector.pooling
