@@ -61,9 +61,30 @@ def create_table(db_connection, db):
             db_connection.close()
 
 
+def truncate_table(db_connection, db):
+    try:
+        bt.logging.info("start truncate table_{}".format(str(db)))
+        cursor = db_connection.cursor()
+        sql = "truncate table table_{}".format(str(db))
+        cursor.execute(sql)
+        db_connection.commit()
+        cursor.close()
+        bt.logging.info("create table_{} success".format(str(db)))
+    except Exception as e:
+        bt.logging.error(e)
+    finally:
+        if 'db_connection' in locals() and db_connection.is_connected():
+            db_connection.close()
+
+
 def create_all_table(num_db):
     for i in range(num_db):
         create_table(get_db_connection(), i)
+
+
+def truncate_all_table(num_db):
+    for i in range(num_db):
+        truncate_table(get_db_connection(), i)
 
 
 def load(file_path):
@@ -106,7 +127,7 @@ def load_record(list_data, thread_name):
                 sha256_hex = m.hexdigest()
                 hash_value = hash_code(sha256_hex)
                 db = hash_value % 10_000
-                insert(my_conn, db, sha256_hex[8])
+                insert(my_conn, db, sha256_hex[:8])
                 bt.logging.info(
                     "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
@@ -115,6 +136,7 @@ def load_record(list_data, thread_name):
         bt.logging.info("===> upload line to redis success: thread_name: " + thread_name + " : " + str(len(token_list)))
     if 'my_conn' in locals() and my_conn.is_connected():
         my_conn.close()
+
 
 def hash_code(string) -> int:
     h = 0
@@ -129,8 +151,8 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
-    load(file_path)
-
+    # load(file_path)
+    # create_all_table(10_000)
+    truncate_all_table(10_000)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
-    # create_all_table(10_000)
