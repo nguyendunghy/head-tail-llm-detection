@@ -199,7 +199,6 @@ if __name__ == '__main__':
     # load(file_path)
     # create_all_table(10_000)
     # truncate_all_table(10_000)
-    # verify_data(file_path)
-    e =exist(get_db_connection(), 9991, ['ac2104be'])
-    print(e)
+    verify_data(file_path)
+
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
