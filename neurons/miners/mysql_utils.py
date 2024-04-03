@@ -220,10 +220,6 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
-    # load(file_path)
-    # create_all_table(10_000)
-    # truncate_all_table(10_000)
-    # drop_all_table(10_000)
     if arg1 == 'load':
         load(file_path)
     elif arg1 == 'verify':
