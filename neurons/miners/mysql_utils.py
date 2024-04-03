@@ -53,7 +53,7 @@ def insert(db_connection, db, hash_value):
     # Close the cursor and connection
     cursor.close()
     # db_connection.close()
-    print(cursor.rowcount, "record inserted.")
+    # print(cursor.rowcount, "record inserted.")
 
 
 def create_table(db_connection, db):
@@ -217,10 +217,10 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
-    load(file_path)
+    # load(file_path)
     # create_all_table(10_000)
     # truncate_all_table(10_000)
     # drop_all_table(10_000)
-    # verify_data(file_path)
+    verify_data(file_path)
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
