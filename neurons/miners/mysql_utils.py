@@ -35,7 +35,7 @@ def exist(db_connection, db, hash_value):
     count_result = cursor.fetchone()[0]
 
     cursor.close()
-    return count_result > 0
+    return int(count_result) > 0
 
 
 def insert(db_connection, db, hash_value):
@@ -160,6 +160,7 @@ def hash_code(string) -> int:
 def verify_data(file_path):
     # human_dataset = HumanDataset()
     augmentator = DataAugmentator()
+    db_conn = get_db_connection()
     with open(file_path, 'r') as file:
         for line in file:
             el = json.loads(line)
@@ -170,18 +171,25 @@ def verify_data(file_path):
                 bt.logging.info("text too short" + text)
             else:
                 list_result = []
-                for token in list_token:
-                    m = hashlib.sha256(token.encode('UTF-8'))
-                    sha256_hex = m.hexdigest()
-                    hash_value = hash_code(sha256_hex)
-                    db = hash_value % 10_000
-                    key = sha256_hex[:8]
-                    re = exist(get_db_connection(), db, [key])
-                    list_result.append(re)
-                if list_result.count(False) == 2:
-                    bt.logging.info("indexing<==>fail: " + text)
-                else:
-                    bt.logging.info("indexing success")
+                try:
+                    for token in list_token:
+                        m = hashlib.sha256(token.encode('UTF-8'))
+                        sha256_hex = m.hexdigest()
+                        hash_value = hash_code(sha256_hex)
+                        db = hash_value % 10_000
+                        key = sha256_hex[:8]
+                        re = exist(db_conn, db, [key])
+                        list_result.append(re)
+                    if list_result.count(False) == 2:
+                        bt.logging.info("indexing<==>fail: " + text)
+                    else:
+                        bt.logging.info("indexing success")
+                except Exception as e:
+                    bt.logging.error(e)
+
+    if 'db_conn' in locals() and db_conn.is_connected():
+        db_conn.close()
+
 
 
 if __name__ == '__main__':
