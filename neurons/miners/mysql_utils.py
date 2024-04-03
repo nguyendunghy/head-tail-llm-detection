@@ -29,8 +29,7 @@ def get_db_connection():
 def insert(db_connection, db, hash_value):
     cursor = db_connection.cursor()
 
-    table_name = 'table_' + str(db)
-    sql = "INSERT INTO " + table_name + " (hash) VALUES (%s)"
+    sql = "INSERT INTO table_{} (hash) VALUES (%s)".format(str(db))
     val = tuple(hash_value)
 
     # Execute the query
