@@ -220,7 +220,7 @@ class Miner(BaseMinerNeuron):
                 bt.logging.error(e)
             pred_list.append(pred)
         bt.logging.info('short_text_list: ', str(input_data), str(len(input_data)))
-        self.accuracy_monitor(pred_list, 'standard_current_model', input_data)
+        self.accuracy_monitor(pred_list, 'consider_text_length', input_data)
         return pred_list
 
     def gpt_zero_api_pred(self, input_data):
