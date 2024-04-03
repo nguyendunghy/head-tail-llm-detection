@@ -33,7 +33,7 @@ def exist(db_connection, db, hash_value):
 
     cursor.execute(sql, tuple(hash_value))
     count_result = cursor.fetchone()[0]
-
+    print(count_result)
     cursor.close()
     return int(count_result) > 0
 
