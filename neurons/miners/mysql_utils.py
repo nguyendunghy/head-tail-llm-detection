@@ -218,9 +218,9 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
     # load(file_path)
-    # create_all_table(10_000)
+    create_all_table(10_000)
     # truncate_all_table(10_000)
-    drop_all_table(10_000)
+    # drop_all_table(10_000)
     # verify_data(file_path)
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
