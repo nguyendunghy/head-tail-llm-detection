@@ -3,6 +3,7 @@ from nltk import pos_tag
 
 import random
 import nltk
+
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
@@ -76,3 +77,9 @@ class DataAugmentator:
             res['type'] = 'remove_adj'
         return res
 
+
+if __name__ == '__main__':
+    text = 'In a production environment, you typically use production-grade servers like Gunicorn, uWSGI, or Apache with mod_wsgi to serve your Python application. These servers may support features like graceful reloads or rolling restarts, allowing you to apply code changes without interrupting the service. Consult the documentation of your chosen server for instructions on how to perform graceful reloads.'
+    sentences = sent_tokenize(text)
+    print("sentences length: " + str(len(sentences)))
+    print(sentences)
