@@ -58,5 +58,5 @@ def call_insert(text_hash, model_type, count_human, count_ai):
 
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', debug=True, port=8080)
-    call_insert(text_hash="abcdef", model_type='standard', count_ai=100, count_human=100)
+    app.run(host='0.0.0.0', debug=True, port=8080)
+    # call_insert(text_hash="abcdef", model_type='standard', count_ai=100, count_human=100)
