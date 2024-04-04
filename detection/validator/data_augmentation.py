@@ -1,4 +1,8 @@
+import json
 import random
+import sys
+import time
+
 from nltk import pos_tag
 
 import random
@@ -79,7 +83,14 @@ class DataAugmentator:
 
 
 if __name__ == '__main__':
-    text = 'In a production environment, you typically use production-grade servers like Gunicorn, uWSGI, or Apache with mod_wsgi to serve your Python application. These servers may support features like graceful reloads or rolling restarts, allowing you to apply code changes without interrupting the service. Consult the documentation of your chosen server for instructions on how to perform graceful reloads.'
-    sentences = sent_tokenize(text)
-    print("sentences length: " + str(len(sentences)))
-    print(sentences)
+    start_time = time.time_ns()
+    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
+    with open(file_path, 'r') as file:
+        for line in file:
+            el = json.loads(line)
+            text = el['text']
+            print("origin text: " + str(text))
+            sentences = sent_tokenize(text)
+            print("sentences : " + str(sentences))
