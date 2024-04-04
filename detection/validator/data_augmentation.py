@@ -94,3 +94,4 @@ if __name__ == '__main__':
             print("origin text: " + str(text))
             sentences = sent_tokenize(text)
             print("sentences : " + str(sentences))
+            print("updated sentences: " + str(' '.join(sentences)))
