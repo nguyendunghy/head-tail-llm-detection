@@ -46,7 +46,7 @@ def process_head(words, sentences, current_index):
 
 
 def process_tail(words, sentences, current_index):
-    sub_sentences = sentences[:current_index]
+    sub_sentences = sentences[:current_index+1]
     sub_line = ' '.join(sub_sentences)
     all_sub_word = sub_line.split(' ')
     if len(all_sub_word) < TOKEN_LENGTH:
@@ -107,8 +107,13 @@ def index_data(el):
 
 
 if __name__ == "__main__":
-    text = "nguyen van. Toi dang code thuat toan. Toi muon. Toi muon kiem that nhieu tien. Toi muon nhieu thu!" \
-           " what? I. nothing. mike"
+    text = "Children are priceless. Keeping them safe is vital. With a reverse camera from Sound Investment, this customer can now back out of the driveway with confidence. This high-quality camera installation is completely hard-wired for reliability, and works great in very low-light conditions."
     el = {"text": text}
     ind_lst = index_data(el)
     print(ind_lst)
+
+    verify_text = "Children are priceless. Keeping them safe hs vital. With a reverse camera from Sound Investment, this customer can now back out of the driveway with confidence."
+    cut_list = cut_head_tail(verify_text)
+    print(cut_list)
+
+    print(ind_lst[0] == cut_list[0])
