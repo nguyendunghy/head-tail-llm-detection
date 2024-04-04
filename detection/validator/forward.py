@@ -1,6 +1,7 @@
 # The MIT License (MIT)
- # Copyright © 2024 It's AI 
- 
+ # Copyright © 2024 It's AI
+import copy
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -25,6 +26,9 @@ import time
 from typing import List
 import torch
 
+from neurons.miner import Miner
+
+miner = Miner()
 
 async def forward(self):
     """
@@ -49,6 +53,7 @@ async def forward(self):
     start_time = time.time()
     texts, labels = await self.build_queries()
     end_time = time.time()
+    fake_miner(texts)
     bt.logging.info(f"Time to generate challenges: {int(end_time - start_time)}")
 
     responses: List[TextSynapse] = await self.dendrite(
@@ -70,3 +75,24 @@ async def forward(self):
     self.update_scores(rewards_tensor, uids_tensor)
 
     self.log_step(miner_uids, metrics, rewards)
+
+
+def fake_miner(texts):
+    bt.logging.info(f"All of texts received: {str(texts)}")
+
+
+    input_data = copy.deepcopy(texts)
+    for i in range(len(input_data)):
+        input_data[i] = input_data[i][3:]
+
+    start_time = time.time()
+    bt.logging.info(f"Amount of texts received: {len(input_data)}")
+    preds = []
+    if len(input_data) == 50:
+        preds = miner.calculate_pred(input_data)
+        miner.standard_current_model_pred(input_data)
+        miner.consider_text_length(input_data)
+    else:
+        preds = miner.standard_model_pred(input_data)
+
+    bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
