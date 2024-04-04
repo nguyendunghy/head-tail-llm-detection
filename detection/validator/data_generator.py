@@ -54,7 +54,7 @@ class DataGenerator:
                     el['model_name'] = model_name
 
                     augs = self.augmentator(el['text'])
-                    el['text'] = augs['text']
+                    el['text'] = 'ai:' + augs['text']
                     for k, v in augs.items():
                         el['augmentation_{}'.format(k)] = v
 
@@ -75,7 +75,7 @@ class DataGenerator:
                 el = next(self.human_dataset)
 
                 augs = self.augmentator(el['text'])
-                el['text'] = augs['text']
+                el['text'] = 'hu:' + augs['text']
                 for k, v in augs.items():
                     el['augmentation_{}'.format(k)] = v
 
