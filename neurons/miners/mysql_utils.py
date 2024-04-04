@@ -159,7 +159,7 @@ def load_range_thread(file_path, start_line, end_line):
             if start_line <= count < end_line:
                 data = json.loads(line)
                 list_data.append(data)
-                if count % 100 == 99:
+                if count % 500 == 499:
                     try:
                         thread_name = "thread-" + str(thread_count)
                         tmp_list_data = copy.deepcopy(list_data)

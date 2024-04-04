@@ -107,14 +107,15 @@ def index_data(el):
 
 
 if __name__ == "__main__":
-    text = "Children are priceless. Keeping them safe is vital. With a reverse camera from Sound Investment, this customer can now back out of the driveway with confidence. This high-quality camera installation is completely hard-wired for reliability, and works great in very low-light conditions."
+    text = "Is Your Subaru Ready For Spring?\nSpring will be in full swing in just a few weeks. Are you and your car prepared for the drastic weather change? We’re taking a guess that you have been enjoying the warmer weather lately, and because of this, we want to make sure that your car is prepared for the warmer weather, just like you! In our previous post, we gave you a few things to check under the hood. Today, your Subaru repair experts will be giving you some things to check on the exterior of your car.\nWhen was the last time you check your Subaru’s wiper blades? It’s important (and suggested) to change out your car’s wiper blades before summer hits, which is why we recommend changing them during the spring time months. After a harsh winter involving lots of mag chloride, we’re sure your windshield will appreciate the love.\nInspect your Subaru for any signs of rust. If you notice that your car has chipped paint evolving into rust, make sure you make an appointment with the Subaru repair experts in Denver immediately. If rust spreads to the rest of the body of your car, you could be in for a rude awakening.\nDouble check your car’s tire pressure. Air expands when it’s warm, which means your tires could be over inflated when warmer temperatures arise. Take a look at what your car’s manual says, and either let air out, or put some air in the tires to keep them at a safe level.\nLastly, be sure that you wash all of the road grime from winter off of your car! A clean car is a happy car.\nTo schedule a repair appointment with Denver’s most trusted Subaru experts, contact us online!"
     el = {"text": text}
     ind_lst = index_data(el)
     print(ind_lst)
 
-    verify_text = "Children are priceless. Keeping them safe hs vital. With a reverse camera from Sound Investment, this customer can now back out of the driveway with confidence."
+    verify_text = "It’s important (and suggested) to change out your car’s wikper blades before summer hits, which is why we recommend changing them during the spring time months. After a harsh winter involving lots of mag chloride, we’re sure your windshield will appreciate the love. Inspect your Subaru for any signs of rust. If you notice that your car has chipped paint evolving into rust, make sure you make an appointment with the Subaru repair experts in Denver immediately. If rust spreads to the rest of the body of your car, you could be in for a rude awakening. Double check your car’s tire pressure. Air expands when it’s warm, which means your tires could be over inflated when warmer temperatures arise."
     cut_list = cut_head_tail(verify_text)
     print(cut_list)
 
     print(ind_lst[0] == cut_list[0])
     print(ind_lst[2] == cut_list[1])
+
