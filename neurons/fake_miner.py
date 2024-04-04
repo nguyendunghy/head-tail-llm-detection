@@ -146,3 +146,21 @@ class FakeMiner:
         bt.logging.info('short_text_list: ' + str(short_text_list) + str(len(short_text_list)))
         self.accuracy_monitor(pred_list, 'consider_text_length', input_data)
         return pred_list
+
+    def jackie_current_model_pred(self, input_data):
+        bt.logging.info("start jackie_current_model_pred")
+        prob_list = []
+        for text in input_data:
+            try:
+                pred_prob = self.model(text)
+            except Exception as e:
+                pred_prob = 0
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+            prob_list.append(pred_prob)
+
+        bt.logging.info("jackie_current_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_current_model_pred pred_list: " + str(pred_list))
+        self.accuracy_monitor(pred_list, '50_50_current_model', input_data)
+        return pred_list, prob_list
