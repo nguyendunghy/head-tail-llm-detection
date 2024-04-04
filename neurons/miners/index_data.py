@@ -117,3 +117,4 @@ if __name__ == "__main__":
     print(cut_list)
 
     print(ind_lst[0] == cut_list[0])
+    print(ind_lst[2] == cut_list[1])
