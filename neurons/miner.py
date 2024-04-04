@@ -74,8 +74,8 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
 
         input_data = synapse.texts
-        bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
-
+        bt.logging.info(f"Amount of texts received: {len(input_data)}")
+        bt.logging.info(f"All of texts received: {str(input_data)}")
         preds = []
         if len(input_data) == 50:
             preds = self.calculate_pred(input_data)
