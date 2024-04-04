@@ -245,6 +245,9 @@ def verify_data(file_path):
             el = json.loads(line)
             augs = augmentator(el['text'])
             text = augs['text']
+            if len(text) <= 250:
+                print("human written text")
+                continue
             list_token = index_data.cut_head_tail(text)
             if len(list_token) == 1:
                 bt.logging.info("text too short" + text)
