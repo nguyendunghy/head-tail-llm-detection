@@ -23,14 +23,17 @@ def find_incorrect_human_text(file_path, start_line, end_line):
         for line in file:
             if start_line <= count < end_line:
                 data = json.loads(line)
-                list_sub_sentence = data_aug.get_all_sub_sentences(data['text'])
+                # list_sub_sentence = data_aug.get_all_sub_sentences(data['text'])
+                list_sub_sentence = [data['text']]
                 # bt.logging.info("list sub sentences: " + str(list_sub_sentence))
                 bt.logging.info(
                     "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
                 for i in range(len(list_sub_sentence)):
                     try:
                         res = model(list_sub_sentence[i])
-                        bt.logging.info("process sub-sentence {} of line {}".format(str(i+1),str(count)))
+                        bt.logging.info(
+                            "process sub-sentence {}/{} of line {}".format(str(i + 1), str(len(list_sub_sentence)),
+                                                                           str(count)))
                         if res > 0.5:
                             bt.logging.info("bad human text:" + str(count) + ":" + list_sub_sentence[i])
                     except Exception as e:
