@@ -126,6 +126,7 @@ if __name__ == '__main__':
     file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
     model = PPLModel(device='cpu')
+    model.load_pretrained('neurons/miners/ppl_model.pk')
     model.find_incorrect_human_text(file_path, 0, 10001)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
 
