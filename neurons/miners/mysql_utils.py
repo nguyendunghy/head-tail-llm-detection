@@ -192,12 +192,11 @@ def load_range_one_thread(file_path, start_line, end_line):
 
 
 def load_record(list_data, thread_name, line_count=None):
-    my_conn = None
+    my_conn = get_db_connection()
     for data in list_data:
         token_list = index_data.index_data(data)
         for token in token_list:
             try:
-                my_conn = get_db_connection()
                 m = hashlib.sha256(token.encode('UTF-8'))
                 sha256_hex = m.hexdigest()
                 hash_value = hash_code(sha256_hex)
@@ -207,12 +206,10 @@ def load_record(list_data, thread_name, line_count=None):
                     "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
                 bt.logging.error(e)
-            finally:
-                if my_conn is not None and my_conn.is_connected():
-                    my_conn.close()
         bt.logging.info(
-            "===> upload line {} to mysql success: thread_name: {} token list: {}".format(str(line_count), thread_name,
-                                                                                          str(len(token_list))))
+            "===> upload line {} to mysql success: thread_name: {} token list: {}".format(str(line_count), thread_name,str(len(token_list))))
+    if 'my_conn' in locals() and my_conn.is_connected():
+        my_conn.close()
 
 
 def hash_code(string) -> int:
