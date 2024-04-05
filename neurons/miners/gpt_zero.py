@@ -106,6 +106,7 @@ class PPLModel:
                 if start_line <= count < end_line:
                     data = json.loads(line)
                     list_sub_sentence = data_aug.get_all_sub_sentences(data['text'])
+                    bt.logging.info("list sub sentences: " + str(list_sub_sentence))
                     bt.logging.info(
                         "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
                     for sub_sentence in list_sub_sentence:
