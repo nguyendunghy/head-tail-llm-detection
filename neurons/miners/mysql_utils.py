@@ -284,7 +284,7 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
     if arg1 == 'load':
-        load_range_thread(file_path, int(arg2), int(arg3))
+        load_range_one_thread(file_path, int(arg2), int(arg3))
     elif arg1 == 'verify':
         verify_data(file_path)
     elif arg1 == 'create_all':
