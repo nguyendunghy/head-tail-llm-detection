@@ -50,8 +50,8 @@ if __name__ == '__main__':
     # print(res)
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
 
     find_incorrect_human_text(file_path, 0, 10001)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
