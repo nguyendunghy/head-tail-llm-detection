@@ -9,8 +9,8 @@ import bittensor as bt
 import mysql.connector
 import mysql.connector.pooling
 
-import index_data
 from detection.validator.data_augmentation import DataAugmentator
+from neurons.miners import index_data
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="jackie_pool",
