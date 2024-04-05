@@ -23,9 +23,9 @@ def find_incorrect_human_text(file_path, start_line, end_line):
         for line in file:
             if start_line <= count < end_line:
                 data = json.loads(line)
-                # list_sub_sentence = data_aug.get_all_sub_sentences(data['text'])
-                list_sub_sentence = [data['text']]
-                # bt.logging.info("list sub sentences: " + str(list_sub_sentence))
+                list_sub_sentence = data_aug.get_all_sub_sentences(data['text'])
+                # list_sub_sentence = [data['text']]
+                bt.logging.info("list sub sentences: " + str(list_sub_sentence))
                 bt.logging.info(
                     "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
                 for i in range(len(list_sub_sentence)):
@@ -50,8 +50,8 @@ if __name__ == '__main__':
     # print(res)
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
 
     find_incorrect_human_text(file_path, 0, 10001)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
