@@ -111,7 +111,7 @@ class PPLModel:
                         "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
                     for sub_sentence in list_sub_sentence:
                         try:
-                            res = self.model(sub_sentence)
+                            res = self.__call__(sub_sentence)
                             if res > 0.5:
                                 bt.logging.info(str(count) + ":" + sub_sentence)
                         except Exception as e:
