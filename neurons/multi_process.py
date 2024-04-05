@@ -4,10 +4,13 @@ import math
 import time
 from concurrent.futures import ProcessPoolExecutor
 
+from neurons.miners.mysql_utils import load_range_one_thread
+
 
 # define a cpu-intensive task
 def task(arg):
-    return sum([math.sqrt(i) for i in range(1, arg)])
+    file_path = '/root/c4_dataset/head-10000-00001.json'
+    load_range_one_thread(file_path, arg * 1000, arg * 1000 + 1000)
 
 
 # protect the entry point
@@ -28,9 +31,9 @@ def multi_cpu():
     # report a message
     print('Starting task...')
     # create the process pool
-    with ProcessPoolExecutor(8) as exe:
+    with ProcessPoolExecutor(12) as exe:
         # perform calculations
-        results = exe.map(task, range(1, 50000))
+        results = exe.map(task, range(0, 10))
     # report a message
     print('Done.')
 
@@ -39,4 +42,4 @@ if __name__ == '__main__':
     start = time.time_ns()
     multi_cpu()
     end = time.time_ns()
-    print('time processing {}'.format(str((end-start)/1000_000)))
+    print('time processing {}'.format(str((end - start) / 1000_000)))
