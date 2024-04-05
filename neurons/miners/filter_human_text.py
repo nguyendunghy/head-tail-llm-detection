@@ -36,7 +36,7 @@ def find_incorrect_human_text(file_path, start_line, end_line):
                                                                            str(count)))
                         if res > 0.5:
                             bt.logging.info("bad human text:" + str(count))
-                            continue
+                            break
                     except Exception as e:
                         bt.logging.error(e)
             count += 1
