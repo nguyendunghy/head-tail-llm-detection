@@ -16,7 +16,7 @@ def find_incorrect_human_text(file_path, start_line, end_line):
     :return:
     """
     data_aug = DataAugmentator()
-    model = PPLModel(device='cpu')
+    model = PPLModel(device='cuda:0')
     model.load_pretrained('neurons/miners/ppl_model.pk')
     with open(file_path, 'r') as file:
         count = 1
@@ -27,11 +27,12 @@ def find_incorrect_human_text(file_path, start_line, end_line):
                 bt.logging.info("list sub sentences: " + str(list_sub_sentence))
                 bt.logging.info(
                     "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
-                for sub_sentence in list_sub_sentence:
+                for i in range(len(list_sub_sentence)):
                     try:
-                        res = model(sub_sentence)
+                        res = model(list_sub_sentence[i])
+                        bt.logging.info("process sub-sentence {} of line {}".format(str(i+1),str(count)))
                         if res > 0.5:
-                            bt.logging.info(str(count) + ":" + sub_sentence)
+                            bt.logging.info("bad human text:" + str(count) + ":" + list_sub_sentence[i])
                     except Exception as e:
                         bt.logging.error(e)
             count += 1
