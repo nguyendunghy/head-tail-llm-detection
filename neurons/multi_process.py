@@ -1,6 +1,7 @@
 # SuperFastPython.com
 # example of a program that does not use all cpu cores
 import math
+import time
 
 
 # define a cpu-intensive task
@@ -10,6 +11,7 @@ def task(arg):
 
 # protect the entry point
 if __name__ == '__main__':
+    start = time.time_ns()
     # report a message
     print('Starting task...')
     # perform calculations
@@ -17,3 +19,5 @@ if __name__ == '__main__':
     # report a message
     print(results)
     print('Done.')
+    end = time.time_ns()
+    print("time processing: {}".format(str((end - start)//1000_000)))
