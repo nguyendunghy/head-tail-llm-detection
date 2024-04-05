@@ -35,7 +35,8 @@ def find_incorrect_human_text(file_path, start_line, end_line):
                             "process sub-sentence {}/{} of line {}".format(str(i + 1), str(len(list_sub_sentence)),
                                                                            str(count)))
                         if res > 0.5:
-                            bt.logging.info("bad human text:" + str(count) + ":" + list_sub_sentence[i])
+                            bt.logging.info("bad human text:" + str(count))
+                            continue
                     except Exception as e:
                         bt.logging.error(e)
             count += 1
