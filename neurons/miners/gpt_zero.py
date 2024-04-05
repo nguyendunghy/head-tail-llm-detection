@@ -110,9 +110,12 @@ class PPLModel:
                     bt.logging.info(
                         "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
                     for sub_sentence in list_sub_sentence:
-                        res = self.model(sub_sentence)
-                        if res > 0.5:
-                            bt.logging.info(str(count) + ":" + sub_sentence)
+                        try:
+                            res = self.model(sub_sentence)
+                            if res > 0.5:
+                                bt.logging.info(str(count) + ":" + sub_sentence)
+                        except Exception as e:
+                            bt.logging.error(e)
                 count += 1
 
 
@@ -130,5 +133,3 @@ if __name__ == '__main__':
     model.load_pretrained('neurons/miners/ppl_model.pk')
     model.find_incorrect_human_text(file_path, 0, 10001)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
-
-
