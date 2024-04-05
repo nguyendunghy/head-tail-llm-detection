@@ -222,7 +222,7 @@ def load_record(list_data, thread_name):
             except Exception as e:
                 bt.logging.error(e)
 
-        bt.logging.info("===> upload line to redis success: thread_name: " + thread_name + " : " + str(len(token_list)))
+        bt.logging.info("===> upload line to mysql success: thread_name: " + thread_name + " : " + str(len(token_list)))
     if 'my_conn' in locals() and my_conn.is_connected():
         my_conn.close()
 

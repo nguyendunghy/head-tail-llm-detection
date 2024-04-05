@@ -70,6 +70,15 @@ class DataAugmentator:
         ind = random.randint(0, len(sentences) - cnt)
         return {'text': ' '.join(sentences[ind:ind + cnt]), 'subtype': '{}_sentences'.format(cnt)}
 
+    def get_all_sub_sentences(self, text, min_sentence=3, max_sentence=10):
+        sentences = sent_tokenize(text)
+        if len(sentences) <= min_sentence:
+            return [' '.join(sentences)]
+        all_sub_sentences = []
+        for i in range(len(sentences) - 2):
+            for j in range(i + 3, min(i + max_sentence, len(sentences)) + 1):
+                all_sub_sentences.append(' '.join(sentences[i:j]))
+        return all_sub_sentences
     def __call__(self, text):
         text = self.subsample_sentences(text)['text']
 
@@ -87,11 +96,12 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
+    data_aug = DataAugmentator()
     with open(file_path, 'r') as file:
         for line in file:
             el = json.loads(line)
             text = el['text']
-            print("origin text: " + str(text))
-            sentences = sent_tokenize(text)
-            print("sentences : " + str(sentences))
-            print("updated sentences: " + str(' '.join(sentences)))
+            # print("origin text: " + str(text))
+            list_sub_sentence = data_aug.get_all_sub_sentences(text)
+
+

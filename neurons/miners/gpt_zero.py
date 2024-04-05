@@ -1,3 +1,6 @@
+import json
+import time
+
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from sklearn.linear_model import LogisticRegression
@@ -5,6 +8,8 @@ from tqdm import tqdm
 import pickle
 import numpy as np
 import bittensor as bt
+
+from detection.validator.data_augmentation import DataAugmentator
 
 
 class PPLModel:
@@ -14,7 +19,7 @@ class PPLModel:
         self.model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True).to(device)
         self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 
-        self.max_length = 512 #self.model.config.n_positions
+        self.max_length = 512  # self.model.config.n_positions
         self.stride = 512
         self.logreg = LogisticRegression(class_weight='balanced')
 
@@ -85,10 +90,43 @@ class PPLModel:
         ppl = int(torch.exp(torch.stack(nlls).sum() / end_loc))
         return ppl
 
+    def find_incorrect_human_text(self, file_path, start_line, end_line):
+        """
+        human writen text has model(text) < 0.5. In this function, we will find al sub-sentence that has mode(text)>0.5
+        even it's human written text
+        :param file_path:
+        :param start_line:
+        :param end_line:
+        :return:
+        """
+        data_aug = DataAugmentator()
+        with open(file_path, 'r') as file:
+            count = 1
+            for line in file:
+                if start_line <= count < end_line:
+                    text = json.loads(line)
+                    list_sub_sentence = data_aug.get_all_sub_sentences(text)
+                    bt.logging.info(
+                        "text in line {} has {} sub-sentences".format(str(count), str(len(list_sub_sentence))))
+                    for sub_sentence in list_sub_sentence:
+                        res = self.model(sub_sentence)
+                        if res > 0.5:
+                            bt.logging.info(str(count) + ":" + sub_sentence)
+                count += 1
+
 
 if __name__ == '__main__':
+    # model = PPLModel(device='cpu')
+    # model.load_pretrained('neurons/miners/ppl_model.pk')
+    # text = 'Hello world, i am here'
+    # res = model(text)
+    # print(res)
+    start_time = time.time_ns()
+    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+    file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+    # file_path = "/root/c4_dataset/c4/extracted_file/head-10000-00001.json"
     model = PPLModel(device='cpu')
-    model.load_pretrained('neurons/miners/ppl_model.pk')
-    text = 'Hello world, i am here'
-    res = model(text)
-    print(res)
+    model.find_incorrect_human_text(file_path)
+    bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
+
+
