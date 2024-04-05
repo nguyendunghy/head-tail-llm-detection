@@ -184,34 +184,20 @@ def load_range_thread(file_path, start_line, end_line):
 def load_range_one_thread(file_path, start_line, end_line):
     with open(file_path, 'r') as file:
         count = 0
-        list_data = []
         for line in file:
             if start_line <= count < end_line:
                 data = json.loads(line)
-                list_data.append(data)
-                if count % 100 == 99:
-                    try:
-                        load_record(list_data, 'thread-main')
-                    except Exception as e:
-                        bt.logging.error(e)
-                    list_data = []
-
-                bt.logging.info("---> upload line count: " + str(count))
+                load_record([data], 'thread-main', count+1)
             count += 1
 
-        if len(list_data) > 0:
-            try:
-                load_record(list_data, "thread-main")
-            except Exception as e:
-                bt.logging.error(e)
 
-
-def load_record(list_data, thread_name):
-    my_conn = get_db_connection()
+def load_record(list_data, thread_name, line_count=None):
+    my_conn = None
     for data in list_data:
         token_list = index_data.index_data(data)
         for token in token_list:
             try:
+                my_conn = get_db_connection()
                 m = hashlib.sha256(token.encode('UTF-8'))
                 sha256_hex = m.hexdigest()
                 hash_value = hash_code(sha256_hex)
@@ -221,10 +207,12 @@ def load_record(list_data, thread_name):
                     "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
                 bt.logging.error(e)
-
-        bt.logging.info("===> upload line to mysql success: thread_name: " + thread_name + " : " + str(len(token_list)))
-    if 'my_conn' in locals() and my_conn.is_connected():
-        my_conn.close()
+            finally:
+                if my_conn is not None and my_conn.is_connected():
+                    my_conn.close()
+        bt.logging.info(
+            "===> upload line {} to mysql success: thread_name: {} token list: {}".format(str(line_count), thread_name,
+                                                                                          str(len(token_list))))
 
 
 def hash_code(string) -> int:
