@@ -309,7 +309,7 @@ def scan_all_file_insert_data(des_dir_path='/root/test_data/', processed_dir_pat
         try:
             file_names = [file.name for file in directory.iterdir() if file.is_file()]
             if len(file_names) == 0:
-                if count % 1000 == 0:
+                if count % 10000 == 0:
                     count = 0
                     bt.logging.info("No file to process")
                 count += 1
