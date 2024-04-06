@@ -205,7 +205,7 @@ def load_record(list_data, thread_name, line_count=None):
                 bt.logging.info(
                     "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
             except Exception as e:
-                bt.logging.error(e)
+                bt.logging.error(e.with_traceback())
         bt.logging.info(
             "===> upload line {} to mysql success: thread_name: {} token list: {}".format(str(line_count), thread_name,str(len(token_list))))
     if 'my_conn' in locals() and my_conn.is_connected():
