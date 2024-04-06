@@ -32,7 +32,7 @@ def multi_cpu():
     # report a message
     print('Starting task...')
     # create the process pool
-    with ProcessPoolExecutor(12) as exe:
+    with ProcessPoolExecutor(8) as exe:
         # perform calculations
         results = exe.map(task, range(0, 10))
     # report a message
