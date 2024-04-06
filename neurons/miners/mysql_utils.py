@@ -304,11 +304,15 @@ def verify_data(file_path):
 
 def scan_all_file_insert_data(des_dir_path='/root/test_data/', processed_dir_path='/root/test_data/processed'):
     directory = Path(des_dir_path)
+    count = 0
     while True:
         try:
             file_names = [file.name for file in directory.iterdir() if file.is_file()]
             if len(file_names) == 0:
-                bt.logging.info("No file to process")
+                if count % 1000 == 0:
+                    count = 0
+                    bt.logging.info("No file to process")
+                count += 1
                 continue
 
             for f_name in file_names:

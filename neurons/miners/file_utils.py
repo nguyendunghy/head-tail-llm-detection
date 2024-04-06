@@ -5,7 +5,7 @@ import random
 import threading
 import time
 import traceback
-
+from concurrent.futures import ProcessPoolExecutor
 import bittensor as bt
 
 from neurons.miners import index_data
@@ -22,7 +22,7 @@ def save(db, token):
     else:
         token_list = ALL_TOKEN[db]
         token_list.append(token)
-        if len(token_list) >= 100:
+        if len(token_list) >= 1000:
             save_by_thread(db, token_list)
             token_list.clear()
         return True
@@ -115,11 +115,23 @@ def load_range_one_thread(file_path, start_line, end_line):
     flush(ALL_TOKEN)
 
 
+def load_range_process(arg):
+    file_path = "/root/c4_dataset/c4-train.00001-of-01024.json"
+    load_range_one_thread(file_path, arg * 36_000, arg * 36_000 + 36_000)
+
+
+def load_range_multi_process():
+    bt.logging.info('Starting task...')
+    with ProcessPoolExecutor(10) as exe:
+        results = exe.map(load_range_process, range(0, 10))
+    bt.logging.info('Done.')
+
+
 if __name__ == '__main__':
     start_time = time.time_ns()
     file_path = "/root/c4_dataset/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/head-1000-00001.json"
     # file_path = "/root/c4_dataset/head-10000-00001.json"
-    load_range_one_thread(file_path, 0, 1000_000)
+    load_range_multi_process()
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")
