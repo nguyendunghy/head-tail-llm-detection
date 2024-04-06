@@ -42,6 +42,21 @@ def exist(db_connection, db, hash_value):
     return int(count_result) > 0
 
 
+def count_all(num_db=10_000):
+    db_connection = get_db_connection()
+    total = 0
+    cursor = db_connection.cursor()
+    for db in range(num_db):
+        sql = "select count(*) from table_{}".format(str(db))
+        cursor.execute(sql)
+        count_result = cursor.fetchone()[0]
+        bt.logging.info("count db {} has {} record".format(str(db), str(count_result)))
+        total += count_result
+    cursor.close()
+    db_connection.close()
+    bt.logging.info("total record in database: " + str(total))
+
+
 def insert(db_connection, db, hash_value):
     cursor = db_connection.cursor()
 
@@ -348,5 +363,7 @@ if __name__ == '__main__':
         insert_from_file('/root/test_data/flush_1712394114153152150_775.txt')
     elif arg1 == 'scan':
         scan_all_file_insert_data()
+    elif arg1 == 'count_all':
+        count_all()
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")
