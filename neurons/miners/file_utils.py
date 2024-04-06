@@ -9,10 +9,9 @@ import traceback
 import bittensor as bt
 
 from neurons.miners import index_data
-from neurons.miners.mysql_utils import hash_code
 
 NUM_DB = 10_000
-ALL_TOKEN = [[]] * NUM_DB
+ALL_TOKEN = [[] for i in range(NUM_DB)]
 DIR_PATH = '/root/test_data/'
 
 
@@ -36,7 +35,7 @@ def flush(all_token):
         for i in range(len(all_token)):
             if len(all_token[i]) > 0:
                 data = str(i) + ',' + ','.join(all_token[i])
-                file.write(data)
+                print(data, file=file)
     all_token.clear()
 
 
@@ -77,6 +76,14 @@ def db_to_str(db):
         return str(db)
 
 
+def hash_code(string) -> int:
+    h = 0
+    if len(string) > 0:
+        for i in range(0, len(string)):
+            h = 31 * h + ord(string[i])
+    return h
+
+
 def load_record(list_data, thread_name, line_count=None):
     for data in list_data:
         token_list = index_data.index_data(data)
@@ -105,7 +112,7 @@ def load_range_one_thread(file_path, start_line, end_line):
                 data = json.loads(line)
                 load_record([data], 'thread-main', count + 1)
             count += 1
-        flush(ALL_TOKEN)
+    flush(ALL_TOKEN)
 
 
 if __name__ == '__main__':
@@ -114,4 +121,7 @@ if __name__ == '__main__':
     file_path = "/root/c4_dataset/head-1000-00001.json"
     # file_path = "/root/c4_dataset/head-10000-00001.json"
     load_range_one_thread(file_path, 0, 1000)
+    # a = [['abc', 'def'], ['123']]
+    # flush(a)
+
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")
