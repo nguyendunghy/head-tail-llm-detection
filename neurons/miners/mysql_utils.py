@@ -101,7 +101,8 @@ def insert_from_file(file_path):
         for line in file:
             try:
                 ele_list = line.split(',')
-                db = int(ele_list[0])
+                # db = int(ele_list[0])
+                db = 10_000
                 data_list = ele_list[1:]
                 db_conn = get_db_connection()
                 insert_batch(db_conn, db, data_list)
@@ -360,7 +361,7 @@ if __name__ == '__main__':
     elif arg1 == 'drop_all':
         drop_all_table(10_000)
     elif arg1 == 'insert_file':
-        insert_from_file('/root/test_data/flush_1712394114153152150_775.txt')
+        insert_from_file(arg2)
     elif arg1 == 'scan':
         scan_all_file_insert_data()
     elif arg1 == 'count_all':
