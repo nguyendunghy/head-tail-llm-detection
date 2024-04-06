@@ -11,7 +11,7 @@ from neurons.miners.mysql_utils import load_range_one_thread
 def task(arg):
     print('start task: ' + str(arg))
     file_path = '/root/c4_dataset/head-10000-00001.json'
-    load_range_one_thread(file_path, arg * 1000, arg * 1000 + 1000)
+    load_range_one_thread(file_path, arg * 1250, arg * 1250 + 1250)
 
 
 # protect the entry point
@@ -34,7 +34,7 @@ def multi_cpu():
     # create the process pool
     with ProcessPoolExecutor(12) as exe:
         # perform calculations
-        results = exe.map(task, range(0, 10))
+        results = exe.map(task, range(0, 8))
     # report a message
     print('Done.')
 
