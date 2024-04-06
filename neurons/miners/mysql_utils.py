@@ -65,10 +65,10 @@ def insert_batch(db_connection, db, list_value):
     postfix_sql = '(%s),' * len(list_value)
     sql = prefix_sql + postfix_sql[:len(postfix_sql) - 1]
 
-    val = (value for value in list_value)
+    val = [tuple(value) for value in list_value]
 
     # Execute the query
-    cursor.execute(sql, val)
+    cursor.executemany(sql, val)
 
     # Commit to the database
     db_connection.commit()
