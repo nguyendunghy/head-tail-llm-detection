@@ -22,7 +22,7 @@ def save(db, token):
     else:
         token_list = ALL_TOKEN[db]
         token_list.append(token)
-        if len(token_list) >= 100:
+        if len(token_list) >= 1000:
             save_by_thread(db, token_list)
             token_list.clear()
         return True
