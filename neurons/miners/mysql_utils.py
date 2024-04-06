@@ -61,9 +61,9 @@ def insert(db_connection, db, hash_value):
 def insert_batch(db_connection, db, list_value):
     cursor = db_connection.cursor()
 
-    prefix_sql = "INSERT INTO table_{} (hash) VALUES ".format(str(db))
-    postfix_sql = '(%s),' * len(list_value)
-    sql = prefix_sql + postfix_sql[:len(postfix_sql) - 1]
+    sql = "INSERT INTO table_{} (hash) VALUES (%s)".format(str(db))
+    # postfix_sql = '(%s),' * len(list_value)
+    # sql = prefix_sql + postfix_sql[:len(postfix_sql) - 1]
 
     val = [tuple(value) for value in list_value]
 
