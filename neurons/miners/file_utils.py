@@ -22,7 +22,7 @@ def save(db, token):
     else:
         token_list = ALL_TOKEN[db]
         token_list.append(token)
-        if len(token_list) > 100:
+        if len(token_list) > 2:
             save_by_thread(db, token_list)
             token_list.clear()
         return True
@@ -120,8 +120,13 @@ if __name__ == '__main__':
     # file_path = "/root/c4_dataset/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/head-1000-00001.json"
     file_path = "/root/c4_dataset/head-10000-00001.json"
-    load_range_one_thread(file_path, 0, 10000)
+    # load_range_one_thread(file_path, 0, 10000)
     # a = [['abc', 'def'], ['123']]
     # flush(a)
+    save(1,'abc')
+    save(2,'def')
+    save(3,'mnp')
+    save(1,'xyz')
+    save(1,'ysz')
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")

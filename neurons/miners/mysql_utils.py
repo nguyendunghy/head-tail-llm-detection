@@ -1,10 +1,12 @@
 import copy
 import hashlib
 import json
+import shutil
 import sys
 import threading
 import time
 import traceback
+from pathlib import Path
 
 import bittensor as bt
 import mysql.connector
@@ -94,6 +96,7 @@ def insert_from_file(file_path):
             finally:
                 if 'db_conn' in locals() and db_conn.is_connected():
                     db_conn.close()
+
 
 def create_table(db_connection, db):
     try:
@@ -299,6 +302,26 @@ def verify_data(file_path):
         db_conn.close()
 
 
+def scan_all_file_insert_data(des_dir_path='/root/test_data/', processed_dir_path='/root/test_data/processed'):
+    directory = Path(des_dir_path)
+    while True:
+        try:
+            file_names = [file.name for file in directory.iterdir() if file.is_file()]
+            if len(file_names) == 0:
+                bt.logging.info("No file to process")
+                continue
+
+            for f_name in file_names:
+                f_path = des_dir_path + f_name
+                insert_from_file(f_path)
+                shutil.move(f_path, processed_dir_path)
+
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+
+
+
 if __name__ == '__main__':
     arg1 = sys.argv[1]
     arg2 = sys.argv[2]
@@ -320,5 +343,7 @@ if __name__ == '__main__':
         drop_all_table(10_000)
     elif arg1 == 'insert_file':
         insert_from_file('/root/test_data/flush_1712394114153152150_775.txt')
+    elif arg1 == 'scan':
+        scan_all_file_insert_data()
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")
