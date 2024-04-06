@@ -321,7 +321,6 @@ def scan_all_file_insert_data(des_dir_path='/root/test_data/', processed_dir_pat
             traceback.print_exc()
 
 
-
 if __name__ == '__main__':
     arg1 = sys.argv[1]
     arg2 = sys.argv[2]
