@@ -58,6 +58,43 @@ def insert(db_connection, db, hash_value):
     # print(cursor.rowcount, "record inserted.")
 
 
+def insert_batch(db_connection, db, list_value):
+    cursor = db_connection.cursor()
+
+    prefix_sql = "INSERT INTO table_{} (hash) VALUES ".format(str(db))
+    postfix_sql = '(%s),' * len(list_value)
+    sql = prefix_sql + postfix_sql[:len(postfix_sql) - 1]
+
+    val = (value for value in list_value)
+
+    # Execute the query
+    cursor.execute(sql, val)
+
+    # Commit to the database
+    db_connection.commit()
+
+    # Close the cursor and connection
+    cursor.close()
+    # db_connection.close()
+    bt.logging.info("record inserted: {}".format(str(cursor.rowcount)))
+
+
+def insert_from_file(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            try:
+                ele_list = line.split(',')
+                db = int(ele_list[0])
+                data_list = ele_list[1:]
+                db_conn = get_db_connection()
+                insert_batch(db_conn, db, data_list)
+            except Exception as ex:
+                bt.logging.error(ex)
+                traceback.print_exc()
+            finally:
+                if 'db_conn' in locals() and db_conn.is_connected():
+                    db_conn.close()
+
 def create_table(db_connection, db):
     try:
         bt.logging.info("start create table_{}".format(str(db)))
@@ -188,7 +225,7 @@ def load_range_one_thread(file_path, start_line, end_line):
         for line in file:
             if start_line <= count < end_line:
                 data = json.loads(line)
-                load_record([data], 'thread-main', count+1)
+                load_record([data], 'thread-main', count + 1)
             count += 1
 
 
@@ -209,7 +246,8 @@ def load_record(list_data, thread_name, line_count=None):
                 bt.logging.error(e)
                 traceback.print_exc()
         bt.logging.info(
-            "===> upload line {} to mysql success: thread_name: {} token list: {}".format(str(line_count), thread_name,str(len(token_list))))
+            "===> upload line {} to mysql success: thread_name: {} token list: {}".format(str(line_count), thread_name,
+                                                                                          str(len(token_list))))
     if 'my_conn' in locals() and my_conn.is_connected():
         my_conn.close()
 
@@ -280,5 +318,7 @@ if __name__ == '__main__':
         truncate_all_table(10_000)
     elif arg1 == 'drop_all':
         drop_all_table(10_000)
+    elif arg1 == 'insert_file':
+        insert_from_file('/root/test_data/flush_1712391506932374875_466.txt')
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
