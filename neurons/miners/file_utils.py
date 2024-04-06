@@ -29,7 +29,6 @@ def save(db, token):
 
 
 def flush(all_token):
-    print(all_token)
     file_name = 'flush_' + str(time.time_ns()) + '_' + str(random.randint(100, 1000)) + '.txt'
     file_path = DIR_PATH + file_name
     with open(file_path, 'w') as file:
