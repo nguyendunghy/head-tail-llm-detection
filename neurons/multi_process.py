@@ -11,7 +11,7 @@ from neurons.miners.mysql_utils import load_range_one_thread
 def task(arg):
     print('start task: ' + str(arg))
     file_path = '/root/c4_dataset/head-10000-00001.json'
-    load_range_one_thread(file_path, arg * 100, arg * 100 + 100)
+    load_range_one_thread(file_path, arg * 1000, arg * 1000 + 1000)
 
 
 # protect the entry point
