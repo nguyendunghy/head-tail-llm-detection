@@ -70,6 +70,10 @@ class DataAugmentator:
         ind = random.randint(0, len(sentences) - cnt)
         return {'text': ' '.join(sentences[ind:ind + cnt]), 'subtype': '{}_sentences'.format(cnt)}
 
+    def get_all_sentences(self,text):
+        sentences = sent_tokenize(text)
+        return sentences
+
     def get_all_sub_sentences(self, text, min_sentence=3, max_sentence=10):
         sentences = sent_tokenize(text)
         if len(sentences) <= min_sentence:

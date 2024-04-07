@@ -294,7 +294,7 @@ def verify_data(file_path):
                 continue
             list_token = index_data.cut_head_tail(text)
             if len(list_token) == 1:
-                bt.logging.info("text too short" + text)
+                bt.logging.info("text too short:" + text)
             else:
                 list_result = []
                 try:

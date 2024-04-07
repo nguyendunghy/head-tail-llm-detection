@@ -1,10 +1,4 @@
-import nltk
-
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-
-from nltk.tokenize import sent_tokenize
-
+from detection.validator.data_augmentation import DataAugmentator
 TOKEN_LENGTH = 10
 TOO_SHORT_TEXT = "TOO_SHORT_TEXT"
 
@@ -77,7 +71,8 @@ def cut_head_tail(text):
 def index_data(el):
     text = el['text']
     indexing_list = []
-    sentences = sent_tokenize(text)
+    data_aug = DataAugmentator()
+    sentences = data_aug.get_all_sentences(text)
     if len(sentences) < 4:
         line = ' '.join(sentences)
         words = line.split(' ')
@@ -107,15 +102,14 @@ def index_data(el):
 
 
 if __name__ == "__main__":
-    text = "If you follow me on my other blog, SeeSaw (it's >HERE< ) you've seen me introduce a host of new products over the 10 years I've been blogging and running shops. Some products sold well. Others didn't. Running a business is always a process. Or, as the trendies say now, a \"journey.\"\nNow I'm introducing mugs. I found a wonderful printer in the US that manufactures and drop ships. That's great for me, because the last thing I want is shelves full of inventory and trips to the post office. That was fine when I was younger, but now...no thanks. But with all the advances in print technologies and online servicing, it's now relatively easy to make a great product AND have it delivered to the customer's home in a pretty package, safe and sound.\nI've tested this cup and it passes both the visual test - it's gorgeous - and the drinkability test. I'm really picky about what kind of cup I like to drink from. They have to feel just right, with good balance, an easy to hold handle, and the right feel on the lips. I wouldn't sell a cup I don't like to use, so for what it's worth to you, this cup passes the LIZA COWAN DESIGN (that's me!) TEST."
+    text = 'Swift codes, or BIC codes as they are sometimes called, allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..\nNotice: These Swift/BIC codes for BNP PARIBAS, TAIPEI BRANCH are only used for international wire transfer payments.'
     el = {"text": text}
     ind_lst = index_data(el)
     print(ind_lst)
 
-    verify_text = "Some products sold Others didn't. Running a business is always a process."
+    verify_text = 'Swift codes, or BIC codes as they are sometimes allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..'
     cut_list = cut_head_tail(verify_text)
     print(cut_list)
 
-    print(ind_lst[0] == cut_list[0])
-    print(ind_lst[2] == cut_list[1])
+
 
