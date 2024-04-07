@@ -48,7 +48,7 @@ def check_exists_in_db():
 
         db_connection = get_db_connection('localhost', '3306')
         result = check_exists(db_connection, query_data)
-        return jsonify({"check exists success": True, "result": result}), 200
+        return jsonify({"message": "check exists successfully", "result": result}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
