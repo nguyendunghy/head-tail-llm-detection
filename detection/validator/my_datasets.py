@@ -110,7 +110,7 @@ class PromptDataset(Iterator):
 class JackieHumanDataset(Iterator):
     def __init__(self):
         super().__init__()
-        self.file = ''
+        self.file = '/root/c4_dataset/c4/extracted/c4-train.00001-of-01024.json'
 
     def __next__(self) -> dict:
         while True:
@@ -134,9 +134,9 @@ class JackieHumanDataset(Iterator):
 
 
 if __name__ == '__main__':
-    dataset = HumanDataset()
+    dataset = JackieHumanDataset()
     print(next(dataset))
-
-    dataset = PromptDataset()
-    for i in range(15):
-        print(next(dataset))
+    #
+    # dataset = PromptDataset()
+    # for i in range(15):
+    #     print(next(dataset))
