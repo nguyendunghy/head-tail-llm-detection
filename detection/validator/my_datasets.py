@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 import traceback
@@ -118,12 +119,13 @@ class JackieHumanDataset(Iterator):
                 max_line = 356318
                 line = random.randint(1, max_line)
                 bt.logging.info("get text in line " + str(line))
-                text = self.get_line(line)
+                data = self.get_line(line)
+                my_dict = json.loads(data)
             except Exception as e:
                 bt.logging.error(e)
                 bt.logging.info(traceback.format_exc())
                 continue
-            res = {'text': text, 'data_source': 'file'}
+            res = {'text': my_dict['text'], 'data_source': 'file'}
             return res
 
     def get_line(self, line_number):

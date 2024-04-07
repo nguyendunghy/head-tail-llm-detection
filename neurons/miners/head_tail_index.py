@@ -1,4 +1,5 @@
 import hashlib
+import json
 
 import bittensor as bt
 import requests
@@ -59,9 +60,29 @@ def head_tail_api_pred_human(list_text):
         return []
 
 
+def get_line(file, line_number):
+    with open(file, 'r') as file:
+        for current_line_number, line in enumerate(file, start=1):
+            if current_line_number == line_number:
+                return line.strip()
+    return None
+
+
+def verify():
+    file_path = '/root/c4_dataset/c4/extracted/c4-train.00001-of-01024.json'
+    with open(file_path, 'r') as file:
+        for current_line_number, line in enumerate(file, start=1):
+            my_dict = json.loads(line)
+            input = [my_dict['text']]
+            result = head_tail_api_pred_human(input)
+            if not result[0]:
+                bt.logging.info("indexing fail: " + str(current_line_number) + ":" + str(line))
+    return None
+
+
 if __name__ == '__main__':
-    text = '''British lawmakers are to question the country's financial regulator about whether it was lobbied by ministers to change its rules and lure the $2tn flotation of Saudi's Aramco to London.\nThe fears come amid claims that UK Prime Minister Theresa May and senior government ministers actively attempted to lobby Riyadh for the UK to host the sell-off of the world's biggest energy company.\nAndrew Bailey, head of the Financial Conduct Authority, will be questioned by MPs Nicky Morgan, who chairs the Treasury Committee, and Rachel Reeves, who chairs the Business, Energy and Industrial Strategy Committee. A date has yet to be set for the hearings.\nOn Friday, Morgan made public a joint letter that the two MPs sent to Bailey. In it they asked seven questions, including whether the FCA was \"aware of any interest shown by Saudi Aramco in obtaining a UK listing, and if known, how far that interest influenced the consultation?\"\nMorgan told City AM that the FCA had to maintain its role as the body that preserves the reputation of Britain's financial institution.\n“The UK has a world-class reputation for upholding strong corporate governance,” she said. “The FCA must protect this reputation, especially as the City looks to remain competitive and thrive post-Brexit.” The pair plan to discuss Bailey's response with their fellow committee members.\nRiyadh is selling a five percent portion of Aramco as part of its Vision 2030 strategy, which aims to cut the kingdom's reliance on oil - which has suffered reduced prices in recent years - and raise $200bn during the next several years.\nThe FCA is a regulatory body which operates independently of the UK government. It did not mention Aramco when it announced the rule change in July, nor asked during the consultation period whether the flotations by a sovereign state should have a separate category.\nBoth New York and London have vied for Aramco to host its flotation at their respective stock exchanges.\nIn April, UK Prime Minister Theresa May, visited Riyadh to meet Aramco's chief executive, Khalid al-Falih, who is also the kingdom's energy minister.\nAccompanied by Nikhil Rathi, the head of the London Stock Exchange, May attempted to lure Falih to allow London to host Aramco's flotation.\nDowning Street sources also told the Guardian that London's plans to host the flotation were specifically mentioned during several meetings between May and Saudi ministers in April.\nThe FCA confirmed that it received the letter and said it would reply in due course. It expects to complete its rule change consultation next month.\nA survey by the Chartered Institute for Securities and Investment (CISI) of more than 200 financial service professionals has found that a majority are opposed to the rule changes.'''
-    el = {"text": text}
+    # text = '''British lawmakers are to question the country's financial regulator about whether it was lobbied by ministers to change its rules and lure the $2tn flotation of Saudi's Aramco to London.\nThe fears come amid claims that UK Prime Minister Theresa May and senior government ministers actively attempted to lobby Riyadh for the UK to host the sell-off of the world's biggest energy company.\nAndrew Bailey, head of the Financial Conduct Authority, will be questioned by MPs Nicky Morgan, who chairs the Treasury Committee, and Rachel Reeves, who chairs the Business, Energy and Industrial Strategy Committee. A date has yet to be set for the hearings.\nOn Friday, Morgan made public a joint letter that the two MPs sent to Bailey. In it they asked seven questions, including whether the FCA was \"aware of any interest shown by Saudi Aramco in obtaining a UK listing, and if known, how far that interest influenced the consultation?\"\nMorgan told City AM that the FCA had to maintain its role as the body that preserves the reputation of Britain's financial institution.\n“The UK has a world-class reputation for upholding strong corporate governance,” she said. “The FCA must protect this reputation, especially as the City looks to remain competitive and thrive post-Brexit.” The pair plan to discuss Bailey's response with their fellow committee members.\nRiyadh is selling a five percent portion of Aramco as part of its Vision 2030 strategy, which aims to cut the kingdom's reliance on oil - which has suffered reduced prices in recent years - and raise $200bn during the next several years.\nThe FCA is a regulatory body which operates independently of the UK government. It did not mention Aramco when it announced the rule change in July, nor asked during the consultation period whether the flotations by a sovereign state should have a separate category.\nBoth New York and London have vied for Aramco to host its flotation at their respective stock exchanges.\nIn April, UK Prime Minister Theresa May, visited Riyadh to meet Aramco's chief executive, Khalid al-Falih, who is also the kingdom's energy minister.\nAccompanied by Nikhil Rathi, the head of the London Stock Exchange, May attempted to lure Falih to allow London to host Aramco's flotation.\nDowning Street sources also told the Guardian that London's plans to host the flotation were specifically mentioned during several meetings between May and Saudi ministers in April.\nThe FCA confirmed that it received the letter and said it would reply in due course. It expects to complete its rule change consultation next month.\nA survey by the Chartered Institute for Securities and Investment (CISI) of more than 200 financial service professionals has found that a majority are opposed to the rule changes.'''
+    # el = {"text": text}
     # ind_lst = index_data(el)
     # print(ind_lst)
 
@@ -76,6 +97,8 @@ if __name__ == '__main__':
     # cut_list = cut_head_tail(verify_text)
     # print(cut_list)
 
-    input_text = [text,"ten toi la dung,ten toi la dung,ten toi la dung,ten toi la dung,ten toi la dung  ten toi la tao ten toi la tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten toi la tao"]
-    result = head_tail_api_pred_human(input_text)
-    print(result)
+    # input_text = [text,
+    #               "ten toi la dung,ten toi la dung,ten toi la dung,ten toi la dung,ten toi la dung  ten toi la tao ten toi la tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten toi la tao"]
+    # result = head_tail_api_pred_human(input_text)
+    # print(result)
+    verify()
