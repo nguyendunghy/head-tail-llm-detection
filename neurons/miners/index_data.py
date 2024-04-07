@@ -114,15 +114,14 @@ def get_hash_and_db(token):
 
 
 if __name__ == "__main__":
-    text = 'Swift codes, or BIC codes as they are sometimes called, allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..\nNotice: These Swift/BIC codes for BNP PARIBAS, TAIPEI BRANCH are only used for international wire transfer payments.'
+    text = 'SopphieMature . MellodyFountaine. xxwantedbabyxx. MelissaColt.\nCARADEMENINOHappyVikkiXtremCockAnastasiaStele .Stefano86PIERCeCUmFUCKjeanexxx0MizzWendy .AmberKush0MizzWendyOrrianaxLovelyTeachr .0MizzWendyblackVSatleticSweetAylineeMikiAble .claudiaangel4uAmberKushblackVSatleticXElizaX .blackVSatleticjeanexxxAdelineAd3AnastasiaStele .GoddesssOfLoveeTiaCyrusdimemoletayrasensualxxx .JustUniqueNiceJohnXxxxninacpxxxDania1 .PIERCeCUmFUCKLeylaDelice1PrettyyBaby19kinkyrochellexx1 .NinaCrystalTylorLeeSweetAylineeAnastasiaStele .xxAriaxxDania1AnnaDiamondXXAmberKush .\nDania1trannny8inchxclaudiaangel4udimemole .MelissaColtPinayBeauty9inxxJohnNorrisIsabelleWhite .danniboi26MMMonnieXoxoBiancaPetiteRosAnastasiaStele .LovelySweetBoyTrey8481PIERCeCUmFUCKXtremCock .MarilynRosexxxSensualBoy4allThiaraBrightdaniellaxx .Dania1ThiaraBrightTiaCyruskinkyrochellexx1 .raresdarkTrey8481MarilynRosexxxOrrianax .SensualLindaXSensualBoy4allRussianParadisefelicity24 .Kattya20MichaelSpaceJesseyStoneLovelyTeachr .LovelySweetBoyKattyBKattya20IsabelleWhite .NinaCrystallongstrokekitkatJesycaJuiceAlessiaW .'
     el = {"text": text}
     ind_lst = index_data(el)
     print(ind_lst)
 
-    print(get_hash_and_db(ind_lst[0]))
-    print(get_hash_and_db(ind_lst[1]))
+    # print(get_hash_and_db(ind_lst[0]))
+    # print(get_hash_and_db(ind_lst[1]))
 
-    verify_text = '''Swift codes, or BIC codes as they are sometimes allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..
-    Notice: These Swift/BIC codes for BNP PARIBAS, TAIPEI BRANCH are only used for international wire transfer payments.'''
+    verify_text = 'MellodyFountaine. xxwantedbabyxx. MelissaColt. CARADEMENINOHappyVikkiXtremCockAnastasiaStele .Stefano86PIERCeCUmFUCKjeanexxx0MizzWendy .AmberKush0MizzWendyOrrianaxLovelyTeachr .0MizzWendyblackVScatleticSweetAylineeMikiAble .claudiaangel4uAmberKushblackVSatleticXElizaX .blackVSatleticjeanexxxAdelineAd3AnastasiaStele .GoddesssOfLoveeTiaCyrusdimemoletayrasensualxxx .JustUniqueNiceJohnXxxxninacpxxxDania1 .PIERCeCUmFUCKLeylaDelice1PrettyyBaby19kinkyrochellexx1 .NinaCrystalTylorLeeSweetAylineeAnastasiaStele .xxAriaxxDania1AnnaDiamondXXAmberKush .'
     cut_list = cut_head_tail(verify_text)
     print(cut_list)

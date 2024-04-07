@@ -284,8 +284,18 @@ def verify_data(file_path):
             augs = augmentator(el['text'])
             text = augs['text']
             if len(text) <= 250:
-                print("human written text")
+                bt.logging.info("human written text - too short character")
                 continue
+
+            sentences = augmentator.get_all_sentences(text)
+            count_word = 0
+            for sentence in sentences:
+                words = sentence.split(' ')
+                count_word += len(words)
+            if count_word//len(sentences) < 3:
+                bt.logging.info("human written text - too shor words ")
+                continue
+
             list_token = index_data.cut_head_tail(text)
             if len(list_token) == 1:
                 bt.logging.info("text too short:" + text)
