@@ -5,6 +5,7 @@ import bittensor as bt
 from neurons.miners.gpt_zero import PPLModel
 from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.gpt_zero_api import is_human_generated_files
+from neurons.miners.head_tail_index import head_tail_api_pred_human
 from neurons.miners.old_gpt_zero import GPT2PPL
 
 
@@ -29,10 +30,15 @@ class FakeMiner:
             preds = self.calculate_pred(input_data)
             self.standard_current_model_pred(input_data)
             self.consider_text_length(input_data)
+            self.head_tail_api_pred(input_data)
         else:
             preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
+
+    def head_tail_api_pred(self, input_data):
+        pred_list = head_tail_api_pred_human(input_data)
+        self.accuracy_monitor(pred_list, 'head_tail_human', input_data)
 
     def gpt_zero_api_pred(self, input_data):
         bt.logging.info("start gpt_zero_api_pred")
@@ -53,7 +59,8 @@ class FakeMiner:
             prob_list.append(pred_prob)
 
         bt.logging.info("jackie_old_model_pred prob_list: " + str(prob_list))
-        pred_list = jackie_upgrade.order_prob(prob_list)
+        tmp_pred_list = jackie_upgrade.order_prob(prob_list)
+        pred_list = [not value for value in tmp_pred_list]
         bt.logging.info("jackie_old_model_pred pred_list: " + str(pred_list))
         self.accuracy_monitor(pred_list, '50_50_old_model', input_data)
         return pred_list, prob_list
@@ -64,7 +71,7 @@ class FakeMiner:
         for text in input_data:
             try:
                 prob = self.model(text)
-                pred_prob = prob > 0.5
+                pred_prob = prob <= 0.5
             except Exception as e:
                 pred_prob = 0
                 bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
@@ -114,8 +121,8 @@ class FakeMiner:
         pred_list = []
         for text in input_data:
             try:
-                # true is ai, false is human
-                pred = self.model(text) > 0.5
+                # true is human, false is ai
+                pred = self.model(text) <= 0.5
             except Exception as e:
                 pred = 0
                 bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
@@ -135,7 +142,7 @@ class FakeMiner:
                     short_text_list.append(i)
                     pred = True
                 else:
-                    pred = self.model(text) > 0.5
+                    pred = self.model(text) <= 0.5
             except Exception as e:
                 pred = 0
                 bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
@@ -158,7 +165,8 @@ class FakeMiner:
             prob_list.append(pred_prob)
 
         bt.logging.info("jackie_current_model_pred prob_list: " + str(prob_list))
-        pred_list = jackie_upgrade.order_prob(prob_list)
+        tmp_pred_list = jackie_upgrade.order_prob(prob_list)
+        pred_list = [not value for value in tmp_pred_list]
         bt.logging.info("jackie_current_model_pred pred_list: " + str(pred_list))
         self.accuracy_monitor(pred_list, '50_50_current_model', input_data)
         return pred_list, prob_list

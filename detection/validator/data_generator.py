@@ -7,7 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from detection.validator.models import ValDataRow
-from detection.validator.my_datasets import HumanDataset, PromptDataset
+from detection.validator.my_datasets import HumanDataset, PromptDataset, JackieHumanDataset
 from detection.validator.text_completion import OllamaModel
 from detection.validator.data_augmentation import DataAugmentator
 
@@ -29,7 +29,8 @@ class DataGenerator:
             self.model_probs = model_probs
             assert sum(model_probs) == 1
 
-        self.human_dataset = HumanDataset()
+        # self.human_dataset = HumanDataset()
+        self.human_dataset = JackieHumanDataset()
         self.prompt_dataset = PromptDataset()
 
         assert len(self.models) == len(self.model_names) == len(self.model_probs)

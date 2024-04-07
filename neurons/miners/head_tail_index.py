@@ -6,19 +6,19 @@ from neurons.miners import index_data
 from neurons.miners.utils import hash_code
 
 
-def head_tail_api_pred_ai(list_text):
-    bt.logging.info("start head_tail_api_pred")
-    final_ai_pred = [True for _ in range(len(list_text))]
+def head_tail_api_pred_human(list_text):
+    bt.logging.info("start head_tail_api_pred_human")
+    final_human_pred = [False for _ in range(len(list_text))]
     not_touch_index_list = []
     input = []
     for i in range(len(list_text)):
         text = list_text[i]
         if len(text) <= 250:
-            final_ai_pred[i] = False  # Human text < 250 chars
+            final_human_pred[i] = True  # Human text < 250 chars
             continue
         list_token = index_data.cut_head_tail(text)
         if len(list_token) == 1:
-            final_ai_pred[i] = False  # Human text is short
+            final_human_pred[i] = True  # Human text is short
         else:
             not_touch_index_list.append(i)
             tmp_data = []
@@ -49,8 +49,8 @@ def head_tail_api_pred_ai(list_text):
         for i in range(len(not_touch_index_list)):
             human_pred = human_pred_result[i]
             not_touch_ind = not_touch_index_list[i]
-            final_ai_pred[not_touch_ind] = not human_pred
-        return final_ai_pred
+            final_human_pred[not_touch_ind] = human_pred
+        return final_human_pred
     else:
         print('Failed to post data:status_code', response.status_code)
         print('Failed to post data:', response.content)

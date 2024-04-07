@@ -1,5 +1,7 @@
 import logging
 import random
+import traceback
+
 import bittensor as bt
 from datasets import load_dataset
 from collections.abc import Iterator
@@ -17,7 +19,7 @@ class HumanDataset(Iterator):
         seed = random.randint(0, 1000)
 
         c4 = iter(
-            load_dataset("allenai/c4", 'en',  streaming=True)['train'].shuffle(
+            load_dataset("allenai/c4", 'en', streaming=True)['train'].shuffle(
                 seed=seed, buffer_size=1000
             )
         )
@@ -94,7 +96,8 @@ class PromptDataset(Iterator):
                 res['data_source'] = 'prompt_generator'
 
             if len(el['prompt']) > self.max_prompt_len:
-                bt.logging.info("Prompt has len {}, truncating it to {} chars".format(len(el['prompt']), self.max_prompt_len))
+                bt.logging.info(
+                    "Prompt has len {}, truncating it to {} chars".format(len(el['prompt']), self.max_prompt_len))
 
             res['prompt'] = el["prompt"][:self.max_prompt_len]
             res['task_name'] = el['task'] if res['data_source'] == 'prompt_generator' else el['source']
@@ -102,6 +105,32 @@ class PromptDataset(Iterator):
             # Check if the text is not empty or does not consist only of newline characters
             if res['prompt'].strip():
                 return res
+
+
+class JackieHumanDataset(Iterator):
+    def __init__(self):
+        super().__init__()
+        self.file = ''
+
+    def __next__(self) -> dict:
+        while True:
+            try:
+                max_line = 356318
+                line = random.randint(1, max_line)
+                text = self.get_line(line)
+            except Exception as e:
+                bt.logging.error(e)
+                bt.logging.info(traceback.format_exc())
+                continue
+            res = {'text': text, 'data_source': 'file'}
+            return res
+
+    def get_line(self, line_number):
+        with open(self.file, 'r') as file:
+            for current_line_number, line in enumerate(file, start=1):
+                if current_line_number == line_number:
+                    return line.strip()
+        return None
 
 
 if __name__ == '__main__':
