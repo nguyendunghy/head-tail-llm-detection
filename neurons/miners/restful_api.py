@@ -37,7 +37,7 @@ def insert_api():
 
 
 @app.route('/check-exists', methods=['POST'])
-def check_exists():
+def check_exists_in_db():
     if request.is_json:
         data = request.get_json()
         input_arr = data['input']
