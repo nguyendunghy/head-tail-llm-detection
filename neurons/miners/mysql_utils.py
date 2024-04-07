@@ -78,7 +78,7 @@ def insert(db_connection, db, hash_value):
 
 def insert_batch(db_connection, db, list_value):
     bt.logging.info("record list_value: {}, db: {}".format(str(len(list_value)), str(db)))
-
+    bt.logging.info("list_value: " + str(list_value))
     cursor = db_connection.cursor()
 
     sql = "INSERT INTO table_{} (hash) VALUES (%s)".format(str(db))
