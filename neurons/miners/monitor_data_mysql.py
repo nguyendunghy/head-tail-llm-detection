@@ -23,6 +23,29 @@ def get_db_connection(ip, port):
     return global_db_connection
 
 
+def check_exists(db_connection, input_list):
+    cursor = db_connection.cursor()
+    list_sql = []
+    for i in range(len(input_list)):
+        input = input_list[i]
+        head_db = input[0]
+        head_hash = input[1]
+        tail_db = input[2]
+        tail_hash = input[3]
+        tmp_sql = "select {} as pos,hash FROM table_{} where hash = '{}' " \
+                  "union select {} as pos,hash FROM table_{} where hash = '{}' " \
+            .format(str(i), str(head_db), str(head_hash), str(i), str(tail_db), str(tail_hash))
+        list_sql.append(tmp_sql)
+    sql = ' union '.join(list_sql)
+    cursor.execute(sql)
+    result = [False for _ in range(len(input_list))]
+    for row in cursor.fetchall():
+        ind = int(row[0])
+        result[ind] = True
+
+    cursor.close()
+    return result
+
 def get_tunnel():
     global global_tunnel
     if global_tunnel is not None:

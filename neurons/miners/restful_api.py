@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from flask import Flask, request, jsonify
 import requests
-from neurons.miners.monitor_data_mysql import get_db_connection, insert
+from neurons.miners.monitor_data_mysql import get_db_connection, insert, check_exists
 
 app = Flask(__name__)
 
@@ -35,6 +35,22 @@ def insert_api():
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
+
+@app.route('/check-exists', methods=['POST'])
+def insert_api():
+    if request.is_json:
+        data = request.get_json()
+        input_arr = data['input']
+        query_data = []
+        for element in input_arr:
+            tmp_data = [element['head_db'], element['head'], element['tail_db'], element['tail']]
+            query_data.append(tmp_data)
+
+        db_connection = get_db_connection('localhost', '3306')
+        result = check_exists(db_connection, query_data)
+        return jsonify({"check exists success": True, "result": result}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
 
 def call_insert(text_hash, model_type, count_human, count_ai):
     url = "http://70.48.87.64:41365/insert"
