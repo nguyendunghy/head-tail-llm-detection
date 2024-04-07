@@ -75,5 +75,5 @@ if __name__ == '__main__':
     # print(cut_list)
 
     input_text = [aug.subsample_sentences(text)['text'], aug.subsample_sentences(text)['text']]
-    result = head_tail_api_pred_ai(input_text)
+    result = head_tail_api_pred_human(input_text)
     print(result)
