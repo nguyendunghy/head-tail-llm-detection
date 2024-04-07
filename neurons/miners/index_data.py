@@ -103,9 +103,14 @@ def index_data(el):
 
 if __name__ == "__main__":
     text = 'Swift codes, or BIC codes as they are sometimes called, allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..\nNotice: These Swift/BIC codes for BNP PARIBAS, TAIPEI BRANCH are only used for international wire transfer payments.'
-    el = {"text": text}
-    ind_lst = index_data(el)
-    print(ind_lst)
+    # el = {"text": text}
+    # ind_lst = index_data(el)
+    # print(ind_lst)
+
+    a = DataAugmentator()
+    for i in range(5):
+        print(a.subsample_sentences(text)['text'])
+
 
     verify_text = 'Swift codes, or BIC codes as they are sometimes allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..'
     cut_list = cut_head_tail(verify_text)
