@@ -114,10 +114,14 @@ def get_hash_and_db(token):
 
 
 if __name__ == "__main__":
-    text = 'SopphieMature . MellodyFountaine. xxwantedbabyxx. MelissaColt.\nCARADEMENINOHappyVikkiXtremCockAnastasiaStele .Stefano86PIERCeCUmFUCKjeanexxx0MizzWendy .AmberKush0MizzWendyOrrianaxLovelyTeachr .0MizzWendyblackVSatleticSweetAylineeMikiAble .claudiaangel4uAmberKushblackVSatleticXElizaX .blackVSatleticjeanexxxAdelineAd3AnastasiaStele .GoddesssOfLoveeTiaCyrusdimemoletayrasensualxxx .JustUniqueNiceJohnXxxxninacpxxxDania1 .PIERCeCUmFUCKLeylaDelice1PrettyyBaby19kinkyrochellexx1 .NinaCrystalTylorLeeSweetAylineeAnastasiaStele .xxAriaxxDania1AnnaDiamondXXAmberKush .\nDania1trannny8inchxclaudiaangel4udimemole .MelissaColtPinayBeauty9inxxJohnNorrisIsabelleWhite .danniboi26MMMonnieXoxoBiancaPetiteRosAnastasiaStele .LovelySweetBoyTrey8481PIERCeCUmFUCKXtremCock .MarilynRosexxxSensualBoy4allThiaraBrightdaniellaxx .Dania1ThiaraBrightTiaCyruskinkyrochellexx1 .raresdarkTrey8481MarilynRosexxxOrrianax .SensualLindaXSensualBoy4allRussianParadisefelicity24 .Kattya20MichaelSpaceJesseyStoneLovelyTeachr .LovelySweetBoyKattyBKattya20IsabelleWhite .NinaCrystallongstrokekitkatJesycaJuiceAlessiaW .'
+    text = 'AlisaTornado. 01AngelVanessa. DylanParkerSherlynMoonJenellaAngelEbonyBoss4u .VanessaEmeraldRoyCruztiffany4lovtiffany4lov .BustyStasySweetCataleya69HotStoriesOnMyWay .SarahDollysMarvelousEmilylianah12SweetCataleya69 .HolbeinJenellaAngelBustyStasyWILLIAMS5 .StacyCasherMarvelousEmily2WhiteDiamondsAlisaTornado .JasperJonesRoyCruzlianah12AaliyahTease .DylanParkerAnnaGreyXJessieGorgeousdirtkings .AlissaDreamsJenellaAngelHotStoriesoldsimi007 .Hotstv2WhiteDiamondsmeeDanMarvelousEmily .DARL1NGofdCROWDCutieNattieAaliyahTeaseLuckySherrie .'
     el = {"text": text}
     ind_lst = index_data(el)
-    print(ind_lst)
+    # print(ind_lst)
+
+    aug = DataAugmentator()
+    sentences = aug.get_all_sentences(text)
+    print(sentences)
 
     # print(get_hash_and_db(ind_lst[0]))
     # print(get_hash_and_db(ind_lst[1]))

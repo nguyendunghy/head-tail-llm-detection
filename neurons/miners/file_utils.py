@@ -120,7 +120,8 @@ def load_range_multi_process():
 
 if __name__ == '__main__':
     start_time = time.time_ns()
-    file_path = "/root/c4_dataset/c4-train.00001-of-01024.json"
+    # file_path = "/root/c4_dataset/extracted/c4-train.00001-of-01024.json"
+    file_path = "/root/c4_dataset/extracted/c4-train.00002-of-01024.json"
     # file_path = "/root/c4_dataset/head-1000-00001.json"
     # file_path = "/root/c4_dataset/head-10000-00001.json"
     load_range_multi_process()
