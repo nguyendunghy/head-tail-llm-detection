@@ -117,6 +117,7 @@ class JackieHumanDataset(Iterator):
             try:
                 max_line = 356318
                 line = random.randint(1, max_line)
+                bt.logging.info("get text in line " + str(line))
                 text = self.get_line(line)
             except Exception as e:
                 bt.logging.error(e)
