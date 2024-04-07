@@ -18,9 +18,6 @@ class FakeMiner:
 
     def fake_miner(self, texts):
         bt.logging.info(f"All of texts received: {str(texts)}")
-        tmp_texts = [text[3:] for text in texts]
-        texts = tmp_texts
-
         input_data = copy.deepcopy(texts)
         for i in range(len(input_data)):
             input_data[i] = input_data[i][3:]
@@ -29,10 +26,10 @@ class FakeMiner:
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         preds = []
         if len(input_data) == 50:
+            self.head_tail_api_pred(input_data)
             preds = self.calculate_pred(input_data)
             self.standard_current_model_pred(input_data)
             self.consider_text_length(input_data)
-            self.head_tail_api_pred(input_data)
         else:
             preds = self.standard_model_pred(input_data)
 
