@@ -1,7 +1,7 @@
 import hashlib
+
 import bittensor as bt
 import requests
-from detection.validator.data_augmentation import DataAugmentator
 from neurons.miners import index_data
 from neurons.miners.utils import hash_code
 
@@ -37,12 +37,14 @@ def head_tail_api_pred_human(list_text):
                 "tail": str(tmp_data[3]),
             }
             input.append(tmp_dic)
+    if len(input) == 0:
+        return final_human_pred
     body_data = {"input": input}
     headers = {
         'Content-Type': 'application/json'
     }
     url = "http://65.108.33.125:8080/check-exists"
-    response = requests.request("POST", url, headers=headers, data=body_data)
+    response = requests.request("POST", url, headers=headers, json=body_data)
     if response.status_code == 200:
         data = response.json()
         human_pred_result = data['result']
@@ -63,8 +65,8 @@ if __name__ == '__main__':
     # ind_lst = index_data(el)
     # print(ind_lst)
 
-    aug = DataAugmentator()
-    sentences = aug.subsample_sentences(text)['text']
+    # aug = DataAugmentator()
+    # sentences = aug.subsample_sentences(text)['text']
     # print(sentences['text'])
 
     # print(get_hash_and_db(ind_lst[0]))
@@ -74,6 +76,6 @@ if __name__ == '__main__':
     # cut_list = cut_head_tail(verify_text)
     # print(cut_list)
 
-    input_text = [aug.subsample_sentences(text)['text'], aug.subsample_sentences(text)['text']]
+    input_text = [text,"ten toi la dung,ten toi la dung,ten toi la dung,ten toi la dung,ten toi la dung  ten toi la tao ten toi la tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten  tao ten toi la tao ten toi la tao ten toi la tao"]
     result = head_tail_api_pred_human(input_text)
     print(result)
