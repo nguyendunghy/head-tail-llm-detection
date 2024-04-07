@@ -103,7 +103,7 @@ def insert_from_file(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             try:
-                ele_list = line.split(',')
+                ele_list = line.strip().split(',')
                 db = int(ele_list[0])
                 data_list = ele_list[1:]
                 db_conn = get_db_connection()
