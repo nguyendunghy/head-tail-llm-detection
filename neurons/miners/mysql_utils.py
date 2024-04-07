@@ -14,6 +14,7 @@ import mysql.connector.pooling
 
 from detection.validator.data_augmentation import DataAugmentator
 from neurons.miners import index_data
+from neurons.miners.utils import hash_code
 
 connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_name="jackie_pool",
@@ -101,8 +102,7 @@ def insert_from_file(file_path):
         for line in file:
             try:
                 ele_list = line.split(',')
-                # db = int(ele_list[0])
-                db = 10_000
+                db = int(ele_list[0])
                 data_list = ele_list[1:]
                 db_conn = get_db_connection()
                 insert_batch(db_conn, db, data_list)
@@ -269,14 +269,6 @@ def load_record(list_data, thread_name, line_count=None):
                                                                                           str(len(token_list))))
     if 'my_conn' in locals() and my_conn.is_connected():
         my_conn.close()
-
-
-def hash_code(string) -> int:
-    h = 0
-    if len(string) > 0:
-        for i in range(0, len(string)):
-            h = 31 * h + ord(string[i])
-    return h
 
 
 def verify_data(file_path):

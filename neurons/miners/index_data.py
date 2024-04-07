@@ -1,4 +1,8 @@
+import hashlib
+
 from detection.validator.data_augmentation import DataAugmentator
+from neurons.miners.utils import hash_code
+
 TOKEN_LENGTH = 10
 TOO_SHORT_TEXT = "TOO_SHORT_TEXT"
 
@@ -40,7 +44,7 @@ def process_head(words, sentences, current_index):
 
 
 def process_tail(words, sentences, current_index):
-    sub_sentences = sentences[:current_index+1]
+    sub_sentences = sentences[:current_index + 1]
     sub_line = ' '.join(sub_sentences)
     all_sub_word = sub_line.split(' ')
     if len(all_sub_word) < TOKEN_LENGTH:
@@ -101,20 +105,24 @@ def index_data(el):
     return indexing_list
 
 
+def get_hash_and_db(token):
+    m = hashlib.sha256(token.encode('UTF-8'))
+    sha256_hex = m.hexdigest()
+    hash_value = hash_code(sha256_hex)
+    db = hash_value % 10_000
+    return sha256_hex[:8], db
+
+
 if __name__ == "__main__":
     text = 'Swift codes, or BIC codes as they are sometimes called, allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..\nNotice: These Swift/BIC codes for BNP PARIBAS, TAIPEI BRANCH are only used for international wire transfer payments.'
-    # el = {"text": text}
-    # ind_lst = index_data(el)
-    # print(ind_lst)
+    el = {"text": text}
+    ind_lst = index_data(el)
+    print(ind_lst)
 
-    a = DataAugmentator()
-    for i in range(5):
-        print(a.subsample_sentences(text)['text'])
+    print(get_hash_and_db(ind_lst[0]))
+    print(get_hash_and_db(ind_lst[1]))
 
-
-    verify_text = 'Swift codes, or BIC codes as they are sometimes allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..'
+    verify_text = '''Swift codes, or BIC codes as they are sometimes allow you to make an international wire transfer. Unlike routing numbers used for domestic wire transfers, Swift codes are only used for making international transfers. If you want to send or receive money internationally to a bank account held with BNP PARIBAS, TAIPEI BRANCH, your bank will ask for the Swift code(s) listed below..
+    Notice: These Swift/BIC codes for BNP PARIBAS, TAIPEI BRANCH are only used for international wire transfer payments.'''
     cut_list = cut_head_tail(verify_text)
     print(cut_list)
-
-
-

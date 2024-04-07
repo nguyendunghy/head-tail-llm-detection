@@ -75,15 +75,6 @@ def db_to_str(db):
     else:
         return str(db)
 
-
-def hash_code(string) -> int:
-    h = 0
-    if len(string) > 0:
-        for i in range(0, len(string)):
-            h = 31 * h + ord(string[i])
-    return h
-
-
 def load_record(list_data, thread_name, line_count=None):
     for data in list_data:
         token_list = index_data.index_data(data)

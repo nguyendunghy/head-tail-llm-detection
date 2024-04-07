@@ -9,6 +9,7 @@ import redis
 
 import index_data
 from detection.validator.data_augmentation import DataAugmentator
+from neurons.miners.utils import hash_code
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 
@@ -20,15 +21,6 @@ def hash_code_java(string) -> int:
             h = 31 * h + ord(string[i])
     h = (h + 2 ** 31) % 2 ** 32 - 2 ** 31
     return -h if h < 0 else h
-
-
-def hash_code(string) -> int:
-    h = 0
-    if len(string) > 0:
-        for i in range(0, len(string)):
-            h = 31 * h + ord(string[i])
-    return h
-
 
 def get_conn():
     conn = redis.Redis(connection_pool=redis_pool)
