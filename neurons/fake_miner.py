@@ -2,7 +2,7 @@ import copy
 import hashlib
 import time
 import bittensor as bt
-from miners.gpt_zero import PPLModel
+from neurons.miners.gpt_zero import PPLModel
 from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.gpt_zero_api import is_human_generated_files
 from neurons.miners.old_gpt_zero import GPT2PPL
