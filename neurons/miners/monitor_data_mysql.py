@@ -1,7 +1,7 @@
 import time
 import mysql.connector
 from sshtunnel import SSHTunnelForwarder
-
+import bittensor as bt
 import mysql.connector
 
 global_tunnel = None
@@ -37,6 +37,7 @@ def check_exists(db_connection, input_list):
             .format(str(i), str(head_db), str(head_hash), str(i), str(tail_db), str(tail_hash))
         list_sql.append(tmp_sql)
     sql = ' union '.join(list_sql)
+    bt.logging.info("query sql: " + sql)
     cursor.execute(sql)
     result = [False for _ in range(len(input_list))]
     for row in cursor.fetchall():
