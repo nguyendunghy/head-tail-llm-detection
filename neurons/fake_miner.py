@@ -18,6 +18,8 @@ class FakeMiner:
 
     def fake_miner(self, texts):
         bt.logging.info(f"All of texts received: {str(texts)}")
+        tmp_texts = [text[3:] for text in texts]
+        texts = tmp_texts
 
         input_data = copy.deepcopy(texts)
         for i in range(len(input_data)):
