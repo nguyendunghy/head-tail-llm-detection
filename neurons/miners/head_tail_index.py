@@ -7,7 +7,7 @@ from neurons.miners.utils import hash_code
 
 
 def head_tail_api_pred_human(list_text):
-    bt.logging.info("start head_tail_api_pred_human")
+    bt.logging.info("head_tail_api_pred_human list_text :" + str(list_text))
     final_human_pred = [False for _ in range(len(list_text))]
     not_touch_index_list = []
     input = []
