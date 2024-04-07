@@ -9,6 +9,7 @@ from concurrent.futures import ProcessPoolExecutor
 import bittensor as bt
 
 from neurons.miners import index_data
+from neurons.miners.utils import hash_code
 
 NUM_DB = 10_000
 ALL_TOKEN = [[] for i in range(NUM_DB)]
