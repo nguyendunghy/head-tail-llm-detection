@@ -77,8 +77,7 @@ def insert(db_connection, db, hash_value):
 
 
 def insert_batch(db_connection, db, list_value):
-    bt.logging.info("record list_value: {}, db: {}".format(str(len(list_value)), str(db)))
-    bt.logging.info("list_value: " + str(list_value))
+    # bt.logging.info("list_value: " + str(list_value))
     cursor = db_connection.cursor()
 
     sql = "INSERT INTO table_{} (hash) VALUES (%s)".format(str(db))
@@ -96,7 +95,8 @@ def insert_batch(db_connection, db, list_value):
     # Close the cursor and connection
     cursor.close()
     # db_connection.close()
-    bt.logging.info("record inserted: {}".format(str(cursor.rowcount)))
+    bt.logging.info("record list_value length: {}, db: {} inserted: {}".
+                    format(str(len(list_value)), str(db), str(cursor.rowcount)))
 
 
 def insert_from_file(file_path):
