@@ -52,6 +52,7 @@ def check_exists_in_db():
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
+
 def call_insert(text_hash, model_type, count_human, count_ai):
     url = "http://70.48.87.64:41365/insert"
 

@@ -1,9 +1,7 @@
 import copy
 import hashlib
 import time
-
 import bittensor as bt
-
 from miners.gpt_zero import PPLModel
 from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.gpt_zero_api import is_human_generated_files
@@ -116,7 +114,7 @@ class FakeMiner:
         pred_list = []
         for text in input_data:
             try:
-                # true is human, false is ai
+                # true is ai, false is human
                 pred = self.model(text) > 0.5
             except Exception as e:
                 pred = 0
