@@ -108,7 +108,7 @@ def load_range_one_thread(file_path, start_line, end_line):
 
 
 def load_range_process(arg):
-    file_path = "/root/c4_dataset/extracted/c4-train.00004-of-01024.json"
+    file_path = "/root/c4_dataset/extracted/c4-train.00005-of-01024.json"
     load_range_one_thread(file_path, arg * 36_000, arg * 36_000 + 36_000)
 
 
