@@ -16,8 +16,8 @@ class PPLModel:
     def __init__(self, device="cuda", model_id="microsoft/phi-2"):
         self.device = device
         self.model_id = model_id
-        self.model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True).to(device)
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+        # self.model = AutoModelForCausalLM.from_pretrained(model_id, trust_remote_code=True).to(device)
+        # self.tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
 
         self.max_length = 512  # self.model.config.n_positions
         self.stride = 512
