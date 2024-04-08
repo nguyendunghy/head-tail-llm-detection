@@ -23,7 +23,7 @@ def save(db, token):
     else:
         token_list = ALL_TOKEN[db]
         token_list.append(token)
-        if len(token_list) >= 1000:
+        if len(token_list) >= 5000:
             save_by_thread(db, token_list)
             token_list.clear()
         return True
@@ -108,7 +108,7 @@ def load_range_one_thread(file_path, start_line, end_line):
 
 
 def load_range_process(arg):
-    file_path = "/root/c4_dataset/extracted/c4-train.00002-of-01024.json"
+    file_path = "/root/c4_dataset/extracted/c4-train.00003-of-01024.json"
     load_range_one_thread(file_path, arg * 36_000, arg * 36_000 + 36_000)
 
 
@@ -123,6 +123,8 @@ if __name__ == '__main__':
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/extracted/c4-train.00001-of-01024.json"
     file_path = "/root/c4_dataset/extracted/c4-train.00002-of-01024.json"
+    file_path = "/root/c4_dataset/extracted/c4-train.00003-of-01024.json"
+
     # file_path = "/root/c4_dataset/head-1000-00001.json"
     # file_path = "/root/c4_dataset/head-10000-00001.json"
     load_range_multi_process()
