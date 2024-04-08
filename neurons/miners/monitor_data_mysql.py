@@ -32,8 +32,8 @@ def check_exists(db_connection, input_list):
         head_hash = input[1]
         tail_db = input[2]
         tail_hash = input[3]
-        tmp_sql = "select {} as pos,hash FROM table_{} where hash = '{}' " \
-                  "union select {} as pos,hash FROM table_{} where hash = '{}' " \
+        tmp_sql = "(select {} as pos,hash FROM table_{} where hash = '{}' limt 1) " \
+                  "union (select {} as pos,hash FROM table_{} where hash = '{}' limit 1) " \
             .format(str(i), str(head_db), str(head_hash), str(i), str(tail_db), str(tail_hash))
         list_sql.append(tmp_sql)
     sql = ' union '.join(list_sql)
