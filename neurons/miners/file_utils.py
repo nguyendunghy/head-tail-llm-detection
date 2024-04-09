@@ -102,7 +102,7 @@ def load_record(list_data, thread_name, line_count=None):
 
 
 def load_range_one_thread(file_path, start_line, end_line):
-    process_name = 'process-' + str(start_line * PROCESS_NUMBER//(360_000 // PROCESS_NUMBER))
+    process_name = 'process-' + str(start_line//(360_000 // PROCESS_NUMBER))
     with open(file_path, 'r') as file:
         count = 0
         for line in file:
