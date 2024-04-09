@@ -322,7 +322,7 @@ def verify_data(file_path):
         db_conn.close()
 
 
-def scan_all_file_insert_data(des_dir_path='/root/test_data/', processed_dir_path='/root/test_data/processed'):
+def scan_all_file_insert_data(des_dir_path='/home/ubuntu/mysql/upload_data', processed_dir_path='/home/ubuntu/mysql/processed_data'):
     directory = Path(des_dir_path)
     count = 0
     while True:
