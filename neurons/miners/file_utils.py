@@ -125,7 +125,7 @@ def load_range_multi_process():
 if __name__ == '__main__':
     start_time = time.time_ns()
     file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.0000{}-of-01024.json"
-    dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}"
+    dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}/"
     for i in range(1):
         FILE_PATH = file_path_template.format(str(i))
         DIR_PATH = dir_path_template.format("0000" + str(i))
