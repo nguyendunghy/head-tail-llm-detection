@@ -16,7 +16,7 @@ NUM_DB = 10_000
 ALL_TOKEN = [[] for i in range(NUM_DB)]
 DIR_PATH = ''
 FILE_PATH = ''
-PROCESS_NUMBER = 40
+PROCESS_NUMBER = 20
 
 
 def save(db, token):
