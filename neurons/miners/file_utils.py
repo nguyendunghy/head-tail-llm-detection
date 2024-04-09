@@ -18,6 +18,7 @@ DIR_PATH = ''
 FILE_PATH = ''
 PROCESS_NUMBER = 40
 
+
 def save(db, token):
     if 0 > db >= NUM_DB:
         bt.logging.error("invalid db value {}".format(str(db)))
@@ -31,8 +32,8 @@ def save(db, token):
         return True
 
 
-def flush(all_token):
-    file_name = 'flush_' + str(time.time_ns()) + '_' + str(random.randint(100, 1000)) + '.txt'
+def flush(all_token, arg):
+    file_name = 'flush_' + str(arg) + '_' + str(time.time_ns()) + '_' + str(random.randint(1000, 9999)) + '.txt'
     file_path = DIR_PATH + file_name
     with open(file_path, 'w') as file:
         for i in range(len(all_token)):
@@ -107,12 +108,13 @@ def load_range_one_thread(file_path, start_line, end_line):
                 data = json.loads(line)
                 load_record([data], 'thread-main', count + 1)
             count += 1
-    flush(ALL_TOKEN)
 
 
 def load_range_process(arg):
-    num_record_per_process = 360_000//PROCESS_NUMBER
-    load_range_one_thread(FILE_PATH, arg * num_record_per_process, arg * num_record_per_process + num_record_per_process)
+    num_record_per_process = 360_000 // PROCESS_NUMBER
+    load_range_one_thread(FILE_PATH, arg * num_record_per_process,
+                          arg * num_record_per_process + num_record_per_process)
+    flush(ALL_TOKEN, arg)
 
 
 def load_range_multi_process():
