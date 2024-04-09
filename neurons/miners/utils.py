@@ -15,8 +15,9 @@ def create_one_column_file(source_path, dest_path):
     with open(source_path, 'r') as source_file:
         with open(dest_path, 'w') as dest_file:
             for line in source_file:
-                data = line.strip().split(',')
-                if len(data) > 0:
+                line = line.strip()
+                if len(line) > 0:
+                    data = line.split(',')
                     if is_first_not_empty_line:
                         converted_data = '\n'.join(data)
                         is_first_not_empty_line = False
