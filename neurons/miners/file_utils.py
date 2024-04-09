@@ -2,6 +2,7 @@ import copy
 import hashlib
 import json
 import random
+import sys
 import threading
 import time
 import traceback
@@ -129,7 +130,9 @@ if __name__ == '__main__':
     start_time = time.time_ns()
     file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.0000{}-of-01024.json"
     dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}/"
-    for i in range(1):
+    arg1 = sys.argv[1]
+    arg2 = sys.argv[2]
+    for i in range(int(arg1), int(arg2)):
         FILE_PATH = file_path_template.format(str(i))
         DIR_PATH = dir_path_template.format("0000" + str(i))
         directory_path = Path(DIR_PATH)
