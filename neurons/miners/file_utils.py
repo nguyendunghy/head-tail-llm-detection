@@ -7,14 +7,16 @@ import time
 import traceback
 from concurrent.futures import ProcessPoolExecutor
 import bittensor as bt
+from pathlib import Path
 
 from neurons.miners import index_data
 from neurons.miners.utils import hash_code
 
 NUM_DB = 10_000
 ALL_TOKEN = [[] for i in range(NUM_DB)]
-DIR_PATH = '/root/test_data/'
-
+DIR_PATH = ''
+FILE_PATH = ''
+PROCESS_NUMBER = 40
 
 def save(db, token):
     if 0 > db >= NUM_DB:
@@ -76,6 +78,7 @@ def db_to_str(db):
     else:
         return str(db)
 
+
 def load_record(list_data, thread_name, line_count=None):
     for data in list_data:
         token_list = index_data.index_data(data)
@@ -108,26 +111,29 @@ def load_range_one_thread(file_path, start_line, end_line):
 
 
 def load_range_process(arg):
-    file_path = "/root/c4_dataset/extracted/c4-train.00005-of-01024.json"
-    load_range_one_thread(file_path, arg * 36_000, arg * 36_000 + 36_000)
+    num_record_per_process = 360_000//PROCESS_NUMBER
+    load_range_one_thread(FILE_PATH, arg * num_record_per_process, arg * num_record_per_process + num_record_per_process)
 
 
 def load_range_multi_process():
     bt.logging.info('Starting task...')
-    with ProcessPoolExecutor(10) as exe:
-        results = exe.map(load_range_process, range(0, 10))
+    with ProcessPoolExecutor(PROCESS_NUMBER) as exe:
+        exe.map(load_range_process, range(0, PROCESS_NUMBER))
     bt.logging.info('Done.')
 
 
 if __name__ == '__main__':
     start_time = time.time_ns()
-    # file_path = "/root/c4_dataset/extracted/c4-train.00001-of-01024.json"
-    file_path = "/root/c4_dataset/extracted/c4-train.00002-of-01024.json"
-    file_path = "/root/c4_dataset/extracted/c4-train.00003-of-01024.json"
-    file_path = "/root/c4_dataset/extracted/c4-train.00004-of-01024.json"
+    file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.0000{}-of-01024.json"
+    dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}"
+    for i in range(10):
+        FILE_PATH = file_path_template.format(str(i))
+        DIR_PATH = dir_path_template.format("0000" + str(i))
+        directory_path = Path(DIR_PATH)
+        if not directory_path.exists():
+            directory_path.mkdir(parents=True, exist_ok=True)
+            bt.logging.info(f"Directory created: {directory_path}")
 
-    # file_path = "/root/c4_dataset/head-1000-00001.json"
-    # file_path = "/root/c4_dataset/head-10000-00001.json"
-    load_range_multi_process()
+        load_range_multi_process()
 
-    bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")
+    bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
