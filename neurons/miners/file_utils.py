@@ -14,10 +14,12 @@ from neurons.miners import index_data
 from neurons.miners.utils import hash_code
 
 NUM_DB = 10_000
+MAX_RECORD_C4_FILE = 360_000
 ALL_TOKEN = [[] for i in range(NUM_DB)]
 DIR_PATH = ''
 FILE_PATH = ''
 PROCESS_NUMBER = 20
+HASH_LENGTH = 8
 
 
 def save(db, token):
@@ -39,8 +41,10 @@ def flush(all_token, arg):
     with open(file_path, 'w') as file:
         for i in range(len(all_token)):
             if len(all_token[i]) > 0:
-                data = str(i) + ',' + ','.join(all_token[i])
+                data = ','.join(all_token[i])
                 print(data, file=file)
+            else:
+                print('', file=file)
     all_token.clear()
 
 
@@ -89,10 +93,10 @@ def load_record(list_data, thread_name, line_count=None):
                 m = hashlib.sha256(token.encode('UTF-8'))
                 sha256_hex = m.hexdigest()
                 hash_value = hash_code(sha256_hex)
-                db = hash_value % 10_000
-                save(db, sha256_hex[:8])
+                db = hash_value % NUM_DB
+                save(db, sha256_hex[:HASH_LENGTH])
                 bt.logging.info(
-                    "upload success thread_name: " + thread_name + " key: " + sha256_hex[:8] + " : " + str(db))
+                    "upload success thread_name: " + thread_name + " key: " + sha256_hex[:HASH_LENGTH] + " : " + str(db))
             except Exception as e:
                 bt.logging.error(e)
                 traceback.print_exc()
@@ -102,7 +106,7 @@ def load_record(list_data, thread_name, line_count=None):
 
 
 def load_range_one_thread(file_path, start_line, end_line):
-    process_name = 'process-' + str(start_line//(360_000 // PROCESS_NUMBER))
+    process_name = 'process-' + str(start_line//(MAX_RECORD_C4_FILE // PROCESS_NUMBER))
     with open(file_path, 'r') as file:
         count = 0
         for line in file:
@@ -113,7 +117,7 @@ def load_range_one_thread(file_path, start_line, end_line):
 
 
 def load_range_process(arg):
-    num_record_per_process = 360_000 // PROCESS_NUMBER
+    num_record_per_process = MAX_RECORD_C4_FILE // PROCESS_NUMBER
     load_range_one_thread(FILE_PATH, arg * num_record_per_process,
                           arg * num_record_per_process + num_record_per_process)
     flush(ALL_TOKEN, arg)
