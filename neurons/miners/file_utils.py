@@ -101,12 +101,13 @@ def load_record(list_data, thread_name, line_count=None):
 
 
 def load_range_one_thread(file_path, start_line, end_line):
+    process_name = 'process-' + str(start_line * PROCESS_NUMBER//(360_000 // PROCESS_NUMBER))
     with open(file_path, 'r') as file:
         count = 0
         for line in file:
             if start_line <= count < end_line:
                 data = json.loads(line)
-                load_record([data], 'thread-main', count + 1)
+                load_record([data], process_name, count + 1)
             count += 1
 
 
