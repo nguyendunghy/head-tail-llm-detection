@@ -101,13 +101,13 @@ def insert_batch(db_connection, db, list_value):
 
 def insert_from_file(file_path):
     with open(file_path, 'r') as file:
+        db = 0
         for line in file:
             try:
-                ele_list = line.strip().split(',')
-                db = int(ele_list[0])
-                data_list = ele_list[1:]
+                data_list = line.strip().split(',')
                 db_conn = get_db_connection()
                 insert_batch(db_conn, db, data_list)
+                db += 1
             except Exception as ex:
                 bt.logging.error(ex)
                 traceback.print_exc()
