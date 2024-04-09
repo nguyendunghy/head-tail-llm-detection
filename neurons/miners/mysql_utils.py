@@ -120,7 +120,8 @@ def create_table(db_connection, db):
     try:
         bt.logging.info("start create table_{}".format(str(db)))
         cursor = db_connection.cursor()
-        sql = "create table table_{}(hash varchar(100),INDEX index_table_{} (hash))".format(str(db), str(db))
+        # sql = "create table table_{}(hash varchar(100),INDEX index_table_{} (hash))".format(str(db), str(db))
+        sql = "create table table_{}(hash varchar(100))".format(str(db), str(db))
         cursor.execute(sql)
         db_connection.commit()
         cursor.close()
