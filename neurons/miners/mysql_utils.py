@@ -58,6 +58,19 @@ def count_all(num_db=10_000):
     bt.logging.info("total record in database: " + str(total))
 
 
+def index_table(start, end):
+    db_connection = get_db_connection()
+    for db in range(start, end):
+        cursor = db_connection.cursor()
+        sql = "CREATE INDEX index_table_{} ON table_{}(hash)".format(str(db), str(db))
+        cursor.execute(sql)
+        db_connection.commit()
+        cursor.close()
+        bt.logging.info("index table_{} success".format(str(db)))
+    if 'db_connection' in locals() and db_connection.is_connected():
+        db_connection.close()
+
+
 def insert(db_connection, db, hash_value):
     cursor = db_connection.cursor()
 
@@ -371,5 +384,7 @@ if __name__ == '__main__':
         scan_all_file_insert_data(str(arg2), str(arg3))
     elif arg1 == 'count_all':
         count_all()
+    elif arg1 == 'index':
+        index_table(int(arg2), int(arg3))
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)} nanosecond")
