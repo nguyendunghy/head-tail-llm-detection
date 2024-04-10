@@ -1,17 +1,22 @@
 import copy
 import hashlib
 import json
+import shutil
 import threading
 import time
+from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
 
 import bittensor as bt
 import redis
 
 import index_data
 from detection.validator.data_augmentation import DataAugmentator
-from neurons.miners.utils import hash_code
+from neurons.miners.utils import hash_code, db_to_str, create_directory
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
+PARENT_DIR_PATH = '/home/ubuntu/c4-index-v1'
+PROCESS_NUMBER = 32
 
 
 def hash_code_java(string) -> int:
@@ -124,7 +129,7 @@ def load(file_path):
                 bt.logging.error(e)
 
 
-def load_index(file_path, db):
+def load_index_to_db(file_path, db, file_name):
     with open(file_path, 'r') as file:
         count = 1
         for line in file:
@@ -134,7 +139,50 @@ def load_index(file_path, db):
             for data in list_data:
                 conn.set(data, '')
             count += 1
-            bt.logging.info("---> upload line count: " + str(count))
+            bt.logging.info("---> upload line {} of file {} to db {}: ".format(str(count), file_name, str(db)))
+
+
+def load_file_to_redis(file_path, file_name):
+    with open(file_path, 'r') as file:
+        db = 0
+        for line in file:
+            list_data = line.strip().split(',')
+            conn = get_conn()
+            conn.select(db)
+            for data in list_data:
+                conn.set(data, '')
+            db += 1
+            bt.logging.info("---> upload line {} of file {} to db {}".format(str(db + 1)), file_name, str(db))
+
+
+def load_index_directory(parent_path, start, end, dest_path):
+    for i in range(start, end):
+        dir_path = parent_path + '/' + db_to_str(i)
+        directory = Path(dir_path)
+        file_names = [file.name for file in directory.iterdir() if file.is_file()]
+        for f_name in file_names:
+            file_path = dir_path + "/" + f_name
+            if 'flush' in f_name:
+                load_file_to_redis(file_path, f_name)
+            else:
+                arr = f_name.split('_')
+                db = int(arr[0])
+                load_index_to_db(file_path, db, f_name)
+            dest_file_path = dest_path + '/' + db_to_str(i)
+            create_directory(dest_file_path)
+            shutil.move(file_path, dest_file_path)
+
+
+def load_range_multi_process():
+    bt.logging.info('Starting task...')
+    with ProcessPoolExecutor(PROCESS_NUMBER) as exe:
+        exe.map(load_range_process, range(0, PROCESS_NUMBER))
+    bt.logging.info('Done.')
+
+
+def load_range_process(arg):
+    num_folder = 512 // PROCESS_NUMBER
+    load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder)
 
 
 def check_db_size(start, end):
@@ -149,8 +197,9 @@ if __name__ == "__main__":
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    file_path = "/home/ubuntu/c4-index-v1/00000/merge_00000.txt"
-    load_index(file_path,0)
+    parent_path = "/home/ubuntu/c4-index-v1"
+    des_path = '/home/ubuntu/c4-dataset/processed'
+    load_index_directory(parent_path, 0, 2, des_path)
 
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")

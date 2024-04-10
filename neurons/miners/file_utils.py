@@ -11,7 +11,7 @@ import bittensor as bt
 from pathlib import Path
 
 from neurons.miners import index_data
-from neurons.miners.utils import hash_code
+from neurons.miners.utils import hash_code, db_to_str
 
 NUM_DB = 10_000
 MAX_RECORD_C4_FILE = 360_000
@@ -71,18 +71,7 @@ def read_from_file(file_path):
             print(a)
 
 
-def db_to_str(db):
-    length = len(str(db))
-    if length == 1:
-        return '0000' + str(db)
-    elif length == 2:
-        return '000' + str(db)
-    elif length == 3:
-        return '00' + str(db)
-    elif length == 4:
-        return '0' + str(db)
-    else:
-        return str(db)
+
 
 
 def load_record(list_data, thread_name, line_count=None):

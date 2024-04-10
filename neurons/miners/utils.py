@@ -1,4 +1,6 @@
 import sys
+from pathlib import Path
+
 import bittensor as bt
 
 
@@ -36,11 +38,32 @@ def create_10000_file_from_merge_all(source_path, dest_dir_path):
             data = line.strip().split(',')
             converted_data = '\n'.join(data)
             file_name = 'table_{}.csv'.format(str(db))
-            file_path = dest_dir_path + '/group-' + str(db//1000) + '/' + file_name
+            file_path = dest_dir_path + '/group-' + str(db // 1000) + '/' + file_name
             with open(file_path, 'w') as des_file:
                 des_file.write(converted_data)
             bt.logging.info("data at line {} converted".format(str(db)))
             db += 1
+
+
+def db_to_str(db):
+    length = len(str(db))
+    if length == 1:
+        return '0000' + str(db)
+    elif length == 2:
+        return '000' + str(db)
+    elif length == 3:
+        return '00' + str(db)
+    elif length == 4:
+        return '0' + str(db)
+    else:
+        return str(db)
+
+
+def create_directory(dir_path):
+    directory_path = Path(dir_path)
+    if not directory_path.exists():
+        directory_path.mkdir(parents=True, exist_ok=True)
+        bt.logging.info(f"Directory created: {directory_path}")
 
 
 if __name__ == '__main__':
