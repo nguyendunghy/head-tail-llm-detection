@@ -362,7 +362,7 @@ if __name__ == '__main__':
     elif arg1 == 'create_all':
         create_all_table(10_000)
     elif arg1 == 'truncate':
-        truncate_all_table(int(arg1), int(arg2))
+        truncate_all_table(arg1, arg2)
     elif arg1 == 'drop_all':
         drop_all_table(10_000)
     elif arg1 == 'insert_file':
