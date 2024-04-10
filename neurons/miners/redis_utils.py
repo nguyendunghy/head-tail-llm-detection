@@ -5,6 +5,7 @@ import shutil
 import sys
 import threading
 import time
+import traceback
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
@@ -184,12 +185,16 @@ def load_range_multi_process():
 
 
 def load_range_process(arg):
-    bt.logging.info("start load_range_process " + str(arg))
-    bt.logging.info("NUM_FILE: " + str(NUM_FILE))
-    bt.logging.info("PROCESS_NUMBER: " + str(PROCESS_NUMBER))
+    try:
+        bt.logging.info("start load_range_process " + str(arg))
+        bt.logging.info("NUM_FILE: " + str(NUM_FILE))
+        bt.logging.info("PROCESS_NUMBER: " + str(PROCESS_NUMBER))
 
-    num_folder = NUM_FILE // PROCESS_NUMBER
-    load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder, DESTINATION_FOLDER)
+        num_folder = NUM_FILE // PROCESS_NUMBER
+        load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder, DESTINATION_FOLDER)
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
 
 
 def check_db_size(start, end):
