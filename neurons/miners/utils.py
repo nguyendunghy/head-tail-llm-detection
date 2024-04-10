@@ -67,6 +67,8 @@ def create_directory(dir_path):
 
 
 if __name__ == '__main__':
-    arg1 = sys.argv[1]
-    arg2 = sys.argv[2]
-    create_10000_file_from_merge_all(source_path=arg1, dest_dir_path=arg2)
+    # arg1 = sys.argv[1]
+    # arg2 = sys.argv[2]
+    # create_10000_file_from_merge_all(source_path=arg1, dest_dir_path=arg2)
+    for i in range(32):
+        print("nohup python3 redis_utils.py load_dir {} {} > redis{}.log &".format(str(i), str(i + 1), str(i)))

@@ -18,6 +18,7 @@ from neurons.miners.utils import hash_code, db_to_str, create_directory
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 PARENT_DIR_PATH = '/home/ubuntu/c4-index-v1'
 PROCESS_NUMBER = 32
+NUM_FILE = 512
 
 
 def hash_code_java(string) -> int:
@@ -182,7 +183,7 @@ def load_range_multi_process():
 
 
 def load_range_process(arg):
-    num_folder = 512 // PROCESS_NUMBER
+    num_folder = NUM_FILE // PROCESS_NUMBER
     load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder)
 
 
@@ -210,6 +211,9 @@ if __name__ == "__main__":
         load_index_directory(parent_path, int(arg2), int(arg3), des_path)
     elif arg1 == 'verify':
         verify_data(str(arg2))
+    elif arg1 == 'multi_process':
+        NUM_FILE = int(arg2)
+        load_range_multi_process()
 
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
