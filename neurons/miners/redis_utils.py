@@ -184,6 +184,10 @@ def load_range_multi_process():
 
 
 def load_range_process(arg):
+    bt.logging.info("start load_range_process " + str(arg))
+    bt.logging.info("NUM_FILE: " + str(NUM_FILE))
+    bt.logging.info("PROCESS_NUMBER: " + str(PROCESS_NUMBER))
+
     num_folder = NUM_FILE // PROCESS_NUMBER
     load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder, DESTINATION_FOLDER)
 
