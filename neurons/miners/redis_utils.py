@@ -132,10 +132,10 @@ def load(file_path):
 def load_index_to_db(file_path, db, file_name):
     with open(file_path, 'r') as file:
         count = 1
+        conn = get_conn()
+        conn.select(db)
         for line in file:
             list_data = line.strip().split(',')
-            conn = get_conn()
-            conn.select(db)
             for data in list_data:
                 conn.set(data, '')
             count += 1
@@ -145,9 +145,9 @@ def load_index_to_db(file_path, db, file_name):
 def load_file_to_redis(file_path, file_name):
     with open(file_path, 'r') as file:
         db = 0
+        conn = get_conn()
         for line in file:
             list_data = line.strip().split(',')
-            conn = get_conn()
             conn.select(db)
             for data in list_data:
                 conn.set(data, '')
