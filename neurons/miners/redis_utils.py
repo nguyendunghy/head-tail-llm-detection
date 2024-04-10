@@ -166,12 +166,12 @@ def load_index_directory(parent_path, start, end, dest_path):
         file_names = [file.name for file in directory.iterdir() if file.is_file()]
         for f_name in file_names:
             file_path = dir_path + "/" + f_name
-            if 'flush' in f_name:
-                load_file_to_redis(file_path, f_name)
+            if 'merged' in f_name:
+                load_file_to_redis(file_path, file_path)
             else:
                 arr = f_name.split('_')
                 db = int(arr[0])
-                load_index_to_db(file_path, db, f_name)
+                load_index_to_db(file_path, db, file_path)
             dest_file_path = dest_path + '/' + db_to_str(i)
             create_directory(dest_file_path)
             shutil.move(file_path, dest_file_path)
