@@ -17,6 +17,7 @@ from neurons.miners.utils import hash_code, db_to_str, create_directory
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 PARENT_DIR_PATH = '/home/ubuntu/c4-index-v1'
+DESTINATION_FOLDER = '/home/ubuntu/c4-dataset/processed'
 PROCESS_NUMBER = 32
 NUM_FILE = 512
 
@@ -184,7 +185,7 @@ def load_range_multi_process():
 
 def load_range_process(arg):
     num_folder = NUM_FILE // PROCESS_NUMBER
-    load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder)
+    load_index_directory(PARENT_DIR_PATH, arg * num_folder, arg * num_folder + num_folder, DESTINATION_FOLDER)
 
 
 def check_db_size(start, end):
