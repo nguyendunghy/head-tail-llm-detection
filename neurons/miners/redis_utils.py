@@ -156,7 +156,7 @@ def load_file_to_redis(file_path, file_name):
             key = 'set-' + str(db)
             conn.sadd(key, *list_data)
             db += 1
-            bt.logging.info("---> upload line {} of file {} to db {}".format(str(db + 1), file_name, str(db)))
+            bt.logging.info("---> upload line {} of file {} to db {}".format(str(db), file_name, str(db-1)))
 
 
 def load_index_directory(parent_path, start, end, dest_path):
