@@ -219,6 +219,8 @@ if __name__ == "__main__":
     elif arg1 == 'multi_process':
         NUM_FILE = int(arg2)
         load_range_multi_process()
+    elif arg1 == 'load_index_to_db':
+        load_index_to_db('/home/ubuntu/c4-dataset/processed/00000/merge_00000.txt', 0, 'main-thread')
 
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
