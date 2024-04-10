@@ -2,6 +2,7 @@ import copy
 import hashlib
 import json
 import shutil
+import sys
 import threading
 import time
 from concurrent.futures import ProcessPoolExecutor
@@ -194,13 +195,22 @@ def check_db_size(start, end):
 
 
 if __name__ == "__main__":
+    arg1 = sys.argv[1]
+    arg2 = sys.argv[2]
+    arg3 = sys.argv[3]
+
     start_time = time.time_ns()
-    # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
-    # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
-    des_path = '/home/ubuntu/c4-dataset/processed'
-    load_index_directory(parent_path, 0, 2, des_path)
+    if arg1 == 'check_db_size':
+        check_db_size(int(arg2), int(arg3))
+    elif arg1 == 'load_dir':
+        # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
+        # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
+        parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
+        des_path = '/home/ubuntu/c4-dataset/processed'
+        load_index_directory(parent_path, int(arg2), int(arg3), des_path)
+    elif arg1 == 'verify':
+        verify_data(str(arg2))
 
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
-    check_db_size(0, 1)
+    # check_db_size(0, 1)
