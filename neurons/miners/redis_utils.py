@@ -197,7 +197,7 @@ if __name__ == "__main__":
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    parent_path = "/home/ubuntu/c4-index-v1"
+    parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
     des_path = '/home/ubuntu/c4-dataset/processed'
     load_index_directory(parent_path, 0, 2, des_path)
 
