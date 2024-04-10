@@ -36,7 +36,7 @@ def create_10000_file_from_merge_all(source_path, dest_dir_path):
             data = line.strip().split(',')
             converted_data = '\n'.join(data)
             file_name = 'table_{}.csv'.format(str(db))
-            file_path = dest_dir_path + '/' + file_name
+            file_path = dest_dir_path + '/group-' + str(db//1000) + '/' + file_name
             with open(file_path, 'w') as des_file:
                 des_file.write(converted_data)
             bt.logging.info("data at line {} converted".format(str(db)))
