@@ -21,7 +21,7 @@ connection_pool = mysql.connector.pooling.MySQLConnectionPool(
     pool_size=32,
     pool_reset_session=True,
     host='localhost',
-    port='3306',#3306
+    port='3306',  # 3306
     database='ai_generated_text',
     user='jackie',
     password='jackie_password'
@@ -170,8 +170,8 @@ def create_all_table(num_db):
         create_table(get_db_connection(), i)
 
 
-def truncate_all_table(num_db):
-    for i in range(num_db):
+def truncate_all_table(start=0, end=10_000):
+    for i in range(start, end):
         truncate_table(get_db_connection(), i)
 
 
@@ -293,7 +293,7 @@ def verify_data(file_path):
             for sentence in sentences:
                 words = sentence.split(' ')
                 count_word += len(words)
-            if count_word//len(sentences) < 3:
+            if count_word // len(sentences) < 3:
                 bt.logging.info("human written text - too shor words ")
                 continue
 
@@ -323,7 +323,8 @@ def verify_data(file_path):
         db_conn.close()
 
 
-def scan_all_file_insert_data(des_dir_path='/home/ubuntu/mysql/upload_data/', processed_dir_path='/home/ubuntu/mysql/processed_data/'):
+def scan_all_file_insert_data(des_dir_path='/home/ubuntu/mysql/upload_data/',
+                              processed_dir_path='/home/ubuntu/mysql/processed_data/'):
     directory = Path(des_dir_path)
     count = 0
     while True:
@@ -360,8 +361,8 @@ if __name__ == '__main__':
         verify_data(file_path)
     elif arg1 == 'create_all':
         create_all_table(10_000)
-    elif arg1 == 'truncate_all':
-        truncate_all_table(10_000)
+    elif arg1 == 'truncate':
+        truncate_all_table(int(arg1), int(arg2))
     elif arg1 == 'drop_all':
         drop_all_table(10_000)
     elif arg1 == 'insert_file':
