@@ -367,7 +367,7 @@ if __name__ == '__main__':
     elif arg1 == 'insert_file':
         insert_from_file(arg2)
     elif arg1 == 'scan':
-        scan_all_file_insert_data()
+        scan_all_file_insert_data(str(arg2), str(arg3))
     elif arg1 == 'count_all':
         count_all()
 
