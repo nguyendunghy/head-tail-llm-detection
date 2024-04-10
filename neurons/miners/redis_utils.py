@@ -139,8 +139,8 @@ def load_index_to_db(file_path, db, file_name):
         conn.select(db)
         for line in file:
             list_data = line.strip().split(',')
-            for data in list_data:
-                conn.set(data, '')
+            key = 'set-' + str(db)
+            conn.sadd(key, *list_data)
             count += 1
             bt.logging.info("---> upload line {} of file {} to db {}: ".format(str(count), file_name, str(db)))
 
@@ -152,8 +152,8 @@ def load_file_to_redis(file_path, file_name):
         for line in file:
             list_data = line.strip().split(',')
             conn.select(db)
-            for data in list_data:
-                conn.set(data, '')
+            key = 'set-' + str(db)
+            conn.sadd(key, *list_data)
             db += 1
             bt.logging.info("---> upload line {} of file {} to db {}".format(str(db + 1), file_name, str(db)))
 
