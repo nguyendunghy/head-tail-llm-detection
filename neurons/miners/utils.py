@@ -46,4 +46,4 @@ def create_10000_file_from_merge_all(source_path, dest_dir_path):
 if __name__ == '__main__':
     arg1 = sys.argv[1]
     arg2 = sys.argv[2]
-    create_10000_file_from_merge_all(source_path=arg1, dest_path=arg2)
+    create_10000_file_from_merge_all(source_path=arg1, dest_dir_path=arg2)
