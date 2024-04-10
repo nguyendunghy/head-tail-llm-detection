@@ -22,6 +22,7 @@ def hash_code_java(string) -> int:
     h = (h + 2 ** 31) % 2 ** 32 - 2 ** 31
     return -h if h < 0 else h
 
+
 def get_conn():
     conn = redis.Redis(connection_pool=redis_pool)
     return conn
@@ -122,9 +123,23 @@ def load(file_path):
             except Exception as e:
                 bt.logging.error(e)
 
-def check_db_size():
+
+def load_index(file_path, db):
+    with open(file_path, 'r') as file:
+        count = 1
+        for line in file:
+            list_data = line.strip().split(',')
+            conn = get_conn()
+            conn.select(db)
+            for data in list_data:
+                conn.set(data, '')
+            count += 1
+            bt.logging.info("---> upload line count: " + str(count))
+
+
+def check_db_size(start, end):
     conn = get_conn()
-    for i in range(100_000_000):
+    for i in range(start, end):
         conn.select(i)
         size = conn.dbsize()
         print(str(i) + ":" + str(size))
@@ -134,9 +149,9 @@ if __name__ == "__main__":
     start_time = time.time_ns()
     # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
     # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-    file_path = "/root/c4_dataset/c4/extracted_file/tail-2000-00001.json"
-    load(file_path)
+    file_path = "/home/ubuntu/c4-index-v1/00000/merge_00000.txt"
+    load_index(file_path,0)
 
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time)}nanosecond")
-    check_db_size()
+    check_db_size(0, 1)
