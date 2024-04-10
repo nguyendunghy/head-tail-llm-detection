@@ -228,5 +228,5 @@ if __name__ == "__main__":
         load_index_to_db('/home/ubuntu/c4-dataset/processed/00000/merge_00000.txt', 0, 'main-thread')
 
     # verify_data(file_path)
-    bt.logging.info(f"time loading {int(time.time_ns() - start_time),} nanosecond")
+    bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
