@@ -136,7 +136,7 @@ def verify_token(file_path):
         count = 1
         conn = get_conn()
         for line in file:
-            if count == 1 or count == 10_000:
+            if count in [1, 2500, 5_000, 7500, 10_000]:
                 db = count - 1
                 conn.select(db)
                 list_data = line.strip().split(',')
