@@ -1,8 +1,8 @@
-import json
-from datetime import datetime
+import time
 from flask import Flask, request, jsonify
-import requests
-from neurons.miners.monitor_data_mysql import get_db_connection, insert, check_exists
+import bittensor as bt
+
+from neurons.miners.redis_utils import check_exists
 
 app = Flask(__name__)
 
@@ -12,66 +12,22 @@ def hello_world():
     return "Hello, World!"
 
 
-@app.route('/insert', methods=['POST'])
-def insert_api():
-    if request.is_json:
-        data = request.get_json()
-        id = data['id']
-        text_hash = data['text_hash']
-        model_type = data['model_type']
-        count_ai = data['count_ai']
-        count_human = data['count_human']
-
-        if id is None:
-            now = datetime.now()
-            id = now.strftime('%Y%m%d%H%M%S%f')[:17]
-
-        input_data = (id, text_hash, model_type, count_ai, count_human)
-        print(input_data)
-        db_connection = get_db_connection('localhost', '8888')
-        insert(db_connection, input_data)
-
-        return jsonify({"insert success": True, "data": data}), 200
-    else:
-        return jsonify({"error": "Request must be JSON"}), 400
-
-
 @app.route('/check-exists', methods=['POST'])
 def check_exists_in_db():
+    start_time = time.time_ns()
     if request.is_json:
         data = request.get_json()
         input_arr = data['input']
-        query_data = []
+        input_redis = []
         for element in input_arr:
             tmp_data = [element['head_db'], element['head'], element['tail_db'], element['tail']]
-            query_data.append(tmp_data)
+            input_redis.append(tmp_data)
 
-        db_connection = get_db_connection('localhost', '3306')
-        result = check_exists(db_connection, query_data)
+        result = check_exists(input_redis)
+        bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
         return jsonify({"message": "check exists successfully", "result": result}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
-
-
-def call_insert(text_hash, model_type, count_human, count_ai):
-    url = "http://65.108.33.125:8080/insert"
-
-    headers = {
-        'Content-Type': 'application/json'
-    }
-    payload = json.dumps({
-        "id": None,
-        "text_hash": text_hash,
-        "model_type": model_type,
-        "count_ai": count_ai,
-        "count_human": count_human
-    })
-
-    response = requests.request("POST", url, headers=headers, data=payload)
-    if response.status_code == 200:
-        ...
-    else:
-        print('Failed to post data:', response.status_code, response.content)
 
 
 if __name__ == '__main__':
