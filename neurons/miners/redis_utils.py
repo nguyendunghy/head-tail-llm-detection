@@ -141,7 +141,7 @@ def verify_token(file_path):
                 conn.select(db)
                 list_data = line.strip().split(',')
                 key = 'set-' + str(db)
-                for data in list_data:
+                for data in list_data[1:]:
                     if conn.sismember(key, data) == 0:
                         bt.logging.info(
                             "---> file {} has token {} at db {} not exit".format(str(file_path), data, str(db)))
