@@ -210,6 +210,7 @@ if __name__ == "__main__":
     elif arg1 == 'load_file':
         load_file_to_redis(file_path=str(arg2), file_name=str(arg3))
     elif arg1 == 'exists':
+        start_time = time.time_ns()
         ex = exists_on_redis(str(arg2), int(arg3))
         bt.logging.info("exists: " + str(ex))
     # verify_data(file_path)
