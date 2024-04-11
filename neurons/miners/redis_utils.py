@@ -23,6 +23,7 @@ PROCESS_NUMBER = 4
 NUM_FILE = 512
 NUM_DB = 10_000
 
+
 def hash_code_java(string) -> int:
     h = 0
     if len(string) > 0:
@@ -38,23 +39,25 @@ def get_conn():
 
 
 def exists(key) -> bool:
-    # start_time = time.time_ns()
     conn = get_conn()
-    # time_connect = time.time_ns()
-    # bt.logging.info("time connect redis: " + str(time_connect - start_time))
-
     m = hashlib.sha256(key.encode('UTF-8'))
     sha256_hex = m.hexdigest()
-    # time_hash_sha256 = time.time_ns()
     db = hash_code_java(sha256_hex) % 1000
-    # bt.logging.info("time hash sha256: " + str(time_hash_sha256 - time_connect))
-    bt.logging.info("sha256_hex: " + sha256_hex + " db= " + str(db))
     conn.select(db)
     ex = conn.exists(sha256_hex) == 1
-    # end_time = time.time_ns()
-    # bt.logging.info("time check exist: " + str(end_time - time_hash_sha256))
-
     return ex
+
+
+def exists_on_redis(token):
+    m = hashlib.sha256(token.encode('UTF-8'))
+    sha256_hex = m.hexdigest()
+    hash_value = hash_code(sha256_hex)
+    db = hash_value % NUM_DB
+    key = 'set-' + str(db)
+    mem = sha256_hex[:8]
+    conn = get_conn()
+    conn.select(db)
+    return conn.sismember(key, mem) == 1
 
 
 def verify_data(file_path):
@@ -77,18 +80,6 @@ def verify_data(file_path):
                     bt.logging.info("indexing<==>fail: " + text)
                 else:
                     bt.logging.info("indexing success")
-
-
-def exists_on_redis(token):
-    m = hashlib.sha256(token.encode('UTF-8'))
-    sha256_hex = m.hexdigest()
-    hash_value = hash_code(sha256_hex)
-    db = hash_value % NUM_DB
-    key = 'set-' + str(db)
-    mem = sha256_hex[:8]
-    conn = get_conn()
-    conn.select(db)
-    return conn.sismember(key, mem) == 1
 
 
 def load_record(conn, list_data, thread_name):
@@ -233,7 +224,9 @@ if __name__ == "__main__":
         load_index_to_db('/home/ubuntu/c4-dataset/processed/00000/merge_00000.txt', 0, 'main-thread')
     elif arg1 == 'load_file':
         load_file_to_redis(file_path=str(arg2), file_name=str(arg3))
-
+    elif arg1 == 'exists':
+        ex = exists_on_redis(str(arg2))
+        bt.logging.info("exists: " + str(ex))
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
