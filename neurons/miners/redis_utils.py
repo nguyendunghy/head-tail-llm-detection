@@ -14,7 +14,7 @@ import redis
 
 import index_data
 from detection.validator.data_augmentation import DataAugmentator
-from neurons.miners.utils import hash_code, db_to_str, create_directory
+from neurons.miners.utils import hash_code, db_to_str, create_directory, gen_hash_and_db
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 PARENT_DIR_PATH = '/home/ubuntu/c4-dataset/c4-index-v1'
@@ -24,40 +24,25 @@ NUM_FILE = 512
 NUM_DB = 10_000
 
 
-def hash_code_java(string) -> int:
-    h = 0
-    if len(string) > 0:
-        for i in range(0, len(string)):
-            h = 31 * h + ord(string[i])
-    h = (h + 2 ** 31) % 2 ** 32 - 2 ** 31
-    return -h if h < 0 else h
-
-
 def get_conn():
     conn = redis.Redis(connection_pool=redis_pool)
     return conn
 
 
-def exists(key) -> bool:
-    conn = get_conn()
-    m = hashlib.sha256(key.encode('UTF-8'))
-    sha256_hex = m.hexdigest()
-    db = hash_code_java(sha256_hex) % 1000
-    conn.select(db)
-    ex = conn.exists(sha256_hex) == 1
-    return ex
+def exists(token) -> bool:
+    hash_value, db = gen_hash_and_db(token=token)
+    return exists_on_redis(hash_value=hash_value, db=db)
 
 
-def exists_on_redis(token):
-    m = hashlib.sha256(token.encode('UTF-8'))
-    sha256_hex = m.hexdigest()
-    hash_value = hash_code(sha256_hex)
-    db = hash_value % NUM_DB
-    key = 'set-' + str(db)
-    mem = sha256_hex[:8]
-    conn = get_conn()
-    conn.select(db)
-    return conn.sismember(key, mem) == 1
+def exists_on_redis(hash_value, db):
+    try:
+        key = 'set-' + str(db)
+        conn = get_conn()
+        conn.select(db)
+        return conn.sismember(key, hash_value) == 1
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
 
 
 def verify_data(file_path):
@@ -74,7 +59,7 @@ def verify_data(file_path):
             else:
                 list_result = []
                 for token in list_token:
-                    re = exists_on_redis(token)
+                    re = exists(token)
                     list_result.append(re)
                 if list_result.count(False) == 2:
                     bt.logging.info("indexing<==>fail: " + text)
@@ -225,7 +210,7 @@ if __name__ == "__main__":
     elif arg1 == 'load_file':
         load_file_to_redis(file_path=str(arg2), file_name=str(arg3))
     elif arg1 == 'exists':
-        ex = exists_on_redis(str(arg2))
+        ex = exists_on_redis(str(arg2), int(arg3))
         bt.logging.info("exists: " + str(ex))
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")

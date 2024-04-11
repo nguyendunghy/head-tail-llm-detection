@@ -9,6 +9,8 @@ LAYER_NAME = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
               'H', 'I', 'J', "K", 'L', 'M', 'N',
               'O', 'P', 'Q', 'R', 'S', 'T', 'U',
               'V', 'W', 'X', 'Y', 'Z']
+NUM_DB = 10_000
+HASH_LEN = 8
 
 
 def hash_code(string) -> int:
@@ -17,6 +19,23 @@ def hash_code(string) -> int:
         for i in range(0, len(string)):
             h = 31 * h + ord(string[i])
     return h
+
+
+def hash_code_java(string) -> int:
+    h = 0
+    if len(string) > 0:
+        for i in range(0, len(string)):
+            h = 31 * h + ord(string[i])
+    h = (h + 2 ** 31) % 2 ** 32 - 2 ** 31
+    return -h if h < 0 else h
+
+
+def gen_hash_and_db(token):
+    m = hashlib.sha256(token.encode('UTF-8'))
+    sha256_hex = m.hexdigest()
+    db = hash_code(sha256_hex) % NUM_DB
+    hash_value = sha256_hex[:HASH_LEN]
+    return hash_value, db
 
 
 def create_one_column_file(source_path, dest_path):
