@@ -35,6 +35,9 @@ from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.gpt_zero_api import is_human_generated_files
 from neurons.miners.old_gpt_zero import GPT2PPL
 
+
+from neurons.miners.deberta_classifier import DebertaClassifier
+
 hf_logging.set_verbosity(40)
 
 
@@ -50,8 +53,13 @@ class Miner(BaseMinerNeuron):
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
 
-        self.model = PPLModel(device=self.device)
-        self.model.load_pretrained('neurons/miners/ppl_model.pk')
+        if self.config.neuron.model_type == 'ppl':
+            self.model = PPLModel(device=self.device)
+            self.model.load_pretrained(self.config.neuron.ppl_model_path)
+        else:
+            self.model = DebertaClassifier(foundation_model_path=self.config.neuron.deberta_foundation_model_path,
+                                           model_path=self.config.neuron.deberta_model_path,
+                                           device=self.device)
         self.old_model = GPT2PPL(device=self.device)
         self.load_state()
 
@@ -74,16 +82,15 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
 
         input_data = synapse.texts
-        bt.logging.info(f"Amount of texts received: {len(input_data)}")
+        bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
         bt.logging.info(f"All of texts received: {str(input_data)}")
-        preds = []
-        if len(input_data) == 50:
-            preds = self.calculate_pred(input_data)
-            self.standard_current_model_pred(input_data)
-            self.consider_text_length(input_data)
-            # self.gpt_zero_api_pred(input_data)
-        else:
-            preds = self.standard_model_pred(input_data)
+        try:
+            preds = self.model.predict_batch(input_data)
+            preds = [el > 0.5 for el in preds]
+        except Exception as e:
+            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            preds = [0] * len(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         synapse.predictions = preds
@@ -126,12 +133,16 @@ class Miner(BaseMinerNeuron):
             bt.logging.trace(
                 f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
             )
+            self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
+            bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
             return True, "Unrecognized hotkey"
 
         uid = self.metagraph.hotkeys.index(synapse.dendrite.hotkey)
         # TODO: comment to test on test net
         # stake = self.metagraph.S[uid].item()
         # if stake < self.config.blacklist.minimum_stake_requirement:
+        #     self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
+        #     bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
         #     return True, "pubkey stake below min_allowed_stake"
 
         bt.logging.trace(
