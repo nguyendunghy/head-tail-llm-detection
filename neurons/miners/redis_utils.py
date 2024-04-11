@@ -62,7 +62,7 @@ def verify_data(file_path):
                     re = exists(token)
                     list_result.append(re)
                 if list_result.count(False) == 2:
-                    bt.logging.info("indexing<==>fail: " + text)
+                    bt.logging.info("indexing fail: " + text)
                 else:
                     bt.logging.info("indexing success")
 
