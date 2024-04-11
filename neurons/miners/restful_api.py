@@ -2,7 +2,7 @@ import time
 from flask import Flask, request, jsonify
 import bittensor as bt
 
-from neurons.miners.redis_utils import check_exists
+from neurons.miners.redis_utils import check_exists, verify_raw_text_exists
 
 app = Flask(__name__)
 
@@ -24,6 +24,23 @@ def check_exists_in_db():
             input_redis.append(tmp_data)
 
         result = check_exists(input_redis)
+        bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
+        return jsonify({"message": "check exists successfully", "result": result}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+
+@app.route('/verify-data', methods=['POST'])
+def verify_data():
+    start_time = time.time_ns()
+    if request.is_json:
+        data = request.get_json()
+        input_arr = data['texts']
+        result = []
+        for element in input_arr:
+            isEx = verify_raw_text_exists(element)
+            result.append(isEx)
+
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
         return jsonify({"message": "check exists successfully", "result": result}), 200
     else:

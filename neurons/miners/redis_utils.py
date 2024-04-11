@@ -53,9 +53,33 @@ def check_exists(input_list):
         head_hash = input[1]
         tail_db = input[2]
         tail_hash = input[3]
-        isExisted = exists_on_redis(hash_value=head_hash, db=head_db) or exists_on_redis(hash_value=tail_hash, db=tail_db)
+        isExisted = exists_on_redis(hash_value=head_hash, db=head_db) or exists_on_redis(hash_value=tail_hash,
+                                                                                         db=tail_db)
         result.append(isExisted)
     return result
+
+
+def verify_raw_text_exists(text):
+    list_token = index_data.cut_head_tail(text)
+    if len(list_token) == 1:
+        bt.logging.info("text too short:" + text)
+        return 'short'
+    else:
+        list_result = []
+        try:
+            for token in list_token:
+                re = exists(token)
+                list_result.append(re)
+            if list_result.count(False) == 2:
+                bt.logging.info("indexing fail: " + text)
+                return 'fail'
+            else:
+                bt.logging.info("indexing success ")
+                return 'success'
+        except Exception as e:
+            bt.logging.error(e)
+            bt.logging.info(str(e) + '--' + text)
+
 
 
 def verify_data(file_path):
