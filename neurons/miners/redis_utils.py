@@ -21,7 +21,7 @@ PARENT_DIR_PATH = '/home/ubuntu/c4-dataset/c4-index-v1'
 DESTINATION_FOLDER = '/home/ubuntu/c4-dataset/processed'
 PROCESS_NUMBER = 4
 NUM_FILE = 512
-
+NUM_DB = 10_000
 
 def hash_code_java(string) -> int:
     h = 0
@@ -71,19 +71,24 @@ def verify_data(file_path):
             else:
                 list_result = []
                 for token in list_token:
-                    m = hashlib.sha256(token.encode('UTF-8'))
-                    sha256_hex = m.hexdigest()
-                    hash_value = hash_code(sha256_hex)
-                    db = hash_value % 100_000_000
-                    key = sha256_hex[:8]
-                    conn = get_conn()
-                    conn.select(db)
-                    re = conn.exists(key) == 1
+                    re = exists_on_redis(token)
                     list_result.append(re)
                 if list_result.count(False) == 2:
                     bt.logging.info("indexing<==>fail: " + text)
                 else:
                     bt.logging.info("indexing success")
+
+
+def exists_on_redis(token):
+    m = hashlib.sha256(token.encode('UTF-8'))
+    sha256_hex = m.hexdigest()
+    hash_value = hash_code(sha256_hex)
+    db = hash_value % NUM_DB
+    key = 'set-' + str(db)
+    mem = sha256_hex[:8]
+    conn = get_conn()
+    conn.select(db)
+    return conn.sismember(key, mem) == 1
 
 
 def load_record(conn, list_data, thread_name):
@@ -156,7 +161,7 @@ def load_file_to_redis(file_path, file_name):
             key = 'set-' + str(db)
             conn.sadd(key, *list_data)
             db += 1
-            bt.logging.info("---> upload line {} of file {} to db {}".format(str(db), file_name, str(db-1)))
+            bt.logging.info("---> upload line {} of file {} to db {}".format(str(db), file_name, str(db - 1)))
 
 
 def load_index_directory(parent_path, start, end, dest_path):
