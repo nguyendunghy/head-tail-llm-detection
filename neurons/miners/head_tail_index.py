@@ -8,6 +8,17 @@ from neurons.miners.utils import hash_code
 
 
 def head_tail_api_pred_human(list_text):
+    url1 = "http://69.67.150.21:8080/check-exists"
+    url2 = 'http://103.219.170.221:8080/check-exists'
+
+    result1 = head_tail_api_pred_human_with_url(list_text, url=url1)
+    result2 = head_tail_api_pred_human_with_url(list_text, url=url2)
+
+    result = [result1[i] or result2[i] for i in range(len(result1))]
+    return result
+
+
+def head_tail_api_pred_human_with_url(list_text, url):
     bt.logging.info("head_tail_api_pred_human list_text :" + str(list_text))
     final_human_pred = [False for _ in range(len(list_text))]
     not_touch_index_list = []
@@ -44,7 +55,6 @@ def head_tail_api_pred_human(list_text):
     headers = {
         'Content-Type': 'application/json'
     }
-    url = "http://65.108.33.125:8080/check-exists"
     response = requests.request("POST", url, headers=headers, json=body_data)
     if response.status_code == 200:
         data = response.json()
