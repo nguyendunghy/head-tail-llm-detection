@@ -29,8 +29,8 @@ class DataGenerator:
             self.model_probs = model_probs
             assert sum(model_probs) == 1
 
-        # self.human_dataset = HumanDataset()
-        self.human_dataset = JackieHumanDataset()
+        # self.human_dataset = JackieHumanDataset()
+        self.human_dataset = HumanDataset()
         self.prompt_dataset = PromptDataset()
 
         assert len(self.models) == len(self.model_names) == len(self.model_probs)
