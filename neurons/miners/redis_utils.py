@@ -131,6 +131,38 @@ def load(file_path):
                 bt.logging.error(e)
 
 
+def verify_token(file_path):
+    with open(file_path, 'r') as file:
+        count = 1
+        conn = get_conn()
+        for line in file:
+            if count == 1 or count == 10_000:
+                db = count - 1
+                conn.select(db)
+                list_data = line.strip().split(',')
+                key = 'set-' + str(db)
+                for data in list_data:
+                    if conn.sismember(key, data) == 0:
+                        bt.logging.info(
+                            "---> file {} has token {} at db {} not exit".format(str(file_path), data, str(db)))
+                        return False
+            count += 1
+        return True
+
+
+def verify_index_directory(parent_path, start, end, dest_path):
+    for i in range(start, end):
+        dir_path = parent_path + '/' + db_to_str(i)
+        directory = Path(dir_path)
+        file_names = [file.name for file in directory.iterdir() if file.is_file()]
+        for f_name in file_names:
+            file_path = dir_path + "/" + f_name
+            if not verify_token(file_path):
+                dest_file_path = dest_path + '/' + db_to_str(i)
+                create_directory(dest_file_path)
+                shutil.move(file_path, dest_file_path)
+
+
 def load_index_to_db(file_path, db, file_name):
     with open(file_path, 'r') as file:
         count = 1
@@ -175,6 +207,7 @@ def load_index_directory(parent_path, start, end, dest_path):
             shutil.move(file_path, dest_file_path)
         time.sleep(10)
 
+
 def load_range_multi_process():
     bt.logging.info('Starting task...')
     with ProcessPoolExecutor(PROCESS_NUMBER) as exe:
@@ -217,8 +250,12 @@ if __name__ == "__main__":
         parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
         des_path = '/home/ubuntu/c4-dataset/processed'
         load_index_directory(parent_path, int(arg2), int(arg3), des_path)
-    elif arg1 == 'verify':
+    elif arg1 == 'verify_raw':
         verify_data(str(arg2))
+    elif arg1 == 'verify_index_directory':
+        parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
+        des_path = '/home/ubuntu/c4-dataset/processed'
+        verify_index_directory(parent_path, int(arg2), int(arg3), des_path)
     elif arg1 == 'multi_process':
         NUM_FILE = int(arg2)
         load_range_multi_process()
