@@ -46,25 +46,42 @@ def exists_on_redis(hash_value, db):
 
 
 def verify_data(file_path):
-    # human_dataset = HumanDataset()
     augmentator = DataAugmentator()
+    count = 1
     with open(file_path, 'r') as file:
         for line in file:
             el = json.loads(line)
             augs = augmentator(el['text'])
             text = augs['text']
+            if len(text) <= 250:
+                bt.logging.info("human written text - too short character")
+                continue
+
+            sentences = augmentator.get_all_sentences(text)
+            count_word = 0
+            for sentence in sentences:
+                words = sentence.split(' ')
+                count_word += len(words)
+            if count_word // len(sentences) < 3:
+                bt.logging.info("human written text - too shor words ")
+                continue
+
             list_token = index_data.cut_head_tail(text)
             if len(list_token) == 1:
-                bt.logging.info("text too short" + text)
+                bt.logging.info("text too short:" + text)
             else:
                 list_result = []
-                for token in list_token:
-                    re = exists(token)
-                    list_result.append(re)
-                if list_result.count(False) == 2:
-                    bt.logging.info("indexing fail: " + text)
-                else:
-                    bt.logging.info("indexing success")
+                try:
+                    for token in list_token:
+                        re = exists(token)
+                        list_result.append(re)
+                    if list_result.count(False) == 2:
+                        bt.logging.info("indexing fail: " + str(count) + " :" + text)
+                    else:
+                        bt.logging.info("indexing success " + str(count))
+                except Exception as e:
+                    bt.logging.error(e)
+            count += 1
 
 
 def load_record(conn, list_data, thread_name):
