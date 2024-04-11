@@ -26,9 +26,6 @@ import time
 from typing import List
 import torch
 
-from neurons.fake_miner import FakeMiner
-
-miner = FakeMiner()
 
 async def forward(self):
     """
@@ -53,7 +50,6 @@ async def forward(self):
     start_time = time.time()
     texts, labels = await self.build_queries()
     end_time = time.time()
-    miner.fake_miner(texts)
     bt.logging.info(f"Time to generate challenges: {int(end_time - start_time)}")
 
     responses: List[TextSynapse] = await self.dendrite(
