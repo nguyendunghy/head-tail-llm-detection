@@ -131,13 +131,13 @@ def load(file_path):
                 bt.logging.error(e)
 
 
-def verify_token(file_path, db=None):
+def verify_token(file_path, fixed_db=None):
     with open(file_path, 'r') as file:
         count = 1
         conn = get_conn()
         for line in file:
             if count in [1, 2500, 5_000, 7500, 10_000]:
-                db = count - 1 if db is None else db
+                db = count - 1 if fixed_db is None else fixed_db
                 conn.select(db)
                 list_data = line.strip().split(',')
                 key = 'set-' + str(db)
@@ -165,7 +165,7 @@ def verify_index_directory(parent_path, start, end, dest_path):
             else:
                 arr = f_name.split('_')
                 db = int(arr[0])
-                verify_token(file_path, db=db)
+                verify_token(file_path, db)
 
 
 def load_index_to_db(file_path, db, file_name):
