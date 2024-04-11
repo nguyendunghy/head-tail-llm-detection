@@ -159,8 +159,8 @@ def verify_index_directory(parent_path, start, end, dest_path):
             file_path = dir_path + "/" + f_name
             if not verify_token(file_path):
                 dest_file_path = dest_path + '/' + db_to_str(i)
-                create_directory(dest_file_path)
-                shutil.move(file_path, dest_file_path)
+                # create_directory(dest_file_path)
+                # shutil.move(file_path, dest_file_path)
 
 
 def load_index_to_db(file_path, db, file_name):
