@@ -253,7 +253,7 @@ if __name__ == "__main__":
     elif arg1 == 'verify_raw':
         verify_data(str(arg2))
     elif arg1 == 'verify_index_directory':
-        parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
+        parent_path = "/home/ubuntu/c4-dataset/processed"
         des_path = '/home/ubuntu/c4-dataset/processed'
         verify_index_directory(parent_path, int(arg2), int(arg3), des_path)
     elif arg1 == 'multi_process':
