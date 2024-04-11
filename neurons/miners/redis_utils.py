@@ -173,7 +173,7 @@ def load_index_directory(parent_path, start, end, dest_path):
             dest_file_path = dest_path + '/' + db_to_str(i)
             create_directory(dest_file_path)
             shutil.move(file_path, dest_file_path)
-
+        time.sleep(10)
 
 def load_range_multi_process():
     bt.logging.info('Starting task...')
