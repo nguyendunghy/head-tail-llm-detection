@@ -71,6 +71,11 @@ def create_10000_file_from_merge_all(source_path, dest_dir_path):
             db += 1
 
 
+def count_lines(filename):
+    with open(filename, 'r') as file:
+        return sum(1 for line in file)
+
+
 def db_to_str(db):
     length = len(str(db))
     if length == 1:

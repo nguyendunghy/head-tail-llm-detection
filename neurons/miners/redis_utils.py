@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+import random
 import shutil
 import sys
 import threading
@@ -14,7 +15,7 @@ import redis
 
 import index_data
 from detection.validator.data_augmentation import DataAugmentator
-from neurons.miners.utils import hash_code, db_to_str, create_directory, gen_hash_and_db
+from neurons.miners.utils import hash_code, db_to_str, create_directory, gen_hash_and_db, count_lines
 
 redis_pool = redis.ConnectionPool(host='127.0.0.1', port=6379, decode_responses=True)
 PARENT_DIR_PATH = '/home/ubuntu/c4-dataset/c4-index-v1'
@@ -45,43 +46,63 @@ def exists_on_redis(hash_value, db):
         traceback.print_exc()
 
 
+def verify_raw_exists(texts, url):
+    return True
+
+
+def verify_line(line, augmentator, line_number, urls=None):
+    el = json.loads(line)
+    augs = augmentator(el['text'])
+    text = augs['text']
+    if len(text) <= 250:
+        bt.logging.info("human written text - too short character")
+        return True
+
+    sentences = augmentator.get_all_sentences(text)
+    count_word = 0
+    for sentence in sentences:
+        words = sentence.split(' ')
+        count_word += len(words)
+    if count_word // len(sentences) < 3:
+        bt.logging.info("human written text - too short words ")
+        return True
+    if urls is not None:
+        for url in urls:
+            result = verify_raw_exists([text], url)
+            if result:
+                bt.logging.info("indexing success " + str(line_number))
+                return True
+
+        bt.logging.info("indexing fail: " + str(line_number) + " :" + text)
+        return False
+
+    list_token = index_data.cut_head_tail(text)
+    if len(list_token) == 1:
+        bt.logging.info("text too short:" + text)
+        return True
+    else:
+        list_result = []
+        try:
+            for token in list_token:
+                re = exists(token)
+                list_result.append(re)
+            if list_result.count(False) == 2:
+                bt.logging.info("indexing fail: " + str(line_number) + " :" + text)
+                return False
+            else:
+                bt.logging.info("indexing success " + str(line_number))
+                return True
+        except Exception as e:
+            bt.logging.error(e)
+
+
 def verify_data(file_path):
     augmentator = DataAugmentator()
-    count = 1
+    line_number = 1
     with open(file_path, 'r') as file:
         for line in file:
-            el = json.loads(line)
-            augs = augmentator(el['text'])
-            text = augs['text']
-            if len(text) <= 250:
-                bt.logging.info("human written text - too short character")
-                continue
-
-            sentences = augmentator.get_all_sentences(text)
-            count_word = 0
-            for sentence in sentences:
-                words = sentence.split(' ')
-                count_word += len(words)
-            if count_word // len(sentences) < 3:
-                bt.logging.info("human written text - too shor words ")
-                continue
-
-            list_token = index_data.cut_head_tail(text)
-            if len(list_token) == 1:
-                bt.logging.info("text too short:" + text)
-            else:
-                list_result = []
-                try:
-                    for token in list_token:
-                        re = exists(token)
-                        list_result.append(re)
-                    if list_result.count(False) == 2:
-                        bt.logging.info("indexing fail: " + str(count) + " :" + text)
-                    else:
-                        bt.logging.info("indexing success " + str(count))
-                except Exception as e:
-                    bt.logging.error(e)
-            count += 1
+            verify_line(line, augmentator, line_number)
+            line_number += 1
 
 
 def load_record(conn, list_data, thread_name):
@@ -166,6 +187,21 @@ def verify_index_directory(parent_path, start, end, dest_path):
                 arr = f_name.split('_')
                 db = int(arr[0])
                 verify_token(file_path, db)
+
+
+def verify_all_c4(c4_dir, start, end, num_random_line=300):
+    """For each raw file, we will get randomly 300 rows to call to our service to verify. If the fail rate is high. we
+    have to verify the accuracy of our indexed data"""
+    augmentator = DataAugmentator()
+    for i in range(start, end):
+        file_path = c4_dir + '/' + 'c4-train.{}-of-01024.json'.format(db_to_str(i))
+        num_line = count_lines(file_path)
+        random_line_index = [random.randint(1, num_line + 1) for i in range(num_random_line)]
+        with open(file_path, 'r') as file:
+            line_number = 1
+            for line in file:
+                if line_number in random_line_index:
+                    verify_line(line, augmentator, line_number)
 
 
 def load_index_to_db(file_path, db, file_name):
@@ -272,6 +308,9 @@ if __name__ == "__main__":
         start_time = time.time_ns()
         ex = exists_on_redis(str(arg2), int(arg3))
         bt.logging.info("exists: " + str(ex))
+    elif arg1 == 'verify_c4':
+        c4_dir = '/root/c4-dataset/c4/en'
+        verify_all_c4(c4_dir, 0, 512)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
