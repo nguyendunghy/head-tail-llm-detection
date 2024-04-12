@@ -69,7 +69,14 @@ def verify_raw_exists(texts, url):
         return ['fail'] * len(texts)
 
 
-def verify_list_lines(texts, line_numbers, urls):
+def verify_list_lines(raw_texts, line_numbers, augmentator, urls):
+    texts = []
+    for line in raw_texts:
+        el = json.loads(line)
+        augs = augmentator(el['text'])
+        text = augs['text']
+        texts.append(text)
+
     processed_index = []
     for url in urls:
         result = verify_raw_exists(texts, url)
@@ -242,7 +249,7 @@ def verify_all_c4(c4_dir, start, end, num_random_line=300, urls=None):
                 if line_number in random_line_index:
                     texts.append(line)
                 line_number += 1
-            verify_list_lines(texts, random_line_index, urls)
+            verify_list_lines(texts, random_line_index, augmentator, urls)
 
 
 def load_index_to_db(file_path, db, file_name):
