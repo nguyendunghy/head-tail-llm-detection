@@ -32,6 +32,7 @@ from transformers.utils import logging as hf_logging
 
 from neurons import jackie_upgrade
 from neurons.miners.deberta_classifier import DebertaClassifier
+from neurons.miners.head_tail_index import head_tail_api_pred_human
 
 hf_logging.set_verbosity(40)
 
@@ -78,15 +79,18 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
 
         input_data = synapse.texts
-        bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
+        bt.logging.info(f"Amount of texts received: {len(input_data)}")
 
         try:
-            preds = self.model.predict_batch(input_data)
-            preds = [el > 0.5 for el in preds]
+            if self.app_config['redis']['active']:
+                preds = self.head_tail_api_pred(input_data)
+            elif self.app_config['50_50_standard_model']['active']:
+                preds = self.current_model_50_50_pred(input_data)
+            else:
+                preds = self.standard_model_pred(input_data)
         except Exception as e:
-            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
             bt.logging.error(e)
-            preds = [0] * len(input_data)
+            preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
 
@@ -200,14 +204,14 @@ class Miner(BaseMinerNeuron):
             bt.logging.error(e)
             preds = [0] * len(input_data)
 
-        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
+        bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
         return preds
 
     def current_model_50_50_pred(self, input_data):
         bt.logging.info("start current_model_50_50_pred")
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        prob_list = []
+
         try:
             prob_list = self.model.predict_batch(input_data)
         except Exception as e:
@@ -220,6 +224,15 @@ class Miner(BaseMinerNeuron):
         bt.logging.info("current_model_50_50_pred pred_list: " + str(pred_list))
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
+
+    def head_tail_api_pred(self, input_data):
+        bt.logging.info("start head_tail_api_pred")
+        start_time = time.time()
+        pred_list = head_tail_api_pred_human(input_data)
+        pred_list = [not pred for pred in pred_list]
+        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
+        return pred_list
+
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
