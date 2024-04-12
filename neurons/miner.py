@@ -186,6 +186,39 @@ class Miner(BaseMinerNeuron):
             bt.logging.error(e)
             self.app_config = None
 
+    def standard_model_pred(self, input_data):
+        bt.logging.info("start standard_model_pred")
+        start_time = time.time()
+        bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
+
+        try:
+            preds = self.model.predict_batch(input_data)
+            preds = [el > 0.5 for el in preds]
+        except Exception as e:
+            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            preds = [0] * len(input_data)
+
+        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
+        return preds
+
+    def current_model_50_50_pred(self, input_data):
+        bt.logging.info("start current_model_50_50_pred")
+        start_time = time.time()
+        bt.logging.info(f"Amount of texts received: {len(input_data)}")
+        prob_list = []
+        try:
+            prob_list = self.model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            prob_list = [0] * len(input_data)
+
+        tmp_pred_list = jackie_upgrade.order_prob(prob_list)
+        pred_list = [not value for value in tmp_pred_list]
+        bt.logging.info("current_model_50_50_pred pred_list: " + str(pred_list))
+        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
+        return pred_list
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
