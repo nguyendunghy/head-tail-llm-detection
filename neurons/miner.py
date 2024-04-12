@@ -30,6 +30,7 @@ from miners.gpt_zero import PPLModel
 
 from transformers.utils import logging as hf_logging
 
+from neurons import jackie_upgrade
 from neurons.miners.deberta_classifier import DebertaClassifier
 
 hf_logging.set_verbosity(40)
