@@ -80,7 +80,7 @@ class Miner(BaseMinerNeuron):
 
         input_data = synapse.texts
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-
+        self.load_app_config()
         try:
             if self.app_config['redis']['active']:
                 preds = self.head_tail_api_pred(input_data)
@@ -183,6 +183,7 @@ class Miner(BaseMinerNeuron):
         return prirority
 
     def load_app_config(self):
+        bt.logging.info("start load_app_config")
         config_path = 'application.json'
         try:
             with open(config_path, 'r') as file:
@@ -190,6 +191,8 @@ class Miner(BaseMinerNeuron):
         except Exception as e:
             bt.logging.error(e)
             self.app_config = None
+        finally:
+            bt.logging.info("finish load_app_config " + str(self.app_config))
 
     def standard_model_pred(self, input_data):
         bt.logging.info("start standard_model_pred")
