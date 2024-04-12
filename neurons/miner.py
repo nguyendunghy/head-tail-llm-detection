@@ -141,14 +141,14 @@ class Miner(BaseMinerNeuron):
         uid = self.metagraph.hotkeys.index(synapse.dendrite.hotkey)
 
         stake = self.metagraph.S[uid].item()
-        if stake < self.config.blacklist.minimum_stake_requirement:
-            self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
-            bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
-            return True, "pubkey stake below min_allowed_stake"
-
-        bt.logging.trace(
-            f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
-        )
+        # if stake < self.config.blacklist.minimum_stake_requirement:
+        #     self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
+        #     bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
+        #     return True, "pubkey stake below min_allowed_stake"
+        #
+        # bt.logging.trace(
+        #     f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+        # )
         return False, "Hotkey recognized!"
 
     async def priority(self, synapse: detection.protocol.TextSynapse) -> float:
