@@ -69,13 +69,19 @@ def verify_raw_exists(texts, url):
         return ['fail'] * len(texts)
 
 
-def verify_list_lines(raw_texts, line_numbers, augmentator, urls):
+def verify_list_lines(raw_texts, raw_line_numbers, augmentator, urls):
     texts = []
-    for line in raw_texts:
+    line_numbers=[]
+    for i in range(len(raw_texts)):
+        line = raw_texts[i]
         el = json.loads(line)
         augs = augmentator(el['text'])
         text = augs['text']
-        texts.append(text)
+        if text <= 250:
+            bt.logging.info("human written text - too short character:" + str(raw_line_numbers[i]) + ":" + line)
+        else:
+            texts.append(text)
+            line_numbers.append(raw_line_numbers[i])
 
     processed_index = []
     for url in urls:
