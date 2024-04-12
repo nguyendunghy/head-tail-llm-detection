@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2023 Nikita Dilman
-
+import json
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -47,6 +47,7 @@ class Miner(BaseMinerNeuron):
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
 
+        self.app_config = None
         if self.config.neuron.model_type == 'ppl':
             self.model = PPLModel(device=self.device)
             self.model.load_pretrained(self.config.neuron.ppl_model_path)
@@ -58,7 +59,7 @@ class Miner(BaseMinerNeuron):
         self.load_state()
 
     async def forward(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> detection.protocol.TextSynapse:
         """
         Processes the incoming 'TextSynapse' synapse by performing a predefined operation on the input data.
@@ -91,9 +92,8 @@ class Miner(BaseMinerNeuron):
         synapse.predictions = preds
         return synapse
 
-
     async def blacklist(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -176,6 +176,15 @@ class Miner(BaseMinerNeuron):
             f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
         )
         return prirority
+
+    def load_app_config(self):
+        config_path = 'application.json'
+        try:
+            with open(config_path, 'r') as file:
+                self.app_config = json.load(file)
+        except Exception as e:
+            bt.logging.error(e)
+            self.app_config = None
 
 
 # This is the main function, which runs the miner.
