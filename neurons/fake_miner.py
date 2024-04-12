@@ -110,6 +110,18 @@ class FakeMiner:
         bt.logging.info(model_type + " correct count_true: " + str(count_true))
         bt.logging.info(model_type + " correct count_false: " + str(count_false))
 
+        fail_hu_pred = []
+        fail_ai_pred = []
+        for i in range(len(pred_list)):
+            if i < len(pred_list) // 2:
+                if not pred_list[i]:
+                    fail_hu_pred.append(input_list[i])
+            else:
+                if pred_list[i]:
+                    fail_ai_pred.append(input_list[i])
+        bt.logging.info("fail_hu_pred: " + str(fail_hu_pred))
+        bt.logging.info("fail_ai_pred: " + str(fail_ai_pred))
+
         input_string = str(input_list)
         sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
         sha128_hash = sha256_hash[:32]
