@@ -64,7 +64,7 @@ class Miner(BaseMinerNeuron):
         self.load_state()
 
     async def forward(
-            self, synapse: detection.protocol.TextSynapse
+        self, synapse: detection.protocol.TextSynapse
     ) -> detection.protocol.TextSynapse:
         """
         Processes the incoming 'TextSynapse' synapse by performing a predefined operation on the input data.
@@ -93,11 +93,13 @@ class Miner(BaseMinerNeuron):
             preds = [0] * len(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
+
         synapse.predictions = preds
         return synapse
 
+
     async def blacklist(
-            self, synapse: detection.protocol.TextSynapse
+        self, synapse: detection.protocol.TextSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should

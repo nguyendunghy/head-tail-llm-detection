@@ -2,6 +2,8 @@ import copy
 import hashlib
 import time
 import bittensor as bt
+
+from neurons.miners.deberta_classifier import DebertaClassifier
 from neurons.miners.gpt_zero import PPLModel
 from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.gpt_zero_api import is_human_generated_files
@@ -11,9 +13,16 @@ from neurons.miners.old_gpt_zero import GPT2PPL
 
 class FakeMiner:
     def __init__(self):
+        # 'deberta', 'ppl'
+        self.model_type = 'ppl'
         self.device = 'cuda:0'
-        self.model = PPLModel(device=self.device)
-        self.model.load_pretrained('neurons/miners/ppl_model.pk')
+        if self.model_type == 'ppl':
+            self.model = PPLModel(device=self.device)
+            self.model.load_pretrained('models/ppl_model.pk')
+        else:
+            self.model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
+                                           model_path='models/deberta-large-ls03-ctx1024.pth',
+                                           device=self.device)
         self.old_model = GPT2PPL(device=self.device)
 
     def fake_miner(self, texts):
