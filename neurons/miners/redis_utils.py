@@ -83,8 +83,8 @@ def verify_list_lines(raw_texts, raw_line_numbers, augmentator, urls):
             texts.append(text)
             line_numbers.append(raw_line_numbers[i])
 
-    processed_index = []
     for url in urls:
+        processed_index = []
         result = verify_raw_exists(texts, url)
         for i in range(len(texts)):
             if result[i] == 'success':
@@ -93,9 +93,12 @@ def verify_list_lines(raw_texts, raw_line_numbers, augmentator, urls):
             elif result[i] == 'short':
                 bt.logging.info("text too short:" + str(line_numbers[i]) + ":" + texts[i])
                 processed_index.append(i)
+        for j in processed_index:
+            texts.pop(j)
+            line_numbers.pop(j)
+
     for i in range(len(texts)):
-        if i not in processed_index:
-            bt.logging.info("indexing fail: " + str(line_numbers[i]) + " :" + texts[i])
+        bt.logging.info("indexing fail: " + str(line_numbers[i]) + " :" + texts[i])
 
 
 def verify_line(line, augmentator, line_number, urls=None):
