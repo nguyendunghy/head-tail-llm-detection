@@ -9,7 +9,8 @@ import time
 import traceback
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
-
+import requests
+import json
 import bittensor as bt
 import redis
 
@@ -47,7 +48,24 @@ def exists_on_redis(hash_value, db):
 
 
 def verify_raw_exists(texts, url):
-    return True
+    payload = json.dumps({
+        "texts": texts
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    if response.status_code == 200:
+        data = response.json()
+        results = data['result']
+        verify_result = []
+        for result in results:
+            verify_result.append(result == 'short' or result == 'success')
+        return verify_result
+    else:
+        print('Failed to post data:', response.status_code, response.content)
+        return [False] * len(texts)
 
 
 def verify_line(line, augmentator, line_number, urls=None):
@@ -69,7 +87,7 @@ def verify_line(line, augmentator, line_number, urls=None):
     if urls is not None:
         for url in urls:
             result = verify_raw_exists([text], url)
-            if result:
+            if result[0]:
                 bt.logging.info("indexing success " + str(line_number))
                 return True
 
