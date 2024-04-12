@@ -209,7 +209,7 @@ def verify_index_directory(parent_path, start, end, dest_path):
                 verify_token(file_path, db)
 
 
-def verify_all_c4(c4_dir, start, end, num_random_line=300):
+def verify_all_c4(c4_dir, start, end, num_random_line=300, urls=None):
     """For each raw file, we will get randomly 300 rows to call to our service to verify. If the fail rate is high. we
     have to verify the accuracy of our indexed data"""
     augmentator = DataAugmentator()
@@ -221,7 +221,7 @@ def verify_all_c4(c4_dir, start, end, num_random_line=300):
             line_number = 1
             for line in file:
                 if line_number in random_line_index:
-                    verify_line(line, augmentator, line_number)
+                    verify_line(line, augmentator, line_number, urls)
 
 
 def load_index_to_db(file_path, db, file_name):
@@ -330,7 +330,8 @@ if __name__ == "__main__":
         bt.logging.info("exists: " + str(ex))
     elif arg1 == 'verify_c4':
         c4_dir = '/root/c4-dataset/c4/en'
-        verify_all_c4(c4_dir, 0, 512)
+        urls = ['http://103.219.170.221:8080/verify-data','http://69.67.150.21:8080/verify-data']
+        verify_all_c4(c4_dir, 0, 512,urls)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
