@@ -78,7 +78,7 @@ def verify_list_lines(raw_texts, raw_line_numbers, augmentator, urls):
         augs = augmentator(el['text'])
         text = augs['text']
         if len(text) <= 250:
-            bt.logging.info("human written text - too short character:" + text + ":" + line)
+            bt.logging.info("human written text - too short character:" + text + ":" + str(raw_line_numbers[i]))
         else:
             texts.append(text)
             line_numbers.append(raw_line_numbers[i])
