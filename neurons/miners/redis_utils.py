@@ -48,6 +48,7 @@ def exists_on_redis(hash_value, db):
 
 
 def verify_raw_exists(texts, url):
+    bt.logging.info("start verify_raw_exists url: " + url)
     payload = json.dumps({
         "texts": texts
     })
@@ -215,6 +216,7 @@ def verify_all_c4(c4_dir, start, end, num_random_line=300, urls=None):
     augmentator = DataAugmentator()
     for i in range(start, end):
         file_path = c4_dir + '/' + 'c4-train.{}-of-01024.json'.format(db_to_str(i))
+        bt.logging.info("file_path: " + file_path)
         num_line = count_lines(file_path)
         random_line_index = [random.randint(1, num_line + 1) for i in range(num_random_line)]
         with open(file_path, 'r') as file:
@@ -330,8 +332,8 @@ if __name__ == "__main__":
         bt.logging.info("exists: " + str(ex))
     elif arg1 == 'verify_c4':
         c4_dir = '/root/c4-dataset/c4/en'
-        urls = ['http://103.219.170.221:8080/verify-data','http://69.67.150.21:8080/verify-data']
-        verify_all_c4(c4_dir, 0, 512,urls=urls)
+        urls = ['http://103.219.170.221:8080/verify-data', 'http://69.67.150.21:8080/verify-data']
+        verify_all_c4(c4_dir, 0, 512, urls=urls)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
