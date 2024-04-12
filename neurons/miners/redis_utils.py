@@ -93,9 +93,14 @@ def verify_list_lines(raw_texts, raw_line_numbers, augmentator, urls):
             elif result[i] == 'short':
                 bt.logging.info("text too short:" + str(line_numbers[i]) + ":" + texts[i])
                 processed_index.append(i)
-        for j in processed_index:
-            texts.pop(j)
-            line_numbers.pop(j)
+        left_texts = []
+        left_numbers = []
+        for j in range(len(texts)):
+            if j not in processed_index:
+                left_texts.append(texts[j])
+                left_numbers.append(line_numbers[j])
+        texts = left_texts
+        line_numbers = left_numbers
 
     for i in range(len(texts)):
         bt.logging.info("indexing fail: " + str(line_numbers[i]) + " :" + texts[i])
