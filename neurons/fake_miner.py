@@ -119,8 +119,8 @@ class FakeMiner:
             else:
                 if pred_list[i]:
                     fail_ai_pred.append(input_list[i])
-        bt.logging.info("fail_hu_pred: " + str(fail_hu_pred))
-        bt.logging.info("fail_ai_pred: " + str(fail_ai_pred))
+        bt.logging.info(model_type + " fail_hu_pred: " + str(fail_hu_pred))
+        bt.logging.info(model_type + " fail_ai_pred: " + str(fail_ai_pred))
 
         input_string = str(input_list)
         sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
