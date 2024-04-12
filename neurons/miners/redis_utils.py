@@ -69,6 +69,22 @@ def verify_raw_exists(texts, url):
         return ['fail'] * len(texts)
 
 
+def verify_list_lines(texts, line_numbers, urls):
+    processed_index = []
+    for url in urls:
+        result = verify_raw_exists(texts, url)
+        for i in range(len(texts)):
+            if result[i] == 'success':
+                bt.logging.info("indexing success " + str(line_numbers[i]))
+                processed_index.append(i)
+            elif result[i] == 'short':
+                bt.logging.info("text too short:" + str(line_numbers[i]) + ":" + texts[i])
+                processed_index.append(i)
+    for i in range(len(texts)):
+        if i not in processed_index:
+            bt.logging.info("indexing fail: " + str(line_numbers[i]) + " :" + texts[i])
+
+
 def verify_line(line, augmentator, line_number, urls=None):
     el = json.loads(line)
     augs = augmentator(el['text'])
@@ -221,10 +237,13 @@ def verify_all_c4(c4_dir, start, end, num_random_line=300, urls=None):
         random_line_index = [random.randint(1, num_line + 1) for i in range(num_random_line)]
         with open(file_path, 'r') as file:
             line_number = 1
+            texts = []
             for line in file:
                 if line_number in random_line_index:
-                    verify_line(line, augmentator, line_number, urls)
+                    texts.append(line)
                 line_number += 1
+            verify_list_lines(texts, random_line_index, urls)
+
 
 def load_index_to_db(file_path, db, file_name):
     with open(file_path, 'r') as file:
