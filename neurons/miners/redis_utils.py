@@ -331,7 +331,7 @@ if __name__ == "__main__":
     elif arg1 == 'verify_c4':
         c4_dir = '/root/c4-dataset/c4/en'
         urls = ['http://103.219.170.221:8080/verify-data','http://69.67.150.21:8080/verify-data']
-        verify_all_c4(c4_dir, 0, 512,urls)
+        verify_all_c4(c4_dir, 0, 512,urls=urls)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
