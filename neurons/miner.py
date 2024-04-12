@@ -230,8 +230,11 @@ class Miner(BaseMinerNeuron):
     def head_tail_api_pred(self, input_data):
         bt.logging.info("start head_tail_api_pred")
         start_time = time.time()
-        pred_list = head_tail_api_pred_human(input_data)
+        pred_list = head_tail_api_pred_human(input_data, self.app_config['redis']['verify_data']['urls'])
         pred_list = [not pred for pred in pred_list]
+        bt.logging.info("head tail pred_list: " + str(pred_list))
+        bt.logging.info("count ai: " + str(pred_list.count(False)))
+        bt.logging.info("count hu: " + str(pred_list.count(True)))
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
 
