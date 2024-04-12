@@ -61,11 +61,11 @@ def verify_raw_exists(texts, url):
         results = data['result']
         verify_result = []
         for result in results:
-            verify_result.append(result == 'short' or result == 'success')
+            verify_result.append(result)
         return verify_result
     else:
         print('Failed to post data:', response.status_code, response.content)
-        return [False] * len(texts)
+        return ['fail'] * len(texts)
 
 
 def verify_line(line, augmentator, line_number, urls=None):
@@ -87,10 +87,12 @@ def verify_line(line, augmentator, line_number, urls=None):
     if urls is not None:
         for url in urls:
             result = verify_raw_exists([text], url)
-            if result[0]:
+            if result[0] == 'success':
                 bt.logging.info("indexing success " + str(line_number))
                 return True
-
+            elif result[0] == 'short':
+                bt.logging.info("text too short:" + text)
+                return True
         bt.logging.info("indexing fail: " + str(line_number) + " :" + text)
         return False
 
