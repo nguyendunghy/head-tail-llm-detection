@@ -222,8 +222,7 @@ class Miner(BaseMinerNeuron):
             bt.logging.error(e)
             prob_list = [0] * len(input_data)
 
-        tmp_pred_list = jackie_upgrade.order_prob(prob_list)
-        pred_list = [not value for value in tmp_pred_list]
+        pred_list = jackie_upgrade.order_prob(prob_list)
         bt.logging.info("current_model_50_50_pred pred_list: " + str(pred_list))
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
