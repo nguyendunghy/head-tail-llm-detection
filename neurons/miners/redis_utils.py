@@ -224,7 +224,7 @@ def verify_all_c4(c4_dir, start, end, num_random_line=300, urls=None):
             for line in file:
                 if line_number in random_line_index:
                     verify_line(line, augmentator, line_number, urls)
-
+                line_number += 1
 
 def load_index_to_db(file_path, db, file_name):
     with open(file_path, 'r') as file:
