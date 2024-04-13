@@ -149,7 +149,7 @@ class AppConfig(ABC):
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
-        return '/root/head-tail-llm-detection/'
+        return '/root/head-tail-llm-detection'
 
     def get_miner_test_processed_dir_path(self):
         try:
@@ -157,7 +157,7 @@ class AppConfig(ABC):
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
-        return '/root/head-tail-llm-detection/'
+        return '/root/head-tail-llm-detection'
 
     def get_validator_test_output_dir_path(self):
         try:
@@ -165,7 +165,7 @@ class AppConfig(ABC):
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
-        return '/root/head-tail-llm-detection/'
+        return '/root/head-tail-llm-detection'
 
     def enable_miner_get_input_from_file(self):
         try:
