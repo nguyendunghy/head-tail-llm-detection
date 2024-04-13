@@ -149,10 +149,10 @@ class Miner(BaseMinerNeuron):
             self.blacklist_hotkeys = set()
             return False, "Do not blacklist any validators !"
         else:
-            blacklist_hotkeys = self.app_config.get_blacklist_hotkeys()
-            for hotkey in blacklist_hotkeys:
+            app_blacklist_hotkeys = self.app_config.get_blacklist_hotkeys()
+            bt.logging.info(f'List of blacklisted hotkeys in app_config: {app_blacklist_hotkeys}')
+            for hotkey in app_blacklist_hotkeys:
                 self.blacklist_hotkeys.add(hotkey)
-            bt.logging.info(f'List of blacklisted hotkeys in app_config: {self.blacklist_hotkeys}')
             if self.blacklist_hotkeys.__contains__(str(synapse.dendrite.hotkey)):
                 return True, 'Hot key in blacklist: ' + str(synapse.dendrite.hotkey)
 
