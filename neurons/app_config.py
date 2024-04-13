@@ -22,6 +22,8 @@ class AppConfig(ABC):
                 "miner": {
                     "show_input": False,
                     "black_list_enable": True,
+                    "blacklist_hotkeys": [],
+                    "whitelist_hotkeys": [],
                     "custom_model": {
                         "active": True,
                         "num_input": [50]
@@ -105,6 +107,22 @@ class AppConfig(ABC):
             traceback.print_exc()
         return True
 
+    def get_blacklist_hotkeys(self):
+        try:
+            return self.value['application']['miner']['blacklist_hotkeys']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
+
+    def get_whitelist_hotkeys(self):
+        try:
+            return self.value['application']['miner']['whitelist_hotkeys']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
+
     def load_app_config(self):
         bt.logging.info("start load_app_config")
 
@@ -129,6 +147,8 @@ if __name__ == '__main__':
     print('get_redis_urls', app_config.get_redis_urls())
     print('enable_blacklist_validator', app_config.enable_blacklist_validator())
     print('allow_show_input', app_config.allow_show_input())
-    while True:
-        ...
+    print('get_blacklist_hotkeys', app_config.get_blacklist_hotkeys())
+    print('get_whitelist_hotkeys', app_config.get_whitelist_hotkeys())
 
+    while True:
+            ...

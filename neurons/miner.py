@@ -137,6 +137,25 @@ class Miner(BaseMinerNeuron):
 
         Otherwise, allow the request to be processed further.
         """
+        self.app_config.load_app_config()
+        whitelist_hotkeys = self.app_config.get_whitelist_hotkeys()
+        bt.logging.info("whitelist_hotkeys: " + str(whitelist_hotkeys))
+        if str(synapse.dendrite.hotkey) in whitelist_hotkeys:
+            return False, 'hotkey {} in whitelist hotkeys'.format(str(synapse.dendrite.hotkey))
+
+        black_list_enable = self.app_config.enable_blacklist_validator()
+        if not black_list_enable:
+            bt.logging.info("do not blacklist any validators !!")
+            self.blacklist_hotkeys = set()
+            return False, "Do not blacklist any validators !"
+        else:
+            blacklist_hotkeys = self.app_config.get_blacklist_hotkeys()
+            for hotkey in blacklist_hotkeys:
+                self.blacklist_hotkeys.add(hotkey)
+            bt.logging.info(f'List of blacklisted hotkeys in app_config: {self.blacklist_hotkeys}')
+            if self.blacklist_hotkeys.__contains__(str(synapse.dendrite.hotkey)):
+                return True, 'Hot key in blacklist: ' + str(synapse.dendrite.hotkey)
+
         if synapse.dendrite.hotkey not in self.metagraph.hotkeys:
             # Ignore requests from unrecognized entities.
             bt.logging.trace(
@@ -149,8 +168,7 @@ class Miner(BaseMinerNeuron):
         uid = self.metagraph.hotkeys.index(synapse.dendrite.hotkey)
 
         stake = self.metagraph.S[uid].item()
-        black_list_enable = self.app_config.enable_blacklist_validator()
-        if black_list_enable and (stake < self.config.blacklist.minimum_stake_requirement):
+        if stake < self.config.blacklist.minimum_stake_requirement:
             self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
             bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
             return True, "pubkey stake below min_allowed_stake"
@@ -237,6 +255,7 @@ class Miner(BaseMinerNeuron):
         bt.logging.info(pred_type + " pred_list: " + str(pred_list))
         bt.logging.info(pred_type + " count ai: " + str(pred_list.count(True)))
         bt.logging.info(pred_type + " count hu: " + str(pred_list.count(False)))
+
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":

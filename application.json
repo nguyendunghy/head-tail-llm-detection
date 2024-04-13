@@ -3,6 +3,8 @@
     "miner": {
       "show_input": false,
       "black_list_enable": true,
+      "blacklist_hotkeys": [],
+      "whitelist_hotkeys": [],
       "custom_model": {
         "active": true,
         "num_input": [
