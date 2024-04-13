@@ -52,7 +52,7 @@ async def forward(self):
     allow_all_uids = len(config_miner_uids) == 1 and config_miner_uids[0] == -1
     if not allow_all_uids:
         miner_uids = config_miner_uids
-
+    bt.logging.info("send requests to miner_uids: " + str(miner_uids))
     axons = [self.metagraph.axons[uid] for uid in miner_uids]
 
     start_time = time.time()
