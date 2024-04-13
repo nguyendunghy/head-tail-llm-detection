@@ -235,8 +235,8 @@ class Miner(BaseMinerNeuron):
 
     def log_prediction_result(self, pred_type, pred_list):
         bt.logging.info(pred_type + " pred_list: " + str(pred_list))
-        bt.logging.info(pred_type + " count ai: " + str(pred_list.count(False)))
-        bt.logging.info(pred_type + " count hu: " + str(pred_list.count(True)))
+        bt.logging.info(pred_type + " count ai: " + str(pred_list.count(True)))
+        bt.logging.info(pred_type + " count hu: " + str(pred_list.count(False)))
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
