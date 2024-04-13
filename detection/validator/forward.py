@@ -102,7 +102,11 @@ async def forward(self):
 
 def write_request_data_to_file(dir_path, texts, labels):
     try:
-        datas = {'texts': texts, 'labels': labels}
+        result = []
+        for lb in labels:
+            result.append(str(lb) == '1')
+
+        datas = {'texts': texts, 'labels': result}
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
         file_name = 'input_data_' + str(time.time_ns()) + '.json'

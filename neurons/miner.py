@@ -234,8 +234,6 @@ class Miner(BaseMinerNeuron):
                         data = json.load(file)
                         list_text = data['texts']
                         result = data['labels']
-                        for i in range(len(result)):
-                            result[i] = result[i] == '1'
                         # move file to processed directory
                         if not os.path.exists(processed_dir_path):
                             os.makedirs(processed_dir_path)
