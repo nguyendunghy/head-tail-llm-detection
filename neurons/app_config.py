@@ -47,8 +47,8 @@ class AppConfig(ABC):
                 "active": False,
                 "verify_data": {
                     "urls": [
-                        "http://69.67.150.21:8080/verify-data",
-                        "http://103.219.170.221:8080/verify-data"
+                        "http://69.67.150.21:8080/check-exists",
+                        "http://103.219.170.221:8080/check-exists"
                     ]
                 }
             },
