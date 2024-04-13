@@ -231,11 +231,11 @@ class Miner(BaseMinerNeuron):
                 file_path = os.path.join(input_dir_path, entry)
                 if os.path.isfile(file_path):
                     with open(file_path, 'r') as file:
-                        content = file.read()
-                        array_list = content.split(',')
-                        middle_index = len(array_list) // 2
-                        list_text = array_list[:middle_index]
-                        result = array_list[middle_index:]
+                        data = json.load(file)
+                        list_text = data['texts']
+                        result = data['labels']
+                        for i in range(len(result)):
+                            result[i] = result[i] == '1'
                         # move file to processed directory
                         if not os.path.exists(processed_dir_path):
                             os.makedirs(processed_dir_path)

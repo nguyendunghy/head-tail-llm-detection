@@ -1,5 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2024 It's AI
+import json
 import os
 import traceback
 
@@ -101,22 +102,14 @@ async def forward(self):
 
 def write_request_data_to_file(dir_path, texts, labels):
     try:
-        datas = []
-        for i in range(len(texts)):
-            datas.append(str(texts[i]))
-        for i in range(len(labels)):
-            lb = str(labels[i]) == '1'
-            datas.append(str(lb))
-
+        datas = {'texts': texts, 'labels': labels}
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
-
-        content = ','.join(datas)
-        file_name = 'input_data_' + str(time.time_ns()) + '.txt'
+        file_name = 'input_data_' + str(time.time_ns()) + '.json'
         file_path = dir_path + '/' + file_name
         with open(file_path, 'w') as file:
-            file.write(content)
-        bt.logging.info("write content:: {} to file {} success".format(content,file_path))
+            json.dump(datas, file, indent=4)
+        bt.logging.info("write content:: {} to file {} success".format(str(datas), file_path))
     except Exception as e:
         bt.logging.error(e)
         traceback.print_exc()
