@@ -8,9 +8,8 @@ class AppConfig(ABC):
 
     def __init__(self, config_path='application.json'):
         self.config_path = config_path
-        self.value = None
+        self.value = self.default_app_config()
         try:
-            self.default_app_config()
             self.load_app_config()
         except Exception as e:
             bt.logging.error(e)
@@ -18,7 +17,7 @@ class AppConfig(ABC):
 
     def default_app_config(self):
         bt.logging.info("start default_app_config")
-        self.value = {
+        value = {
             "application": {
                 "miner": {
                     "show_input": False,
@@ -45,6 +44,7 @@ class AppConfig(ABC):
                 "active": True
             }
         }
+        return value
 
     def allow_predict_with_custom_model(self, input_len):
         try:
@@ -53,7 +53,7 @@ class AppConfig(ABC):
             num_input = self.value['application']['miner']['custom_model']['num_input']
 
             # use custom model for all input_len
-            if input_len == -1:
+            if len(num_input) == 1 and num_input[0] == -1:
                 return True
 
             if input_len in num_input:
@@ -81,7 +81,7 @@ class AppConfig(ABC):
             traceback.print_exc()
         return False
 
-    def allow_predict_by_redis(self):
+    def get_redis_urls(self):
         try:
             return self.value['redis']['verify_data']['urls']
         except Exception as e:
@@ -89,7 +89,7 @@ class AppConfig(ABC):
             traceback.print_exc()
         return ["http://69.67.150.21:8080/verify-data", "http://103.219.170.221:8080/verify-data"]
 
-    def get_redis_urls(self):
+    def allow_predict_by_redis(self):
         try:
             return self.value['redis']['active']
         except Exception as e:
@@ -113,6 +113,22 @@ class AppConfig(ABC):
                 self.value = json.load(file)
         except Exception as e:
             bt.logging.error(e)
-            self.value = None
+            traceback.print_exc()
+            self.value = self.default_app_config()
         finally:
             bt.logging.info("finish load_app_config " + str(self.value))
+
+
+if __name__ == '__main__':
+    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application1.json')
+    print(app_config)
+    print(app_config.value)
+    print('allow_predict_50_50_standard_model', app_config.allow_predict_50_50_standard_model())
+    print('allow_predict_with_custom_model', app_config.allow_predict_with_custom_model(50))
+    print('allow_predict_by_redis', app_config.allow_predict_by_redis())
+    print('get_redis_urls', app_config.get_redis_urls())
+    print('enable_blacklist_validator', app_config.enable_blacklist_validator())
+    print('allow_show_input', app_config.allow_show_input())
+    while True:
+        ...
+
