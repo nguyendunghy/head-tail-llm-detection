@@ -31,6 +31,7 @@ from miners.gpt_zero import PPLModel
 from transformers.utils import logging as hf_logging
 
 from neurons import jackie_upgrade
+from neurons.app_config import AppConfig
 from neurons.miners.deberta_classifier import DebertaClassifier
 from neurons.miners.head_tail_index import head_tail_api_pred_human
 
@@ -49,7 +50,7 @@ class Miner(BaseMinerNeuron):
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
 
-        self.load_app_config()
+        self.app_config = AppConfig()
         if self.config.neuron.model_type == 'ppl':
             self.model = PPLModel(device=self.device)
             self.model.load_pretrained(self.config.neuron.ppl_model_path)
@@ -79,17 +80,24 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
 
         input_data = synapse.texts
+        self.app_config.load_app_config()
+
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        self.load_app_config()
-        try:
-            if self.app_config['redis']['active']:
-                preds = self.head_tail_api_pred(input_data)
-            elif self.app_config['50_50_standard_model']['active']:
-                preds = self.current_model_50_50_pred(input_data)
-            else:
+        if self.app_config.allow_show_input():
+            bt.logging.info("input_data: " + str(input_data))
+
+        if len(input_data) == 50:
+            try:
+                if self.app_config.allow_predict_by_redis():
+                    preds = self.head_tail_api_pred(input_data)
+                elif self.app_config.allow_predict_50_50_standard_model():
+                    preds = self.current_model_50_50_pred(input_data)
+                else:
+                    preds = self.standard_model_pred(input_data)
+            except Exception as e:
+                bt.logging.error(e)
                 preds = self.standard_model_pred(input_data)
-        except Exception as e:
-            bt.logging.error(e)
+        else:
             preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
@@ -141,14 +149,15 @@ class Miner(BaseMinerNeuron):
         uid = self.metagraph.hotkeys.index(synapse.dendrite.hotkey)
 
         stake = self.metagraph.S[uid].item()
-        # if stake < self.config.blacklist.minimum_stake_requirement:
-        #     self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
-        #     bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
-        #     return True, "pubkey stake below min_allowed_stake"
-        #
-        # bt.logging.trace(
-        #     f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
-        # )
+        black_list_enable = self.app_config.enable_blacklist_validator()
+        if black_list_enable and (stake < self.config.blacklist.minimum_stake_requirement):
+            self.blacklist_hotkeys.add(synapse.dendrite.hotkey)
+            bt.logging.info(f'List of blacklisted hotkeys: {self.blacklist_hotkeys}')
+            return True, "pubkey stake below min_allowed_stake"
+
+        bt.logging.trace(
+            f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+        )
         return False, "Hotkey recognized!"
 
     async def priority(self, synapse: detection.protocol.TextSynapse) -> float:
@@ -181,18 +190,6 @@ class Miner(BaseMinerNeuron):
             f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
         )
         return prirority
-
-    def load_app_config(self):
-        bt.logging.info("start load_app_config")
-        config_path = 'application.json'
-        try:
-            with open(config_path, 'r') as file:
-                self.app_config = json.load(file)
-        except Exception as e:
-            bt.logging.error(e)
-            self.app_config = None
-        finally:
-            bt.logging.info("finish load_app_config " + str(self.app_config))
 
     def standard_model_pred(self, input_data):
         bt.logging.info("start standard_model_pred")
@@ -230,7 +227,7 @@ class Miner(BaseMinerNeuron):
     def head_tail_api_pred(self, input_data):
         bt.logging.info("start head_tail_api_pred")
         start_time = time.time()
-        pred_list = head_tail_api_pred_human(input_data, self.app_config['redis']['verify_data']['urls'])
+        pred_list = head_tail_api_pred_human(input_data, self.app_config.get_redis_urls())
         pred_list = [not pred for pred in pred_list]
         bt.logging.info("head tail pred_list: " + str(pred_list))
         bt.logging.info("count ai: " + str(pred_list.count(False)))

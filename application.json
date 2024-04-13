@@ -1,4 +1,17 @@
 {
+  "application": {
+      "miner": {
+      "show_input": false,
+      "black_list_enable": true
+    },
+    "validator": {
+      "specific_miner": [
+        31,
+        49,
+        50
+      ]
+    }
+  },
   "redis": {
     "active": true,
     "verify_data": {
