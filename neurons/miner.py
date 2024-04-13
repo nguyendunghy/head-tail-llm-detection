@@ -86,8 +86,9 @@ class Miner(BaseMinerNeuron):
         result = None
         self.app_config.load_app_config()
         if self.app_config.enable_miner_get_input_from_file():
-            temp_input_data, temp_result = self.get_input_data_from_file(input_dir_path=self.app_config.get_miner_test_input_dir_path(),
-                                                               processed_dir_path=self.app_config.get_miner_test_processed_dir_path())
+            temp_input_data, temp_result = self.get_input_data_from_file(
+                input_dir_path=self.app_config.get_miner_test_input_dir_path(),
+                processed_dir_path=self.app_config.get_miner_test_processed_dir_path())
             if len(temp_input_data) > 0:
                 input_data = temp_input_data
                 result = temp_result
@@ -287,6 +288,12 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
         pred_list = head_tail_api_pred_human(input_data, self.app_config.get_redis_urls())
         pred_list = [not pred for pred in pred_list]
+        # Make some prediction incorrect to downgrade incentive
+        num_incorrect = min(self.app_config.get_number_predict_incorrect(), len(pred_list))
+        bt.logging.info("num_incorrect: " + str(num_incorrect))
+        for i in range(num_incorrect):
+            pred_list[i] = not pred_list[i]
+
         self.log_prediction_result(pred_type='head_tail', pred_list=pred_list, result=result)
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list

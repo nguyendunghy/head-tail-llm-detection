@@ -15,7 +15,8 @@
         "enable_input_from_file": false,
         "input_dir_path": "/root/head-tail-llm-detection/test_data/input_data",
         "processed_dir_path": "/root/head-tail-llm-detection/test_data/processed_data"
-      }
+      },
+      "num_make_incorrect": 0
     },
     "validator": {
       "target_miner_uids": [

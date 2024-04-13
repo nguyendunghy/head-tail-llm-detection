@@ -32,7 +32,8 @@ class AppConfig(ABC):
                         "enable_input_from_file": False,
                         "input_dir_path": "/root/head-tail-llm-detection",
                         "processed_dir_path": "/root/head-tail-llm-detection"
-                    }
+                    },
+                    "num_make_incorrect": 0
                 },
                 "validator": {
                     "target_miner_uids": [-1],
@@ -183,6 +184,14 @@ class AppConfig(ABC):
             traceback.print_exc()
         return False
 
+    def get_number_predict_incorrect(self):
+        try:
+            return self.value['application']['miner']['num_make_incorrect']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return 0
+
     def load_app_config(self):
         bt.logging.info("start load_app_config")
 
@@ -216,6 +225,7 @@ if __name__ == '__main__':
     print('get_miner_test_input_dir_path', app_config.get_miner_test_input_dir_path())
     print('get_miner_test_processed_dir_path', app_config.get_miner_test_processed_dir_path())
     print('get_validator_test_output_dir_path', app_config.get_validator_test_output_dir_path())
+    print('get_number_predict_incorrect', app_config.get_number_predict_incorrect())
 
     while True:
         ...
