@@ -308,7 +308,7 @@ class Miner(BaseMinerNeuron):
             else:
                 count_ai_correct = 0
                 count_hu_correct = 0
-                for i in range(pred_list):
+                for i in range(len(pred_list)):
                     if str(pred_list[i]) == 'True' and str(result[i]) == 'True':
                         count_ai_correct += 1
                     if str(pred_list[i]) == 'False' and str(result[i]) == 'False':
