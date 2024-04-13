@@ -221,6 +221,10 @@ class Miner(BaseMinerNeuron):
 
     def get_input_data_from_file(self, input_dir_path, processed_dir_path):
         try:
+            if not os.path.exists(input_dir_path):
+                os.makedirs(input_dir_path)
+                bt.logging.info("create input directory success:" + str(input_dir_path))
+
             for entry in os.listdir(input_dir_path):
                 file_path = os.path.join(input_dir_path, entry)
                 if os.path.isfile(file_path):
@@ -231,6 +235,9 @@ class Miner(BaseMinerNeuron):
                         list_text = array_list[:middle_index]
                         result = array_list[middle_index:]
                         # move file to processed directory
+                        if not os.path.exists(processed_dir_path):
+                            os.makedirs(processed_dir_path)
+                            bt.logging.info("create processed directory success:" + str(processed_dir_path))
                         destination_path = os.path.join(processed_dir_path, os.path.basename(file_path))
                         shutil.move(file_path, destination_path)
                         return list_text, result
