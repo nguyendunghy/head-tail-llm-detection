@@ -1,4 +1,5 @@
 import hashlib
+import traceback
 
 import bittensor as bt
 import requests
@@ -8,17 +9,22 @@ from neurons.miners.utils import hash_code
 
 
 def head_tail_api_pred_human(list_text, urls):
-    results = []
-    for i in range(len(urls)):
-        result = head_tail_api_pred_human_with_url(list_text, url=urls[i])
-        results.append(result)
+    try:
+        results = []
+        for i in range(len(urls)):
+            result = head_tail_api_pred_human_with_url(list_text, url=urls[i])
+            results.append(result)
 
-    preds = [False] * len(list_text)
-    for i in range(len(results)):
-        for j in range(len(preds)):
-            preds[j] = preds[j] or results[i][j]
+        preds = [False] * len(list_text)
+        for i in range(len(results)):
+            for j in range(len(preds)):
+                preds[j] = preds[j] or results[i][j]
 
-    return preds
+        return preds
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
+
 
 
 def head_tail_api_pred_human_with_url(list_text, url):
