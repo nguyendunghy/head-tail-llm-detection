@@ -30,7 +30,7 @@ class AppConfig(ABC):
                     }
                 },
                 "validator": {
-                    "for_miner": [-1]
+                    "target_miner_uids": [-1]
                 }
             },
             "redis": {
@@ -123,6 +123,17 @@ class AppConfig(ABC):
             traceback.print_exc()
         return []
 
+    def get_miner_uids_to_send_request(self):
+        try:
+            uids = self.value['application']['validator']['target_miner_uids']
+            if len(uids) == 0:
+                return [-1]
+            return uids
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return [-1]
+
     def load_app_config(self):
         bt.logging.info("start load_app_config")
 
@@ -138,7 +149,7 @@ class AppConfig(ABC):
 
 
 if __name__ == '__main__':
-    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application1.json')
+    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
     print(app_config)
     print(app_config.value)
     print('allow_predict_50_50_standard_model', app_config.allow_predict_50_50_standard_model())
@@ -149,6 +160,7 @@ if __name__ == '__main__':
     print('allow_show_input', app_config.allow_show_input())
     print('get_blacklist_hotkeys', app_config.get_blacklist_hotkeys())
     print('get_whitelist_hotkeys', app_config.get_whitelist_hotkeys())
+    print('get_miner_uids_to_send_request', app_config.get_miner_uids_to_send_request())
 
     while True:
-            ...
+        ...

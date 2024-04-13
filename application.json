@@ -13,7 +13,7 @@
       }
     },
     "validator": {
-      "specific_miner": [
+      "target_miner_uids": [
         31,
         49,
         50

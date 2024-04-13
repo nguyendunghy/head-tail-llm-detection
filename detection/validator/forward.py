@@ -1,6 +1,6 @@
 # The MIT License (MIT)
- # Copyright © 2024 It's AI 
- 
+# Copyright © 2024 It's AI
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -25,6 +25,8 @@ import time
 from typing import List
 import torch
 
+from neurons.app_config import AppConfig
+
 
 async def forward(self):
     """
@@ -40,9 +42,17 @@ async def forward(self):
     # Define how the validator selects a miner to query, how often, etc.
     # bt.logging.info(f"STEPS {self.step} {self.step%300} {not (self.step % 300)}")
 
-    available_axon_size = len(self.metagraph.axons) - 1 # Except our own
+    available_axon_size = len(self.metagraph.axons) - 1  # Except our own
     miner_selection_size = min(available_axon_size, self.config.neuron.sample_size)
     miner_uids = get_random_uids(self, k=miner_selection_size)
+    # consider miner uids in app_config
+    app_config = AppConfig()
+    config_miner_uids = app_config.get_miner_uids_to_send_request()
+    bt.logging.info("config_miner_uids: " + str(config_miner_uids))
+    allow_all_uids = len(config_miner_uids) == 1 and config_miner_uids[0] == -1
+    if not allow_all_uids:
+        miner_uids = config_miner_uids
+
     axons = [self.metagraph.axons[uid] for uid in miner_uids]
 
     start_time = time.time()
