@@ -105,7 +105,8 @@ def write_request_data_to_file(dir_path, texts, labels):
         for i in range(len(texts)):
             datas.append(texts[i])
         for i in range(len(labels)):
-            datas.append(str(labels[i]) == '1')
+            label = str(labels[i]) == '1'
+            datas.append(str(label))
 
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
