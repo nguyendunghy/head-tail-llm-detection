@@ -10,6 +10,11 @@
         "num_input": [
           50
         ]
+      },
+      "test_net": {
+        "enable_input_from_file": false,
+        "input_dir_path": "/root/head-tail-llm-detection/test_data/input_data",
+        "processed_dir_path": "/root/head-tail-llm-detection/test_data/processed_data"
       }
     },
     "validator": {
@@ -17,7 +22,11 @@
         31,
         49,
         50
-      ]
+      ],
+      "test_net": {
+        "enable_write_input_to_file": false,
+        "output_dir_path": "/root/head-tail-llm-detection/test_data/input_data"
+      }
     }
   },
   "redis": {

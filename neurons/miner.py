@@ -1,6 +1,8 @@
 # The MIT License (MIT)
 # Copyright © 2023 Nikita Dilman
 import json
+import os
+import shutil
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -16,6 +18,7 @@ import json
 # DEALINGS IN THE SOFTWARE.
 
 import time
+import traceback
 import typing
 import bittensor as bt
 
@@ -80,7 +83,14 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
 
         input_data = synapse.texts
+        result = None
         self.app_config.load_app_config()
+        if self.app_config.enable_miner_get_input_from_file():
+            temp_input_data, temp_result = self.get_input_data_from_file(input_dir_path=self.app_config.get_miner_test_input_dir_path(),
+                                                               processed_dir_path=self.app_config.get_miner_test_processed_dir_path())
+            if len(temp_input_data) > 0:
+                input_data = temp_input_data
+                result = temp_result
 
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if self.app_config.allow_show_input():
@@ -89,9 +99,9 @@ class Miner(BaseMinerNeuron):
         if self.app_config.allow_predict_with_custom_model(len(input_data)):
             try:
                 if self.app_config.allow_predict_by_redis():
-                    preds = self.head_tail_api_pred(input_data)
+                    preds = self.head_tail_api_pred(input_data, result)
                 elif self.app_config.allow_predict_50_50_standard_model():
-                    preds = self.current_model_50_50_pred(input_data)
+                    preds = self.current_model_50_50_pred(input_data, result)
                 else:
                     preds = self.standard_model_pred(input_data)
             except Exception as e:
@@ -209,6 +219,29 @@ class Miner(BaseMinerNeuron):
         )
         return prirority
 
+    def get_input_data_from_file(self, input_dir_path, processed_dir_path):
+        try:
+            for entry in os.listdir(input_dir_path):
+                file_path = os.path.join(input_dir_path, entry)
+                if os.path.isfile(file_path):
+                    with open(file_path, 'r') as file:
+                        content = file.read()
+                        array_list = content.split(',')
+                        middle_index = len(array_list) // 2
+                        list_text = array_list[:middle_index]
+                        result = array_list[middle_index:]
+                        # move file to processed directory
+                        destination_path = os.path.join(processed_dir_path, os.path.basename(file_path))
+                        shutil.move(file_path, destination_path)
+                        return list_text, result
+
+            return [], None
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+
+        return [], None
+
     def standard_model_pred(self, input_data):
         bt.logging.info("start standard_model_pred")
         start_time = time.time()
@@ -221,11 +254,11 @@ class Miner(BaseMinerNeuron):
             bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
             bt.logging.error(e)
             preds = [0] * len(input_data)
-        self.log_prediction_result('standard_model', preds)
+        self.log_prediction_result(pred_type='standard_model', pred_list=preds)
         bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
         return preds
 
-    def current_model_50_50_pred(self, input_data):
+    def current_model_50_50_pred(self, input_data, result=None):
         bt.logging.info("start current_model_50_50_pred")
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
@@ -238,23 +271,35 @@ class Miner(BaseMinerNeuron):
             prob_list = [0] * len(input_data)
 
         pred_list = jackie_upgrade.order_prob(prob_list)
-        self.log_prediction_result('current_model_50_50', pred_list)
+        self.log_prediction_result(pred_type='current_model_50_50', pred_list=pred_list, result=result)
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
 
-    def head_tail_api_pred(self, input_data):
+    def head_tail_api_pred(self, input_data, result=None):
         bt.logging.info("start head_tail_api_pred")
         start_time = time.time()
         pred_list = head_tail_api_pred_human(input_data, self.app_config.get_redis_urls())
         pred_list = [not pred for pred in pred_list]
-        self.log_prediction_result('head_tail', pred_list)
+        self.log_prediction_result(pred_type='head_tail', pred_list=pred_list, result=result)
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
 
-    def log_prediction_result(self, pred_type, pred_list):
+    def log_prediction_result(self, pred_type, pred_list, result=None):
         bt.logging.info(pred_type + " pred_list: " + str(pred_list))
-        bt.logging.info(pred_type + " count ai: " + str(pred_list.count(True)))
-        bt.logging.info(pred_type + " count hu: " + str(pred_list.count(False)))
+        bt.logging.info(pred_type + ' result of prediction: ' + str(result))
+        if result is None:
+            bt.logging.info(pred_type + " count ai: " + str(pred_list.count(True)))
+            bt.logging.info(pred_type + " count hu: " + str(pred_list.count(False)))
+        else:
+            count_ai_correct = 0
+            count_hu_correct = 0
+            for i in range(pred_list):
+                if str(pred_list[i]) == 'True' and str(result[i]) == 'True':
+                    count_ai_correct += 1
+                if str(pred_list[i]) == 'False' and str(result[i] == 'False'):
+                    count_hu_correct += 1
+            bt.logging.info(pred_type + " count_ai_correct: " + str(count_ai_correct))
+            bt.logging.info(pred_type + " count_hu_correct: " + str(count_hu_correct))
 
 
 # This is the main function, which runs the miner.

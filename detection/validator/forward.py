@@ -1,5 +1,9 @@
 # The MIT License (MIT)
 # Copyright © 2024 It's AI
+import os
+import traceback
+
+import bittensor as bt
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
@@ -57,6 +61,9 @@ async def forward(self):
 
     start_time = time.time()
     texts, labels = await self.build_queries()
+    if app_config.enable_validator_write_data_to_file():
+        write_request_data_to_file(dir_path=app_config.get_validator_test_output_dir_path(), texts=texts, labels=labels)
+
     end_time = time.time()
     bt.logging.info(f"Time to generate challenges: {int(end_time - start_time)}")
 
@@ -65,7 +72,7 @@ async def forward(self):
     all_responses = []
     for i in range(0, len(axons), step):
         bt.logging.info(f"Sending challenges to the #{i} subset of miners with size {step}")
-        subset_axons = axons[i:i+step]
+        subset_axons = axons[i:i + step]
 
         responses: List[TextSynapse] = await self.dendrite(
             axons=subset_axons,
@@ -90,3 +97,25 @@ async def forward(self):
     self.update_scores(rewards_tensor, uids_tensor)
 
     # self.log_step(miner_uids, metrics, rewards)
+
+
+def write_request_data_to_file(dir_path, texts, labels):
+    try:
+        datas = []
+        for i in range(len(texts)):
+            datas.append(texts[i])
+        for i in range(len(labels)):
+            datas.append(str(labels[i]) == '1')
+
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+
+        content = ','.join(datas)
+        file_name = 'input_data_' + str(time.time_ns()) + '.txt'
+        file_path = dir_path + '/' + file_name
+        with open(file_path, 'w') as file:
+            file.write(content)
+        bt.logging.info("write content:: {} to file {} success".format(content,file_path))
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()

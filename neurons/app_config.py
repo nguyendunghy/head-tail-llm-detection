@@ -27,10 +27,19 @@ class AppConfig(ABC):
                     "custom_model": {
                         "active": True,
                         "num_input": [50]
+                    },
+                    "test_net": {
+                        "enable_input_from_file": False,
+                        "input_dir_path": "/root/head-tail-llm-detection",
+                        "processed_dir_path": "/root/head-tail-llm-detection"
                     }
                 },
                 "validator": {
-                    "target_miner_uids": [-1]
+                    "target_miner_uids": [-1],
+                    "test_net": {
+                        "enable_write_input_to_file": False,
+                        "output_dir_path": "/root/head-tail-llm-detection"
+                    }
                 }
             },
             "redis": {
@@ -134,6 +143,46 @@ class AppConfig(ABC):
             traceback.print_exc()
         return [-1]
 
+    def get_miner_test_input_dir_path(self):
+        try:
+            return self.value['application']['miner']['test_net']['input_dir_path']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return '/root/head-tail-llm-detection/'
+
+    def get_miner_test_processed_dir_path(self):
+        try:
+            return self.value['application']['miner']['test_net']['processed_dir_path']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return '/root/head-tail-llm-detection/'
+
+    def get_validator_test_output_dir_path(self):
+        try:
+            return self.value['application']['validator']['test_net']['output_dir_path']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return '/root/head-tail-llm-detection/'
+
+    def enable_miner_get_input_from_file(self):
+        try:
+            return self.value['application']['miner']['test_net']['enable_input_from_file']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return False
+
+    def enable_validator_write_data_to_file(self):
+        try:
+            return self.value['application']['validator']['test_net']['enable_write_input_to_file']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return False
+
     def load_app_config(self):
         bt.logging.info("start load_app_config")
 
@@ -161,6 +210,12 @@ if __name__ == '__main__':
     print('get_blacklist_hotkeys', app_config.get_blacklist_hotkeys())
     print('get_whitelist_hotkeys', app_config.get_whitelist_hotkeys())
     print('get_miner_uids_to_send_request', app_config.get_miner_uids_to_send_request())
+
+    print('enable_miner_get_input_from_file', app_config.enable_miner_get_input_from_file())
+    print('enable_validator_write_data_to_file', app_config.enable_validator_write_data_to_file())
+    print('get_miner_test_input_dir_path', app_config.get_miner_test_input_dir_path())
+    print('get_miner_test_processed_dir_path', app_config.get_miner_test_processed_dir_path())
+    print('get_validator_test_output_dir_path', app_config.get_validator_test_output_dir_path())
 
     while True:
         ...
