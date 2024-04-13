@@ -1,8 +1,14 @@
 {
   "application": {
-      "miner": {
+    "miner": {
       "show_input": false,
-      "black_list_enable": true
+      "black_list_enable": true,
+      "custom_model": {
+        "active": true,
+        "num_input": [
+          50
+        ]
+      }
     },
     "validator": {
       "specific_miner": [

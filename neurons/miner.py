@@ -86,7 +86,7 @@ class Miner(BaseMinerNeuron):
         if self.app_config.allow_show_input():
             bt.logging.info("input_data: " + str(input_data))
 
-        if len(input_data) == 50:
+        if self.app_config.allow_predict_with_custom_model(len(input_data)):
             try:
                 if self.app_config.allow_predict_by_redis():
                     preds = self.head_tail_api_pred(input_data)
@@ -203,7 +203,7 @@ class Miner(BaseMinerNeuron):
             bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
             bt.logging.error(e)
             preds = [0] * len(input_data)
-
+        self.log_prediction_result('standard_model', preds)
         bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
         return preds
 
@@ -220,7 +220,7 @@ class Miner(BaseMinerNeuron):
             prob_list = [0] * len(input_data)
 
         pred_list = jackie_upgrade.order_prob(prob_list)
-        bt.logging.info("current_model_50_50_pred pred_list: " + str(pred_list))
+        self.log_prediction_result('current_model_50_50', pred_list)
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
 
@@ -229,12 +229,14 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
         pred_list = head_tail_api_pred_human(input_data, self.app_config.get_redis_urls())
         pred_list = [not pred for pred in pred_list]
-        bt.logging.info("head tail pred_list: " + str(pred_list))
-        bt.logging.info("count ai: " + str(pred_list.count(False)))
-        bt.logging.info("count hu: " + str(pred_list.count(True)))
+        self.log_prediction_result('head_tail', pred_list)
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return pred_list
 
+    def log_prediction_result(self, pred_type, pred_list):
+        bt.logging.info(pred_type + " pred_list: " + str(pred_list))
+        bt.logging.info(pred_type + " count ai: " + str(pred_list.count(False)))
+        bt.logging.info(pred_type + " count hu: " + str(pred_list.count(True)))
 
 # This is the main function, which runs the miner.
 if __name__ == "__main__":
