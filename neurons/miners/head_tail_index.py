@@ -9,7 +9,7 @@ from neurons.miners.utils import hash_code
 
 def head_tail_api_pred_human(list_text, urls):
     results = []
-    for i in range(len(results)):
+    for i in range(len(urls)):
         result = head_tail_api_pred_human_with_url(list_text, url=urls[i])
         results.append(result)
 
