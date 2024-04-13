@@ -151,6 +151,7 @@ class Miner(BaseMinerNeuron):
         self.app_config.load_app_config()
         whitelist_hotkeys = self.app_config.get_whitelist_hotkeys()
         bt.logging.info("whitelist_hotkeys: " + str(whitelist_hotkeys))
+        bt.logging.info("validator hot key: " + str(synapse.dendrite.hotkey))
         if str(synapse.dendrite.hotkey) in whitelist_hotkeys:
             return False, 'hotkey {} in whitelist hotkeys'.format(str(synapse.dendrite.hotkey))
 
@@ -292,6 +293,7 @@ class Miner(BaseMinerNeuron):
         num_incorrect = min(self.app_config.get_number_predict_incorrect(), len(pred_list))
         bt.logging.info("num_incorrect: " + str(num_incorrect))
         for i in range(num_incorrect):
+            bt.logging.info("make pred at {} incorrect".format(str(i)))
             pred_list[i] = not pred_list[i]
 
         self.log_prediction_result(pred_type='head_tail', pred_list=pred_list, result=result)
