@@ -299,21 +299,26 @@ class Miner(BaseMinerNeuron):
         return pred_list
 
     def log_prediction_result(self, pred_type, pred_list, result=None):
-        bt.logging.info(pred_type + " pred_list: " + str(pred_list))
-        bt.logging.info(pred_type + ' result of prediction: ' + str(result))
-        if result is None:
-            bt.logging.info(pred_type + " count ai: " + str(pred_list.count(True)))
-            bt.logging.info(pred_type + " count hu: " + str(pred_list.count(False)))
-        else:
-            count_ai_correct = 0
-            count_hu_correct = 0
-            for i in range(pred_list):
-                if str(pred_list[i]) == 'True' and str(result[i]) == 'True':
-                    count_ai_correct += 1
-                if str(pred_list[i]) == 'False' and str(result[i] == 'False'):
-                    count_hu_correct += 1
-            bt.logging.info(pred_type + " count_ai_correct: " + str(count_ai_correct))
-            bt.logging.info(pred_type + " count_hu_correct: " + str(count_hu_correct))
+        try:
+            bt.logging.info(pred_type + " pred_list: " + str(pred_list))
+            bt.logging.info(pred_type + ' result of prediction: ' + str(result))
+            if result is None:
+                bt.logging.info(pred_type + " count ai: " + str(pred_list.count(True)))
+                bt.logging.info(pred_type + " count hu: " + str(pred_list.count(False)))
+            else:
+                count_ai_correct = 0
+                count_hu_correct = 0
+                for i in range(pred_list):
+                    if str(pred_list[i]) == 'True' and str(result[i]) == 'True':
+                        count_ai_correct += 1
+                    if str(pred_list[i]) == 'False' and str(result[i]) == 'False':
+                        count_hu_correct += 1
+                bt.logging.info(pred_type + " count_ai_correct: " + str(count_ai_correct))
+                bt.logging.info(pred_type + " count_hu_correct: " + str(count_hu_correct))
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+
 
 
 # This is the main function, which runs the miner.
