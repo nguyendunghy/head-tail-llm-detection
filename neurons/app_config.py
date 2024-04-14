@@ -28,6 +28,9 @@ class AppConfig(ABC):
                         "active": True,
                         "num_input": [50]
                     },
+                    "standard_model": {
+                        "urls": []
+                    },
                     "test_net": {
                         "enable_input_from_file": False,
                         "input_dir_path": "/root/head-tail-llm-detection",
@@ -191,6 +194,14 @@ class AppConfig(ABC):
             bt.logging.error(e)
             traceback.print_exc()
         return 0
+
+    def get_model_url(self):
+        try:
+            return self.value['application']['miner']['standard_model']['urls']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
 
     def load_app_config(self):
         bt.logging.info("start load_app_config")

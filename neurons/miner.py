@@ -3,41 +3,31 @@
 import json
 import os
 import shutil
+import time
+import traceback
+import typing
+
+import bittensor as bt
+from transformers.utils import logging as hf_logging
+
+# Bittensor Miner Template:
+import detection
+# import base miner class which takes care of most of the boilerplate
+from detection.base.miner import BaseMinerNeuron
+from neurons.app_config import AppConfig
+from neurons.request_handler import RequestHandler
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
 # and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
 # The above copyright notice and this permission notice shall be included in all copies or substantial portions of
 # the Software.
-
 # THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO
 # THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 # THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
-
-import time
-import traceback
-import typing
-import bittensor as bt
-
-import random
-
-# Bittensor Miner Template:
-import detection
-
-# import base miner class which takes care of most of the boilerplate
-from detection.base.miner import BaseMinerNeuron
-from miners.gpt_zero import PPLModel
-
-from transformers.utils import logging as hf_logging
-
-from neurons import jackie_upgrade
-from neurons.app_config import AppConfig
-from neurons.miners.deberta_classifier import DebertaClassifier
-from neurons.miners.head_tail_index import head_tail_api_pred_human
-from neurons.request_handler import RequestHandler
 
 hf_logging.set_verbosity(40)
 
@@ -53,16 +43,7 @@ class Miner(BaseMinerNeuron):
 
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
-
         self.app_config = AppConfig()
-        if self.config.neuron.model_type == 'ppl':
-            self.model = PPLModel(device=self.device)
-            self.model.load_pretrained(self.config.neuron.ppl_model_path)
-        else:
-            self.model = DebertaClassifier(foundation_model_path=self.config.neuron.deberta_foundation_model_path,
-                                           model_path=self.config.neuron.deberta_model_path,
-                                           device=self.device)
-
         self.load_state()
 
     async def forward(
@@ -95,7 +76,7 @@ class Miner(BaseMinerNeuron):
                 input_data = temp_input_data
                 result = temp_result
 
-        handler = RequestHandler(self.model, self.app_config)
+        handler = RequestHandler(self.app_config)
         synapse.predictions = handler.handle(input_data, result)
         return synapse
 

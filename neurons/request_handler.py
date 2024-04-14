@@ -1,8 +1,9 @@
 import time
 import traceback
 from abc import ABC
-
+import random
 import bittensor as bt
+import requests
 
 from neurons import jackie_upgrade
 from neurons.app_config import AppConfig
@@ -10,7 +11,7 @@ from neurons.miners.head_tail_index import head_tail_api_pred_human
 
 
 class RequestHandler(ABC):
-    def __init__(self, model, app_config=None):
+    def __init__(self, model=None, app_config=None):
         self.app_config = AppConfig() if app_config is None else app_config
         self.model = model
 
@@ -40,35 +41,43 @@ class RequestHandler(ABC):
     def standard_model_pred(self, input_data):
         bt.logging.info("start standard_model_pred")
         start_time = time.time()
-        bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
+        bt.logging.info(f"Amount of texts received: {len(input_data)}")
+        urls = self.app_config.get_model_url()
+        random.shuffle(urls)
+        for url in urls:
+            try:
+                preds = self.call_standard_model_api(input_data, url)
+                preds = [el > 0.5 for el in preds]
+                self.log_prediction_result(pred_type='standard_model', pred_list=preds)
+                bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
+                return preds
+            except Exception as e:
+                bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
+                traceback.print_exc()
 
-        try:
-            preds = self.model.predict_batch(input_data)
-            preds = [el > 0.5 for el in preds]
-        except Exception as e:
-            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-            bt.logging.error(e)
-            preds = [0] * len(input_data)
-        self.log_prediction_result(pred_type='standard_model', pred_list=preds)
         bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
-        return preds
+        return [False] * len(input_data)
 
     def current_model_50_50_pred(self, input_data, result=None):
         bt.logging.info("start current_model_50_50_pred")
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
+        urls = self.app_config.get_model_url()
+        random.shuffle(urls)
+        for url in urls:
+            try:
+                prob_list = self.call_standard_model_api(input_data, url)
+                pred_list = jackie_upgrade.order_prob(prob_list)
+                self.log_prediction_result(pred_type='current_model_50_50', pred_list=pred_list, result=result)
+                bt.logging.info(f"current_model_50_50_pred Made predictions in {int(time.time() - start_time)}s")
+                return pred_list
+            except Exception as e:
+                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
+                bt.logging.error(e)
 
-        try:
-            prob_list = self.model.predict_batch(input_data)
-        except Exception as e:
-            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-            bt.logging.error(e)
-            prob_list = [0] * len(input_data)
-
-        pred_list = jackie_upgrade.order_prob(prob_list)
-        self.log_prediction_result(pred_type='current_model_50_50', pred_list=pred_list, result=result)
-        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
-        return pred_list
+        bt.logging.info(f"current_model_50_50_pred Made predictions in {int(time.time() - start_time)}s")
+        return [False] * len(input_data)
 
     def head_tail_api_pred(self, input_data, result=None):
         bt.logging.info("start head_tail_api_pred")
@@ -106,6 +115,22 @@ class RequestHandler(ABC):
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
+
+    def call_standard_model_api(self, list_text, url):
+        # bt.logging.info("call_standard_model_api list_text :" + str(list_text))
+        body_data = {"list_text": list_text}
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.request("POST", url, headers=headers, json=body_data, timeout=15)
+        if response.status_code == 200:
+            data = response.json()
+            result = data['result']
+            return result
+        else:
+            print('Failed to post data:status_code', response.status_code)
+            print('Failed to post data:', response.content)
+            return [0] * len(list_text)
 
 
 if __name__ == '__main__':
@@ -162,58 +187,57 @@ if __name__ == '__main__':
         "Digital ads were placed in local media's online breaking news alerts, emails and newsletters, garnering high visibility. Targeted online ads were used to reach multiple demographic targets with messaging. Facebook page growth was a core goal of the campaign. The Peoples Bank realized they needed to embrace the opportunities for communication and targeted marketing that Facebook ads can provide. With a new visual direction established with the campaign, promotional materials such as signage and brochures were updated with the new branding."
 
     ]
-    labels = [ True,
-               True,
-               False,
-               False,
-               True,
-               True,
-               True,
-               True,
-               False,
-               True,
-               False,
-               True,
-               False,
-               False,
-               True,
-               False,
-               True,
-               True,
-               True,
-               False,
-               False,
-               True,
-               True,
-               True,
-               True,
-               False,
-               False,
-               False,
-               False,
-               False,
-               True,
-               False,
-               True,
-               False,
-               True,
-               False,
-               True,
-               True,
-               False,
-               False,
-               False,
-               True,
-               False,
-               False,
-               True,
-               False,
-               False,
-               True,
-               True,
-               False]
+    labels = [True,
+              True,
+              False,
+              False,
+              True,
+              True,
+              True,
+              True,
+              False,
+              True,
+              False,
+              True,
+              False,
+              False,
+              True,
+              False,
+              True,
+              True,
+              True,
+              False,
+              False,
+              True,
+              True,
+              True,
+              True,
+              False,
+              False,
+              False,
+              False,
+              False,
+              True,
+              False,
+              True,
+              False,
+              True,
+              False,
+              True,
+              True,
+              False,
+              False,
+              False,
+              True,
+              False,
+              False,
+              True,
+              False,
+              False,
+              True,
+              True,
+              False]
     app_config = AppConfig(config_path='/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
     handler = RequestHandler(model=None, app_config=app_config)
     result = handler.handle(input_data=list_text, result=labels)
     print("Result is: " + str(result))
-

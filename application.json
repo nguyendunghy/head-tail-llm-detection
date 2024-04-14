@@ -11,6 +11,9 @@
           50
         ]
       },
+      "standard_model": {
+        "urls": []
+      },
       "test_net": {
         "enable_input_from_file": false,
         "input_dir_path": "/root/head-tail-llm-detection/test_data/input_data",
