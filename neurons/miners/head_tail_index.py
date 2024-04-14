@@ -64,7 +64,7 @@ def head_tail_api_pred_human_with_url(list_text, url):
     headers = {
         'Content-Type': 'application/json'
     }
-    response = requests.request("POST", url, headers=headers, json=body_data)
+    response = requests.request("POST", url, headers=headers, json=body_data, timeout=10)
     if response.status_code == 200:
         data = response.json()
         human_pred_result = data['result']
