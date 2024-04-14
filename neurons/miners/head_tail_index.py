@@ -28,7 +28,7 @@ def head_tail_api_pred_human(list_text, urls):
 
 
 def head_tail_api_pred_human_with_url(list_text, url):
-    bt.logging.info("head_tail_api_pred_human list_text :" + str(list_text))
+    # bt.logging.info("head_tail_api_pred_human list_text :" + str(list_text))
     final_human_pred = [False for _ in range(len(list_text))]
     not_touch_index_list = []
     input = []
