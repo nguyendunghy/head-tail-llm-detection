@@ -6,7 +6,7 @@ import bittensor as bt
 from neurons.model_api_service import ModelService
 
 app = Flask(__name__)
-model_services = [ModelService()]
+model_services = [ModelService(model_type='ppl')]
 
 
 @app.route("/")
