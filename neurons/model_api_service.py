@@ -1,9 +1,11 @@
+import copy
 import time
 from abc import ABC
 
 import bittensor as bt
 from transformers.utils import logging as hf_logging
 
+from detection.base.neuron import BaseNeuron
 from detection.utils.config import check_config, add_args, config
 from miners.gpt_zero import PPLModel
 from neurons.app_config import AppConfig
@@ -16,9 +18,21 @@ class ModelService(ABC):
 
     def __init__(self):
         self.app_config = AppConfig()
+        base_config = copy.deepcopy(config or BaseNeuron.config())
         self.config = self.config()
-        bt.logging.info("config: " + str(self.config))
-        self.device = self.config.neuron.device if self.config.neuron.device is not None else 'cuda:0'
+        self.config.merge(base_config)
+        self.check_config(self.config)
+
+        # Set up logging with the provided configuration and directory.
+        bt.logging(config=self.config, logging_dir=self.config.full_path)
+
+        # If a gpu is required, set the device to cuda:N (e.g. cuda:0)
+        self.device = self.config.neuron.device
+
+        # Log the configuration for reference.
+        bt.logging.info(self.config)
+
+        # self.device = self.config.neuron.device if self.config.neuron.device is not None else 'cuda:0'
         if self.config.neuron.model_type == 'ppl':
             self.model = PPLModel(device=self.device)
             self.model.load_pretrained(self.config.neuron.ppl_model_path)
