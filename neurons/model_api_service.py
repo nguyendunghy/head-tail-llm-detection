@@ -42,7 +42,5 @@ class ModelService(ABC):
             preds = [0] * len(input_data)
 
         bt.logging.info("predict_list: " + str(preds))
-        bt.logging.info("count ai: " + str(preds.count(True)))
-        bt.logging.info("count hu: " + str(preds.count(False)))
         bt.logging.info(f"standard model predictions in {int(time.time() - start_time)}s")
         return preds
