@@ -48,3 +48,11 @@ class ModelService(ABC):
     @classmethod
     def config(cls):
         return config(cls)
+
+    @classmethod
+    def check_config(cls, config: "bt.Config"):
+        check_config(cls, config)
+
+    @classmethod
+    def add_args(cls, parser):
+        add_args(cls, parser)
