@@ -41,6 +41,7 @@ class ModelService(ABC):
             bt.logging.error(e)
             preds = [0] * len(input_data)
 
-        bt.logging.info("predict_list: " + str(preds))
+        result = preds.tolist()
+        bt.logging.info("predict_list: " + str(result))
         bt.logging.info(f"standard model predictions in {int(time.time() - start_time)}s")
-        return preds
+        return result
