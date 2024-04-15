@@ -21,6 +21,7 @@ def predict():
         data = request.get_json()
         input_data = data['list_text']
         i = random.randint(0, 2)
+        bt.logging.info("use instance i:" + str(i))
         result = model_services[i].predict(input_data=input_data)
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
         return jsonify({"message": "predict successfully", "result": result}), 200
