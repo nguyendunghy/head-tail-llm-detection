@@ -1,12 +1,9 @@
-import copy
 import time
 from abc import ABC
 
 import bittensor as bt
 from transformers.utils import logging as hf_logging
 
-from detection.base.neuron import BaseNeuron
-from detection.utils.config import check_config, add_args, config
 from miners.gpt_zero import PPLModel
 from neurons.app_config import AppConfig
 from neurons.miners.deberta_classifier import DebertaClassifier
@@ -16,30 +13,21 @@ hf_logging.set_verbosity(40)
 
 class ModelService(ABC):
 
-    def __init__(self):
+    def __init__(self,
+                 model_type='deberta',
+                 device='cuda:0',
+                 ppl_model_path='models/ppl_model.pk',
+                 deberta_foundation_model_path='models/deberta-v3-large-hf-weights',
+                 deberta_model_path='models/deberta-large-ls03-ctx1024.pth'):
         self.app_config = AppConfig()
-        base_config = copy.deepcopy(config or BaseNeuron.config())
-        self.config = self.config()
-        self.config.merge(base_config)
-        self.check_config(self.config)
 
-        # Set up logging with the provided configuration and directory.
-        bt.logging(config=self.config, logging_dir=self.config.full_path)
-
-        # If a gpu is required, set the device to cuda:N (e.g. cuda:0)
-        self.device = self.config.neuron.device
-
-        # Log the configuration for reference.
-        bt.logging.info(self.config)
-
-        # self.device = self.config.neuron.device if self.config.neuron.device is not None else 'cuda:0'
-        if self.config.neuron.model_type == 'ppl':
-            self.model = PPLModel(device=self.device)
-            self.model.load_pretrained(self.config.neuron.ppl_model_path)
+        if model_type == 'ppl':
+            self.model = PPLModel(device=device)
+            self.model.load_pretrained(ppl_model_path)
         else:
-            self.model = DebertaClassifier(foundation_model_path=self.config.neuron.deberta_foundation_model_path,
-                                           model_path=self.config.neuron.deberta_model_path,
-                                           device=self.device)
+            self.model = DebertaClassifier(foundation_model_path=deberta_foundation_model_path,
+                                           model_path=deberta_model_path,
+                                           device=device)
 
     def predict(self, input_data):
         bt.logging.info("start predict")
@@ -58,15 +46,3 @@ class ModelService(ABC):
         bt.logging.info("count hu: " + str(preds.count(False)))
         bt.logging.info(f"standard model predictions in {int(time.time() - start_time)}s")
         return preds
-
-    @classmethod
-    def config(cls):
-        return config(cls)
-
-    @classmethod
-    def check_config(cls, config: "bt.Config"):
-        check_config(cls, config)
-
-    @classmethod
-    def add_args(cls, parser):
-        add_args(cls, parser)
