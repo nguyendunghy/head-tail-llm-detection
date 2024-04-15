@@ -20,7 +20,7 @@ class ModelService(ABC):
                  deberta_foundation_model_path='models/deberta-v3-large-hf-weights',
                  deberta_model_path='models/deberta-large-ls03-ctx1024.pth'):
         self.app_config = AppConfig()
-
+        self.model_type = model_type
         if model_type == 'ppl':
             self.model = PPLModel(device=device)
             self.model.load_pretrained(ppl_model_path)
@@ -41,7 +41,7 @@ class ModelService(ABC):
             bt.logging.error(e)
             preds = [0] * len(input_data)
 
-        result = preds.tolist()
+        result = preds.tolist() if self.model_type != 'ppl' else preds
         bt.logging.info("predict_list: " + str(result))
         bt.logging.info(f"standard model predictions in {int(time.time() - start_time)}s")
         return result
