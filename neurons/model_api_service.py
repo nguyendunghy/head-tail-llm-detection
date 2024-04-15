@@ -17,6 +17,7 @@ class ModelService(ABC):
 
         self.app_config = AppConfig()
         self.config = config()
+        bt.logging.info("config: " + str(self.config))
         self.device = self.config.neuron.device
         if self.config.neuron.model_type == 'ppl':
             self.model = PPLModel(device=self.device)
