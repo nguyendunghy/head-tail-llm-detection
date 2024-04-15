@@ -27,6 +27,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    if model_service is None:
-        model_service = ModelService()
     app.run(host='0.0.0.0', debug=True, port=8080)

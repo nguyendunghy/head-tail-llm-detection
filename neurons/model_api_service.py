@@ -13,12 +13,12 @@ hf_logging.set_verbosity(40)
 
 
 class ModelService(ABC):
-    def __int__(self, device='cuda:0'):
 
+    def __init__(self):
         self.app_config = AppConfig()
         self.config = config()
         bt.logging.info("config: " + str(self.config))
-        self.device = self.config.neuron.device
+        self.device = self.config.neuron.device if self.config.neuron.device is not None else 'cuda:0'
         if self.config.neuron.model_type == 'ppl':
             self.model = PPLModel(device=self.device)
             self.model.load_pretrained(self.config.neuron.ppl_model_path)
