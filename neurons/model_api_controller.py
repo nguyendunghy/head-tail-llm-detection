@@ -1,12 +1,11 @@
-import random
 import time
-from flask import Flask, request, jsonify
 import bittensor as bt
+from flask import Flask, request, jsonify
 
 from neurons.model_api_service import ModelService
 
 app = Flask(__name__)
-model_services = [ModelService(model_type='ppl')]
+model_services = [ModelService(model_type='deberta')]
 
 
 @app.route("/")
@@ -20,8 +19,6 @@ def predict():
     if request.is_json:
         data = request.get_json()
         input_data = data['list_text']
-        # i = random.randint(0, 2)
-        # bt.logging.info("use instance i:" + str(i))
         result = model_services[0].predict(input_data=input_data)
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
         return jsonify({"message": "predict successfully", "result": result}), 200
@@ -30,4 +27,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8080)
+    app.run(host='0.0.0.0', debug=True, port=8080, timeout=10)
