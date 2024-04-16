@@ -29,7 +29,7 @@ class AppConfig(ABC):
                         "num_input": [50]
                     },
                     "standard_model": {
-                        "urls": []
+                        "urls": ["http://154.20.200.88:44553/predict"]
                     },
                     "test_net": {
                         "enable_input_from_file": False,
@@ -237,6 +237,7 @@ if __name__ == '__main__':
     print('get_miner_test_processed_dir_path', app_config.get_miner_test_processed_dir_path())
     print('get_validator_test_output_dir_path', app_config.get_validator_test_output_dir_path())
     print('get_number_predict_incorrect', app_config.get_number_predict_incorrect())
+    print('get_model_url', app_config.get_model_url())
 
     while True:
         ...

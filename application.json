@@ -4,7 +4,9 @@
       "show_input": false,
       "black_list_enable": true,
       "blacklist_hotkeys": [],
-      "whitelist_hotkeys": ["5FKstHjZkh4v3qAMSBa1oJcHCLjxYZ8SNTSz1opTv4hR7gVB"],
+      "whitelist_hotkeys": [
+        "5FKstHjZkh4v3qAMSBa1oJcHCLjxYZ8SNTSz1opTv4hR7gVB"
+      ],
       "custom_model": {
         "active": true,
         "num_input": [
@@ -12,7 +14,9 @@
         ]
       },
       "standard_model": {
-        "urls": []
+        "urls": [
+          "http://154.20.200.88:44553/predict"
+        ]
       },
       "test_net": {
         "enable_input_from_file": false,
