@@ -29,7 +29,13 @@ class AppConfig(ABC):
                         "num_input": [50]
                     },
                     "standard_model": {
-                        "urls": ["http://154.20.200.88:44553/predict"]
+                        "urls": [
+                            "http://154.20.200.88:44893/predict",
+                            "http://154.20.200.88:44825/predict",
+                            "http://148.77.2.74:59591/predict",
+                            "http://148.77.2.74:59383/predict"
+                        ],
+                        "timeout": 10
                     },
                     "test_net": {
                         "enable_input_from_file": False,
@@ -212,6 +218,14 @@ class AppConfig(ABC):
             traceback.print_exc()
         return []
 
+    def get_model_timeout(self):
+        try:
+            return self.value['application']['miner']['standard_model']['timeout']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return 10
+
     def load_app_config(self):
         bt.logging.info("start load_app_config")
 
@@ -248,7 +262,6 @@ if __name__ == '__main__':
     print('get_number_predict_incorrect', app_config.get_number_predict_incorrect())
     print('get_model_url', app_config.get_model_url())
     print('get_redis_timeout', app_config.get_redis_timeout())
-
-
+    print('get_model_timeout', app_config.get_model_timeout())
     while True:
         ...
