@@ -1,3 +1,4 @@
+import copy
 import time
 import traceback
 from abc import ABC
@@ -44,8 +45,9 @@ class RequestHandler(ABC):
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         urls = self.app_config.get_model_url()
         random.shuffle(urls)
-        for url in urls:
+        while len(urls) > 0:
             try:
+                url = urls[0]
                 preds = self.call_standard_model_api(input_data, url)
                 preds = [el > 0.5 for el in preds]
                 self.log_prediction_result(pred_type='standard_model', pred_list=preds)
@@ -55,9 +57,34 @@ class RequestHandler(ABC):
                 bt.logging.error('Could not proceed text "{}..."'.format(input_data))
                 bt.logging.error(e)
                 traceback.print_exc()
+                urls = self.handle_url_when_have_error(urls)
 
         bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
         return [False] * len(input_data)
+
+    def handle_url_when_have_error(self, urls):
+        try:
+            temp_urls = copy.deepcopy(urls)
+            fail_url = temp_urls[0]
+            fail_ip = self.get_ip_from_url(fail_url)
+            temp_urls = temp_urls[1:]
+
+            result = []
+            for url in temp_urls:
+                if self.get_ip_from_url(url) != fail_ip:
+                    result.append(url)
+            for url in temp_urls:
+                if self.get_ip_from_url(url) == fail_ip:
+                    result.append(url)
+            return result
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return urls[1:]
+
+    def get_ip_from_url(self, url):
+        arr = url.split(':')
+        return arr[1][2:]
 
     def current_model_50_50_pred(self, input_data, result=None):
         bt.logging.info("start current_model_50_50_pred")
@@ -240,5 +267,20 @@ if __name__ == '__main__':
               False]
     app_config = AppConfig(config_path='/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
     handler = RequestHandler(model=None, app_config=app_config)
-    result = handler.handle(input_data=list_text, result=labels)
-    print("Result is: " + str(result))
+    # result = handler.handle(input_data=list_text, result=labels)
+    # print("Result is: " + str(result))
+    urls = [
+        "http://154.20.200.88:44893/predict",
+        # "http://154.20.200.88:44825/predict",
+        # "http://148.77.2.74:59591/predict",
+        # "http://148.77.2.74:59383/predict",
+        # "http://148.71.20.84:59591/predict",
+        # "http://148.71.20.84:59383/predict"
+    ]
+    random.shuffle(urls)
+    print("shuffle: " + str(urls))
+    for url in urls:
+        print(handler.get_ip_from_url(url))
+    while len(urls) > 0:
+        urls = handler.handle_url_when_have_error(urls)
+        print("temp_url:" + str(urls))
