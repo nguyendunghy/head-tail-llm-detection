@@ -49,7 +49,10 @@ class RequestHandler(ABC):
             try:
                 url = model_urls[0]
                 bt.logging.info("call standard model to url: " + str(url))
-                preds = self.call_standard_model_api(input_data, url)
+                preds, success = self.call_standard_model_api(input_data, url)
+                if not success:
+                    model_urls = self.handle_url_when_have_error(model_urls)
+                    continue
                 preds = [el > 0.5 for el in preds]
                 self.log_prediction_result(pred_type='standard_model', pred_list=preds)
                 bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
@@ -97,7 +100,10 @@ class RequestHandler(ABC):
             try:
                 url = model_urls[0]
                 bt.logging.info("call to model at url: " + str(url))
-                prob_list = self.call_standard_model_api(input_data, url)
+                prob_list, success = self.call_standard_model_api(input_data, url)
+                if not success:
+                    model_urls = self.handle_url_when_have_error(model_urls)
+                    continue
                 pred_list = jackie_upgrade.order_prob(prob_list)
                 self.log_prediction_result(pred_type='current_model_50_50', pred_list=pred_list, result=result)
                 bt.logging.info(f"current_model_50_50_pred Made predictions in {int(time.time() - start_time)}s")
@@ -158,11 +164,11 @@ class RequestHandler(ABC):
         if response.status_code == 200:
             data = response.json()
             result = data['result']
-            return result
+            return result, True
         else:
             print('Failed to post data:status_code', response.status_code)
             print('Failed to post data:', response.content)
-            return [0] * len(list_text)
+            return [0] * len(list_text), False
 
 
 if __name__ == '__main__':
