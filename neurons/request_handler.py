@@ -82,7 +82,8 @@ class RequestHandler(ABC):
     def head_tail_api_pred(self, input_data, result=None):
         bt.logging.info("start head_tail_api_pred")
         start_time = time.time()
-        pred_list = head_tail_api_pred_human(input_data, self.app_config.get_redis_urls())
+        pred_list = head_tail_api_pred_human(list_text=input_data, urls=self.app_config.get_redis_urls(),
+                                             timeout=self.app_config.get_redis_timeout())
         pred_list = [not pred for pred in pred_list]
         # Make some prediction incorrect to downgrade incentive
         num_incorrect = min(self.app_config.get_number_predict_incorrect(), len(pred_list))

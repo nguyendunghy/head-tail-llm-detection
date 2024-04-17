@@ -43,7 +43,8 @@
       "urls": [
         "http://69.67.150.21:8080/check-exists",
         "http://103.219.170.221:8080/check-exists"
-      ]
+      ],
+      "timeout": 12
     }
   },
   "50_50_standard_model": {

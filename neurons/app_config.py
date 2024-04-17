@@ -52,7 +52,8 @@ class AppConfig(ABC):
                     "urls": [
                         "http://69.67.150.21:8080/check-exists",
                         "http://103.219.170.221:8080/check-exists"
-                    ]
+                    ],
+                    "timeout": 12
                 }
             },
             "50_50_standard_model": {
@@ -102,7 +103,15 @@ class AppConfig(ABC):
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
-        return ["http://69.67.150.21:8080/verify-data", "http://103.219.170.221:8080/verify-data"]
+        return ["http://69.67.150.21:8080/check-exists", "http://103.219.170.221:8080/check-exists"]
+
+    def get_redis_timeout(self):
+        try:
+            return self.value['redis']['verify_data']['timeout']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return 10
 
     def allow_predict_by_redis(self):
         try:
@@ -218,7 +227,7 @@ class AppConfig(ABC):
 
 
 if __name__ == '__main__':
-    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
+    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application1.json')
     print(app_config)
     print(app_config.value)
     print('allow_predict_50_50_standard_model', app_config.allow_predict_50_50_standard_model())
@@ -238,6 +247,8 @@ if __name__ == '__main__':
     print('get_validator_test_output_dir_path', app_config.get_validator_test_output_dir_path())
     print('get_number_predict_incorrect', app_config.get_number_predict_incorrect())
     print('get_model_url', app_config.get_model_url())
+    print('get_redis_timeout', app_config.get_redis_timeout())
+
 
     while True:
         ...

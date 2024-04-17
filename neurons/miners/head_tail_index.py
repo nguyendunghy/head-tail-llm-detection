@@ -8,11 +8,11 @@ from neurons.miners import index_data
 from neurons.miners.utils import hash_code
 
 
-def head_tail_api_pred_human(list_text, urls):
+def head_tail_api_pred_human(list_text, urls, timeout=12):
     try:
         results = []
         for i in range(len(urls)):
-            result = head_tail_api_pred_human_with_url(list_text, url=urls[i])
+            result = head_tail_api_pred_human_with_url(list_text=list_text, url=urls[i], timeout=timeout)
             results.append(result)
 
         preds = [False] * len(list_text)
@@ -26,8 +26,7 @@ def head_tail_api_pred_human(list_text, urls):
         traceback.print_exc()
 
 
-
-def head_tail_api_pred_human_with_url(list_text, url):
+def head_tail_api_pred_human_with_url(list_text, url, timeout=12):
     # bt.logging.info("head_tail_api_pred_human list_text :" + str(list_text))
     final_human_pred = [False for _ in range(len(list_text))]
     not_touch_index_list = []
@@ -64,7 +63,7 @@ def head_tail_api_pred_human_with_url(list_text, url):
     headers = {
         'Content-Type': 'application/json'
     }
-    response = requests.request("POST", url, headers=headers, json=body_data, timeout=15)
+    response = requests.request("POST", url, headers=headers, json=body_data, timeout=timeout)
     if response.status_code == 200:
         data = response.json()
         human_pred_result = data['result']
@@ -143,4 +142,3 @@ if __name__ == '__main__':
     result1 = [not l for l in labels]
     print(result1)
     count = 0
-
