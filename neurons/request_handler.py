@@ -43,11 +43,11 @@ class RequestHandler(ABC):
         bt.logging.info("start standard_model_pred")
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        urls = self.app_config.get_model_url()
-        random.shuffle(urls)
-        while len(urls) > 0:
+        model_urls = self.app_config.get_model_url()
+        random.shuffle(model_urls)
+        while len(model_urls) > 0:
             try:
-                url = urls[0]
+                url = model_urls[0]
                 bt.logging.info("call standard model to url: " + str(url))
                 preds = self.call_standard_model_api(input_data, url)
                 preds = [el > 0.5 for el in preds]
@@ -58,7 +58,7 @@ class RequestHandler(ABC):
                 bt.logging.error('Could not proceed text "{}..."'.format(input_data))
                 bt.logging.error(e)
                 traceback.print_exc()
-                urls = self.handle_url_when_have_error(urls)
+                model_urls = self.handle_url_when_have_error(model_urls)
 
         bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
         return [False] * len(input_data)
@@ -91,10 +91,12 @@ class RequestHandler(ABC):
         bt.logging.info("start current_model_50_50_pred")
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        urls = self.app_config.get_model_url()
-        random.shuffle(urls)
-        for url in urls:
+        model_urls = self.app_config.get_model_url()
+        random.shuffle(model_urls)
+        while len(model_urls) > 0:
             try:
+                url = model_urls[0]
+                bt.logging.info("call to model at url: " + str(url))
                 prob_list = self.call_standard_model_api(input_data, url)
                 pred_list = jackie_upgrade.order_prob(prob_list)
                 self.log_prediction_result(pred_type='current_model_50_50', pred_list=pred_list, result=result)
@@ -103,6 +105,7 @@ class RequestHandler(ABC):
             except Exception as e:
                 bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
                 bt.logging.error(e)
+                model_urls = self.handle_url_when_have_error(model_urls)
 
         bt.logging.info(f"current_model_50_50_pred Made predictions in {int(time.time() - start_time)}s")
         return [False] * len(input_data)
