@@ -23,21 +23,32 @@ class RequestHandler(ABC):
             bt.logging.info("input_data: " + str(input_data))
 
         if self.app_config.allow_predict_with_custom_model(len(input_data)):
-            try:
-                if self.app_config.allow_predict_by_redis():
-                    preds = self.head_tail_api_pred(input_data, result)
-                elif self.app_config.allow_predict_50_50_standard_model():
-                    preds = self.current_model_50_50_pred(input_data, result)
-                else:
-                    preds = self.standard_model_pred(input_data)
-            except Exception as e:
-                bt.logging.error(e)
-                preds = self.standard_model_pred(input_data)
+            preds = self.custom_model_pred(input_data=input_data, result=result)
         else:
             preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return preds
+
+    def custom_model_pred(self, input_data, result=None):
+        try:
+            if self.app_config.allow_predict_by_redis():
+                redis_prediction = self.head_tail_api_pred(input_data, result)
+                return redis_prediction
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+
+        try:
+            if self.app_config.allow_predict_50_50_standard_model():
+                _50_50_standard_predict = self.current_model_50_50_pred(input_data, result)
+                return _50_50_standard_predict
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+
+        standard_prediction = self.standard_model_pred(input_data)
+        return standard_prediction
 
     def standard_model_pred(self, input_data):
         bt.logging.info("start standard_model_pred")
