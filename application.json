@@ -15,7 +15,7 @@
       },
       "standard_model": {
         "urls": [
-          "http://154.20.200.88:44553/predict"
+          "http://154.20.200.88:44893/predict","http://154.20.200.88:44825/predict"
         ]
       },
       "test_net": {
