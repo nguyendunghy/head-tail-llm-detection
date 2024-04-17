@@ -27,4 +27,7 @@ def predict():
 
 
 if __name__ == '__main__':
+    # 154.20.200.88:44825 -> 6006/tcp
+    # 154.20.200.88:44893 -> 8888/tcp
+
     app.run(host='0.0.0.0', debug=True, port=8888)
