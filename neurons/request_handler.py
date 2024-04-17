@@ -48,6 +48,7 @@ class RequestHandler(ABC):
         while len(urls) > 0:
             try:
                 url = urls[0]
+                bt.logging.info("call standard model to url: " + str(url))
                 preds = self.call_standard_model_api(input_data, url)
                 preds = [el > 0.5 for el in preds]
                 self.log_prediction_result(pred_type='standard_model', pred_list=preds)
