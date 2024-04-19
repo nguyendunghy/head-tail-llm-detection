@@ -1,4 +1,7 @@
+import sys
 import time
+import traceback
+
 from flask import Flask, request, jsonify
 import bittensor as bt
 
@@ -48,5 +51,11 @@ def verify_data():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=8080)
-    # call_insert(text_hash="abcdef", model_type='standard', count_ai=100, count_human=100)
+    try:
+        arg2 = sys.argv[2]
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
+        arg2 = '8080'
+
+    app.run(host='0.0.0.0', debug=True, port=int(arg2))
