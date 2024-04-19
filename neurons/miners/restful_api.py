@@ -52,10 +52,10 @@ def verify_data():
 
 if __name__ == '__main__':
     try:
-        arg2 = sys.argv[2]
+        arg1 = sys.argv[1]
     except Exception as e:
         bt.logging.error(e)
         traceback.print_exc()
-        arg2 = '8080'
+        arg1 = '8080'
 
-    app.run(host='0.0.0.0', debug=True, port=int(arg2))
+    app.run(host='0.0.0.0', debug=True, port=int(arg1))
