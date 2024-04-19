@@ -1,0 +1,60 @@
+{
+  "application": {
+    "miner": {
+      "show_input": false,
+      "black_list_enable": true,
+      "blacklist_hotkeys": [],
+      "whitelist_hotkeys": [
+        "5FKstHjZkh4v3qAMSBa1oJcHCLjxYZ8SNTSz1opTv4hR7gVB"
+      ],
+      "custom_model": {
+        "active": true,
+        "num_input": [
+          50
+        ]
+      },
+      "standard_model": {
+        "urls": [
+          "http://154.20.200.88:44893/predict",
+          "http://154.20.200.88:44825/predict",
+          "http://148.77.2.74:59591/predict",
+          "http://148.77.2.74:59383/predict"
+        ],
+        "timeout": 10
+      },
+      "test_net": {
+        "enable_input_from_file": false,
+        "input_dir_path": "/root/head-tail-llm-detection/test_data/input_data",
+        "processed_dir_path": "/root/head-tail-llm-detection/test_data/processed_data"
+      },
+      "num_make_incorrect": 0
+    },
+    "validator": {
+      "target_miner_uids": [
+        31,
+        49,
+        50
+      ],
+      "test_net": {
+        "enable_write_input_to_file": false,
+        "output_dir_path": "/root/head-tail-llm-detection/test_data/input_data"
+      }
+    }
+  },
+  "redis": {
+    "active": true,
+    "verify_data": {
+      "urls": [
+        "http://177.54.149.35:8888/check-exists",
+        "http://160.202.130.171:8888/check-exists",
+        "http://189.1.168.181:8888/check-exists",
+        "http://177.54.152.68:8888/check-exists"
+      ],
+      "timeout": 12
+    }
+  },
+  "50_50_standard_model": {
+    "active": true
+  }
+}
+
