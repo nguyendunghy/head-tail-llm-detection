@@ -371,9 +371,10 @@ if __name__ == "__main__":
         ex = exists_on_redis(str(arg2), int(arg3))
         bt.logging.info("exists: " + str(ex))
     elif arg1 == 'verify_c4':
-        c4_dir = '/root/c4-dataset/c4/en'
-        urls = ['http://103.219.170.221:8080/verify-data', 'http://69.67.150.21:8080/verify-data']
-        verify_all_c4(c4_dir, 512, 1024, urls=urls)
+        c4_dir = '/home/ubuntu/c4-dataset/c4/en'
+        urls = ['http://177.54.149.35:8888/verify-data', 'http://160.202.130.171:8888/verify-data',
+                'http://189.1.168.181:8888/verify-data','http://177.54.152.68:8888/verify-data']
+        verify_all_c4(c4_dir=c4_dir, start=512, end=1024, urls=urls)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
