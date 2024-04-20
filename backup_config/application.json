@@ -46,7 +46,7 @@
     "verify_data": {
       "urls": [
         "http://177.54.149.35:8888/check-exists",
-        "http://160.202.130.171:8888/check-exists",
+        "http://189.1.168.180:8888/check-exists",
         "http://189.1.168.181:8888/check-exists",
         "http://177.54.152.68:8888/check-exists"
       ],
