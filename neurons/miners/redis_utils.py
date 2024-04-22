@@ -372,8 +372,9 @@ if __name__ == "__main__":
         bt.logging.info("exists: " + str(ex))
     elif arg1 == 'verify_c4':
         c4_dir = '/home/ubuntu/c4-dataset/c4/en'
-        urls = ['http://177.54.149.35:8888/verify-data', 'http://189.1.168.180:8888/verify-data',
-                'http://189.1.168.181:8888/verify-data','http://177.54.152.68:8888/verify-data']
+        # urls = ['http://177.54.149.35:8888/verify-data', 'http://189.1.168.180:8888/verify-data',
+        #         'http://189.1.168.181:8888/verify-data','http://177.54.152.68:8888/verify-data']
+        urls = ['http://69.67.150.87:8888/check-exists','http://177.54.149.35:8888/check-exists']
         verify_all_c4(c4_dir=c4_dir, start=int(arg2), end=int(arg3), urls=urls)
     # verify_data(file_path)
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
