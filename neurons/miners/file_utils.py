@@ -71,9 +71,6 @@ def read_from_file(file_path):
             print(a)
 
 
-
-
-
 def load_record(list_data, thread_name, line_count=None):
     for data in list_data:
         token_list = index_data.index_data(data)
@@ -85,7 +82,8 @@ def load_record(list_data, thread_name, line_count=None):
                 db = hash_value % NUM_DB
                 save(db, sha256_hex[:HASH_LENGTH])
                 bt.logging.info(
-                    "upload success thread_name: " + thread_name + " key: " + sha256_hex[:HASH_LENGTH] + " : " + str(db))
+                    "upload success thread_name: " + thread_name + " key: " + sha256_hex[:HASH_LENGTH] + " : " + str(
+                        db))
             except Exception as e:
                 bt.logging.error(e)
                 traceback.print_exc()
@@ -119,22 +117,28 @@ def load_range_multi_process():
     bt.logging.info('Done.')
 
 
-
-
 if __name__ == '__main__':
-    start_time = time.time_ns()
-    file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.{}-of-01024.json"
-    dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}/"
     arg1 = sys.argv[1]
     arg2 = sys.argv[2]
-    for i in range(int(arg1), int(arg2)):
-        FILE_PATH = file_path_template.format(str(db_to_str(i)))
-        DIR_PATH = dir_path_template.format(db_to_str(i))
-        directory_path = Path(DIR_PATH)
-        if not directory_path.exists():
-            directory_path.mkdir(parents=True, exist_ok=True)
-            bt.logging.info(f"Directory created: {directory_path}")
+    arg3 = sys.argv[3]
+    start_time = time.time_ns()
 
-        load_range_multi_process()
+    if arg1 == 'index_file':
+        file_path = '/home/ubuntu/c4-dataset/c4/en/c4-train.00000-of-01024.json'
+        load_range_one_thread(file_path=file_path, start_time=int(arg2), end_line=int(arg3))
+    elif arg1 == 'index_multy_process':
+        file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.{}-of-01024.json"
+        dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}/"
+        arg1 = sys.argv[1]
+        arg2 = sys.argv[2]
+        for i in range(int(arg1), int(arg2)):
+            FILE_PATH = file_path_template.format(str(db_to_str(i)))
+            DIR_PATH = dir_path_template.format(db_to_str(i))
+            directory_path = Path(DIR_PATH)
+            if not directory_path.exists():
+                directory_path.mkdir(parents=True, exist_ok=True)
+                bt.logging.info(f"Directory created: {directory_path}")
+
+            load_range_multi_process()
 
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
