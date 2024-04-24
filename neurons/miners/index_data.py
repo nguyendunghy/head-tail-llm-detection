@@ -116,8 +116,8 @@ if __name__ == "__main__":
     text = '''Brushing your teeth on a regular basis is one of the best things you can do for yourself. Healthy teeth make a beautiful smile. Brushing can also help with gum health and even keep your breath smelling sweet.\nFor some of us, though, brushing can be an annoying chore that gets in the way of a good time. Hopefully you don’t think of brushing in such dire terms, but it happens.\nThe best way to build brushing into your routine is to make it a habit. A habit is a repeated practice that becomes hard to give up. Some habits can be bad, of course. Brushing can be a good habit.\nDon’t complicate the instructions for your kids. Keep it as simple as possible at the start. A small amount of toothpaste on your toothbrush, brush for two minutes, rinse with clear water. Simple.\nOnce you have created a healthy habit around brushing your teeth, you’ll have plenty of reason to smile.\nAt Providence Dental in North Las Vegas, the dental health of our patients is our top priority. We offer a full range of services, from family dentistry to urgent dental care. Schedule your next cleaning and checkup with us today.'''
     sentences = data_aug.get_all_sentences(text)
     print("len sentences: " + str(len(sentences)))
-    print(sentences)
+    print('\n'.join(sentences))
     el = {'text': text}
     result = index_data(el)
     print("len result: " + str(len(result)))
-    print(result)
+    print('\n'.join(result))
