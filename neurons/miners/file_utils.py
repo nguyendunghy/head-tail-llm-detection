@@ -124,8 +124,10 @@ if __name__ == '__main__':
     start_time = time.time_ns()
 
     if arg1 == 'index_file':
-        file_path = '/home/ubuntu/c4-dataset/c4/en/c4-train.00000-of-01024.json'
-        load_range_one_thread(file_path=file_path, start_time=int(arg2), end_line=int(arg3))
+        FILE_PATH = '/home/ubuntu/c4-dataset/c4/en/c4-train.00000-of-01024.json'
+        DIR_PATH = '/home/ubuntu/c4-dataset/indexed_data/'
+        PROCESS_NUMBER = 4
+        ...
     elif arg1 == 'index_multy_process':
         file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.{}-of-01024.json"
         dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}/"
