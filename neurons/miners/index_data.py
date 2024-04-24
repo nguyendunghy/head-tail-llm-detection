@@ -61,7 +61,7 @@ def process_tail(sentence, sentences, current_index):
 
 
 def cut_head_tail(text):
-    if len(text) < TOKEN_LENGTH:
+    if len(text) < MIN_TEXT_LENGTH:
         return [TOO_SHORT_TEXT]
     else:
         head = text[:TOKEN_LENGTH]
@@ -74,7 +74,7 @@ def index_data(el):
     indexing_list = []
     data_aug = DataAugmentator()
     sentences = data_aug.get_all_sentences(text)
-    if len(sentences) < 4:
+    if len(sentences) < 4:  # min sentence in request is 3, if less than 3, return all text
         line = ' '.join(sentences)
         if len(line) < MIN_TEXT_LENGTH:
             ...
