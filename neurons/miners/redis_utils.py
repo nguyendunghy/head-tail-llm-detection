@@ -162,10 +162,9 @@ def verify_line_no_words(line, augmentator, line_number):
         bt.logging.info("human written text - too short character")
         return True
 
-    sample_sentence = augmentator.subsample_sentences(text)
-    list_token = index_data.cut_head_tail(sample_sentence['text'])
+    list_token = index_data.cut_head_tail(text)
     if len(list_token) == 1:
-        bt.logging.info("text too short:" + sample_sentence['text'])
+        bt.logging.info("text too short:" + text)
         return True
     else:
         list_result = []
