@@ -163,9 +163,9 @@ def verify_line_no_words(line, augmentator, line_number):
         return True
 
     sample_sentence = augmentator.subsample_sentences(text)
-    list_token = index_data.cut_head_tail(sample_sentence)
+    list_token = index_data.cut_head_tail(sample_sentence['text'])
     if len(list_token) == 1:
-        bt.logging.info("text too short:" + sample_sentence)
+        bt.logging.info("text too short:" + sample_sentence['text'])
         return True
     else:
         list_result = []
