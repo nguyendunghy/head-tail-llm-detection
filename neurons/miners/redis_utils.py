@@ -350,7 +350,7 @@ if __name__ == "__main__":
     elif arg1 == 'load_dir':
         # file_path = "/root/c4_dataset/c4/extracted_file/c4-train.00001-of-01024.json"
         # file_path = "/root/c4_dataset/c4/extracted_file/head-1000-00001.json"
-        parent_path = "/home/ubuntu/c4-dataset/c4-index-v1"
+        parent_path = "/home/ubuntu/c4-dataset/indexed_data"
         des_path = '/home/ubuntu/c4-dataset/processed'
         load_index_directory(parent_path, int(arg2), int(arg3), des_path)
     elif arg1 == 'verify_raw':
