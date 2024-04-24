@@ -154,12 +154,41 @@ def verify_line(line, augmentator, line_number, urls=None):
             bt.logging.error(e)
 
 
+def verify_line_no_words(line, augmentator, line_number):
+    el = json.loads(line)
+    augs = augmentator(el['text'])
+    text = augs['text']
+    if len(text) <= 250:
+        bt.logging.info("human written text - too short character")
+        return True
+
+    sample_sentence = augmentator.subsample_sentences(text)
+    list_token = index_data.cut_head_tail(sample_sentence)
+    if len(list_token) == 1:
+        bt.logging.info("text too short:" + text)
+        return True
+    else:
+        list_result = []
+        try:
+            for token in list_token:
+                re = exists(token)
+                list_result.append(re)
+            if list_result.count(False) == 2:
+                bt.logging.info("indexing fail: " + str(line_number) + " :" + text)
+                return False
+            else:
+                bt.logging.info("indexing success " + str(line_number))
+                return True
+        except Exception as e:
+            bt.logging.error(e)
+
+
 def verify_data(file_path):
     augmentator = DataAugmentator()
     line_number = 1
     with open(file_path, 'r') as file:
         for line in file:
-            verify_line(line, augmentator, line_number)
+            verify_line_no_words(line, augmentator, line_number)
             line_number += 1
 
 
