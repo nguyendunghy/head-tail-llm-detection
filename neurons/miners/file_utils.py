@@ -129,8 +129,8 @@ if __name__ == '__main__':
         PROCESS_NUMBER = 4
         ...
     elif arg1 == 'index_multy_process':
-        file_path_template = "/home/ubuntu/c4-dataset/extracted/c4-train.{}-of-01024.json"
-        dir_path_template = "/home/ubuntu/c4-dataset/indexed_data/{}/"
+        file_path_template = "/mnt/vol_b/c4-dataset/extracted/c4-train.{}-of-01024.json"
+        dir_path_template = "/mnt/vol_b/c4-dataset/indexed_data/{}/"
         for i in range(int(arg2), int(arg3)):
             FILE_PATH = file_path_template.format(str(db_to_str(i)))
             DIR_PATH = dir_path_template.format(db_to_str(i))
