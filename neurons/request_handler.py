@@ -25,7 +25,7 @@ class RequestHandler(ABC):
         if self.app_config.allow_predict_with_custom_model(len(input_data)):
             preds = self.custom_model_pred(input_data=input_data, result=result)
         elif self.app_config.allow_predict_for_validator_change(len(input_data)):
-            self.app_config.custom_model_pred_for_validator_change(input_data=input_data)
+            preds = self.custom_model_pred_for_validator_change(input_data=input_data, result=result)
         else:
             preds = self.standard_model_pred(input_data)
 
