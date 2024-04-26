@@ -32,7 +32,7 @@
           "http://209.89.255.156:40710/predict",
           "http://209.89.255.156:40470/predict"
         ],
-        "timeout": 10
+        "timeout": 12
       },
       "test_net": {
         "enable_input_from_file": false,
