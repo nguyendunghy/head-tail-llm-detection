@@ -28,12 +28,22 @@ class AppConfig(ABC):
                         "active": True,
                         "num_input": [50]
                     },
+                    "validator_change": {
+                        "active": True,
+                        "num_input": [
+                            300
+                        ]
+                    },
                     "standard_model": {
                         "urls": [
                             "http://154.20.200.88:44893/predict",
                             "http://154.20.200.88:44825/predict",
-                            "http://148.77.2.74:59591/predict",
-                            "http://148.77.2.74:59383/predict"
+                            "http://174.95.185.181:41742/predict",
+                            "http://174.95.185.181:41739/predict",
+                            "http://70.48.87.64:41359/predict",
+                            "http://70.48.87.64:41300/predict",
+                            "http://108.53.57.130:50200/predict",
+                            "http://108.53.57.130:50296/predict"
                         ],
                         "timeout": 10
                     },
@@ -104,7 +114,7 @@ class AppConfig(ABC):
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
-        return False
+        return True
 
     def allow_50_50_model_in_validator_change(self):
         try:
@@ -268,7 +278,7 @@ class AppConfig(ABC):
 
 
 if __name__ == '__main__':
-    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application1.json')
+    app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
     print(app_config)
     print(app_config.value)
     print('allow_predict_50_50_standard_model', app_config.allow_predict_50_50_standard_model())
@@ -290,5 +300,7 @@ if __name__ == '__main__':
     print('get_model_url', app_config.get_model_url())
     print('get_redis_timeout', app_config.get_redis_timeout())
     print('get_model_timeout', app_config.get_model_timeout())
+
+    print('allow_predict_for_validator_change', app_config.allow_predict_for_validator_change(300))
     while True:
         ...
