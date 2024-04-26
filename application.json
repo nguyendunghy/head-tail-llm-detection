@@ -16,7 +16,7 @@
       "validator_change": {
         "active": true,
         "num_input": [
-          300
+          300,150
         ]
       },
       "standard_model": {
