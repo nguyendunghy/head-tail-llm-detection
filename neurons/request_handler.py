@@ -23,16 +23,20 @@ class RequestHandler(ABC):
             bt.logging.info("input_data: " + str(input_data))
 
         if self.app_config.allow_predict_with_custom_model(len(input_data)):
+            bt.logging.info("CASE I")
             preds = self.custom_model_pred(input_data=input_data, result=result)
         elif self.app_config.allow_predict_for_validator_change(len(input_data)):
+            bt.logging.info("CASE II")
             preds = self.custom_model_pred_for_validator_change(input_data=input_data, result=result)
         else:
+            bt.logging.info("CASE IV")
             preds = self.standard_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return preds
 
     def custom_model_pred(self, input_data, result=None):
+        bt.logging.info("start custom_model_pred")
         try:
             if self.app_config.allow_predict_by_redis():
                 redis_prediction = self.head_tail_api_pred(input_data, result)
@@ -54,13 +58,14 @@ class RequestHandler(ABC):
 
     def custom_model_pred_for_validator_change(self, input_data, result=None):
         try:
+            bt.logging.info("CASE V")
             if self.app_config.allow_predict_50_50_standard_model():
                 _50_50_standard_predict = self.current_model_50_50_pred(input_data, result)
                 return _50_50_standard_predict
         except Exception as e:
             bt.logging.error(e)
             traceback.print_exc()
-
+        bt.logging.info("CASE VI")
         standard_prediction = self.standard_model_pred(input_data)
         return standard_prediction
 
