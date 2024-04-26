@@ -13,12 +13,22 @@
           50
         ]
       },
+      "validator_change": {
+        "active": true,
+        "num_input": [
+          300
+        ]
+      },
       "standard_model": {
         "urls": [
           "http://154.20.200.88:44893/predict",
           "http://154.20.200.88:44825/predict",
-          "http://148.77.2.74:59591/predict",
-          "http://148.77.2.74:59383/predict"
+          "http://174.95.185.181:41742/predict",
+          "http://174.95.185.181:41739/predict",
+          "http://70.48.87.64:41359/predict",
+          "http://70.48.87.64:41300/predict",
+          "http://108.53.57.130:50200/predict",
+          "http://108.53.57.130:50296/predict"
         ],
         "timeout": 10
       },
@@ -46,9 +56,7 @@
     "verify_data": {
       "urls": [
         "http://177.54.149.35:8888/check-exists",
-        "http://189.1.168.180:8888/check-exists",
-        "http://189.1.168.181:8888/check-exists",
-        "http://177.54.152.68:8888/check-exists"
+        "http://69.67.150.87:8888/check-exists"
       ],
       "timeout": 12
     }

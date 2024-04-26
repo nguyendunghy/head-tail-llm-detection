@@ -87,6 +87,33 @@ class AppConfig(ABC):
             traceback.print_exc()
         return False
 
+    def allow_predict_for_validator_change(self, input_len):
+        try:
+            if not self.value['application']['miner']['validator_change']['active']:
+                return False
+            num_input = self.value['application']['miner']['validator_change']['num_input']
+
+            # use validator_change for all input_len
+            if len(num_input) == 1 and num_input[0] == -1:
+                return True
+
+            if input_len in num_input:
+                return True
+
+            return False
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return False
+
+    def allow_50_50_model_in_validator_change(self):
+        try:
+            return self.value['application']['miner']['validator_change']['50_50_model']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return False
+
     def allow_show_input(self):
         try:
             return self.value['application']['miner']['show_input']

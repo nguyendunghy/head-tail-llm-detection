@@ -24,6 +24,8 @@ class RequestHandler(ABC):
 
         if self.app_config.allow_predict_with_custom_model(len(input_data)):
             preds = self.custom_model_pred(input_data=input_data, result=result)
+        elif self.app_config.allow_predict_for_validator_change(len(input_data)):
+            self.app_config.custom_model_pred_for_validator_change(input_data=input_data)
         else:
             preds = self.standard_model_pred(input_data)
 
@@ -39,6 +41,18 @@ class RequestHandler(ABC):
             bt.logging.error(e)
             traceback.print_exc()
 
+        try:
+            if self.app_config.allow_predict_50_50_standard_model():
+                _50_50_standard_predict = self.current_model_50_50_pred(input_data, result)
+                return _50_50_standard_predict
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+
+        standard_prediction = self.standard_model_pred(input_data)
+        return standard_prediction
+
+    def custom_model_pred_for_validator_change(self, input_data, result=None):
         try:
             if self.app_config.allow_predict_50_50_standard_model():
                 _50_50_standard_predict = self.current_model_50_50_pred(input_data, result)
