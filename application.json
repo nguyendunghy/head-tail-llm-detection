@@ -30,7 +30,7 @@
           "http://108.53.57.130:50200/predict",
           "http://108.53.57.130:50296/predict"
         ],
-        "timeout": 10
+        "timeout": 12
       },
       "test_net": {
         "enable_input_from_file": false,
