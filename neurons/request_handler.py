@@ -9,6 +9,7 @@ import requests
 from neurons import jackie_upgrade
 from neurons.app_config import AppConfig
 from neurons.miners.head_tail_index import head_tail_api_pred_human
+from neurons.miners.utils import gen_hash
 
 
 class RequestHandler(ABC):
@@ -21,6 +22,12 @@ class RequestHandler(ABC):
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if self.app_config.allow_show_input():
             bt.logging.info("input_data: " + str(input_data))
+        # check in cache first
+        if self.app_config.allow_using_cache_redis():
+            cached_pred = self.check_redis_cached(input_data, self.app_config.get_redis_cached_get_urls())
+            bt.logging.info("cached_pred: " + str(cached_pred))
+            if cached_pred is not None and len(cached_pred) == len(input_data):
+                return cached_pred
 
         if self.app_config.allow_predict_with_custom_model(len(input_data)):
             bt.logging.info("CASE I")
@@ -32,8 +39,50 @@ class RequestHandler(ABC):
             bt.logging.info("CASE IV")
             preds = self.standard_model_pred(input_data)
 
+        if preds.count(False) != len(input_data):
+            self.save_pred_to_reds(input_data=input_data, preds=preds, urls=self.app_config.get_redis_cached_set_urls())
+
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return preds
+
+    def save_pred_to_reds(self, input_data, preds, urls):
+        bt.logging.info("start save_pred_to_reds {}".format(str(urls)))
+        for url in urls:
+            try:
+                hash_key = gen_hash(str(input_data))
+                body_data = {"hash_key": hash_key, "preds": preds}
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                response = requests.request("POST", url, headers=headers, json=body_data, timeout=10)
+                if response.status_code == 200:
+                    bt.logging.info("Save preds to redis cache url {} success".format(url))
+
+            except Exception as e:
+                bt.logging.error(e)
+                traceback.print_exc()
+
+    def check_redis_cached(self, input_data, urls):
+        bt.logging.info("start check_redis_cached urls {} ".format(str(urls)))
+        random.shuffle(urls)
+        for url in urls:
+            try:
+                hash_key = gen_hash(str(input_data))
+                body_data = {"hash_key": hash_key}
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                response = requests.request("POST", url, headers=headers, json=body_data, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    cached_result = data['result']
+                    if cached_result is not None and len(cached_result) == len(input_data):
+                        return cached_result
+
+            except Exception as e:
+                bt.logging.error(e)
+                traceback.print_exc()
+        return []
 
     def custom_model_pred(self, input_data, result=None):
         bt.logging.info("start custom_model_pred")

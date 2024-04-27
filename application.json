@@ -61,7 +61,19 @@
         "http://103.219.170.221:8080/check-exists"
       ],
       "timeout": 12
+    },
+    "cache":{
+      "active": true,
+      "set_urls": [
+        "http://69.67.150.21:8080/set_cache",
+        "http://103.219.170.221:8080/set_cache"
+      ],
+      "get_urls":[
+        "http://69.67.150.21:8080/get_cache",
+        "http://103.219.170.221:8080/get_cache"
+      ]
     }
+
   },
   "50_50_standard_model": {
     "active": true

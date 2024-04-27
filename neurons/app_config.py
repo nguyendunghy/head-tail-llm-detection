@@ -276,6 +276,28 @@ class AppConfig(ABC):
         finally:
             bt.logging.info("finish load_app_config " + str(self.value))
 
+    def allow_using_cache_redis(self):
+        try:
+            return self.value['redis']['cache']['active']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return False
+
+    def get_redis_cached_get_urls(self):
+        try:
+            return self.value['redis']['cache']['get_urls']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
+    def get_redis_cached_set_urls(self):
+        try:
+            return self.value['redis']['cache']['set_urls']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
 
 if __name__ == '__main__':
     app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
