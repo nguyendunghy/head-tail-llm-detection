@@ -14,7 +14,7 @@ class RequestHandler(ABC):
     def __init__(self, app_config=None):
         self.app_config = AppConfig() if app_config is None else app_config
 
-    def handle(self, input_data):
+    def handle(self, input_data, result=None):
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if self.app_config.allow_show_input():
