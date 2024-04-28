@@ -77,7 +77,7 @@ class Miner(BaseMinerNeuron):
                 result = temp_result
 
         handler = RequestHandler(self.app_config)
-        synapse.predictions = handler.handle(input_data, result)
+        synapse.predictions = handler.handle(input_data=input_data, result=result)
         return synapse
 
     async def blacklist(
