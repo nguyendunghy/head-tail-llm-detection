@@ -14,7 +14,7 @@ class RequestHandler(ABC):
     def __init__(self, app_config=None):
         self.app_config = AppConfig() if app_config is None else app_config
 
-    def handle(self, input_data, result=None):
+    def handle(self, input_data):
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if self.app_config.allow_show_input():
@@ -218,11 +218,11 @@ if __name__ == '__main__':
               True,
               False]
     app_config = AppConfig(config_path='/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
-    handler = RequestHandler(model=None, app_config=app_config)
+    handler = RequestHandler(app_config=app_config)
     # result = handler.handle(input_data=list_text, result=labels)
     # print("Result is: " + str(result))
     urls = [
-        "http://154.20.200.88:44893/predict",
+        "http://108.236.147.253:51053/predict",
         # "http://154.20.200.88:44825/predict",
         # "http://148.77.2.74:59591/predict",
         # "http://148.77.2.74:59383/predict",

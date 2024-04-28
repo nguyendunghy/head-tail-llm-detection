@@ -311,5 +311,5 @@ if __name__ == '__main__':
     print('allow_predict_for_validator_change', app_config.allow_predict_for_validator_change(300))
     print('get_server_urls', app_config.get_server_urls())
 
-while True:
+    while True:
         ...

@@ -16,7 +16,8 @@
       "validator_change": {
         "active": true,
         "num_input": [
-          300,150
+          300,
+          150
         ]
       },
       "standard_model": {
@@ -34,8 +35,11 @@
         ],
         "timeout": 12
       },
-        "server": {
-        "urls": ["http://108.236.147.253:51053/predict","http://108.236.147.253:51249/predict"]
+      "server": {
+        "urls": [
+          "http://108.236.147.253:51053/predict",
+          "http://108.236.147.253:51249/predict"
+        ]
       },
       "test_net": {
         "enable_input_from_file": false,
