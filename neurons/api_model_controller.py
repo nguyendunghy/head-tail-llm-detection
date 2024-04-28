@@ -16,14 +16,28 @@ def hello_world():
 
 
 @app.route('/predict', methods=['POST'])
-def predict():
+def predict1():
+    start_time = time.time_ns()
+    if request.is_json:
+        data = request.get_json()
+        input_data = data['list_text']
+        result = request_handlers[0].handle(input_data=input_data)
+        result = [1 if val else 0 for val in result]
+        bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
+        return jsonify({"message": "predict successfully", "result": result}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+
+@app.route('/predict-result', methods=['POST'])
+def predict2():
     start_time = time.time_ns()
     if request.is_json:
         data = request.get_json()
         input_data = data['list_text']
         result = request_handlers[0].handle(input_data=input_data)
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
-        return jsonify({"message": "predict successfully", "result": result}), 200
+        return jsonify({"message": "predict result successfully", "result": result}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
