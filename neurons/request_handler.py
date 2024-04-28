@@ -16,75 +16,32 @@ class RequestHandler(ABC):
         self.app_config = AppConfig() if app_config is None else app_config
         self.model = model
 
-    def handle(self, input_data, result=None):
+    def handle(self, input_data):
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if self.app_config.allow_show_input():
             bt.logging.info("input_data: " + str(input_data))
 
-        if self.app_config.allow_predict_with_custom_model(len(input_data)):
-            bt.logging.info("CASE I")
-            preds = self.custom_model_pred(input_data=input_data, result=result)
-        elif self.app_config.allow_predict_for_validator_change(len(input_data)):
-            bt.logging.info("CASE II")
-            preds = self.custom_model_pred_for_validator_change(input_data=input_data, result=result)
-        else:
-            bt.logging.info("CASE IV")
-            preds = self.standard_model_pred(input_data)
+        preds = self.call_servers(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return preds
 
-    def custom_model_pred(self, input_data, result=None):
-        bt.logging.info("start custom_model_pred")
-        try:
-            if self.app_config.allow_predict_by_redis():
-                redis_prediction = self.head_tail_api_pred(input_data, result)
-                return redis_prediction
-        except Exception as e:
-            bt.logging.error(e)
-            traceback.print_exc()
-
-        try:
-            if self.app_config.allow_predict_50_50_standard_model():
-                _50_50_standard_predict = self.current_model_50_50_pred(input_data, result)
-                return _50_50_standard_predict
-        except Exception as e:
-            bt.logging.error(e)
-            traceback.print_exc()
-
-        standard_prediction = self.standard_model_pred(input_data)
-        return standard_prediction
-
-    def custom_model_pred_for_validator_change(self, input_data, result=None):
-        try:
-            bt.logging.info("CASE V")
-            if self.app_config.allow_predict_50_50_standard_model():
-                _50_50_standard_predict = self.current_model_50_50_pred(input_data, result)
-                return _50_50_standard_predict
-        except Exception as e:
-            bt.logging.error(e)
-            traceback.print_exc()
-        bt.logging.info("CASE VI")
-        standard_prediction = self.standard_model_pred(input_data)
-        return standard_prediction
-
-    def standard_model_pred(self, input_data):
-        bt.logging.info("start standard_model_pred")
+    def call_servers(self, input_data):
+        bt.logging.info("start call_servers")
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        model_urls = self.app_config.get_model_url()
+        model_urls = self.app_config.get_server_urls()
         random.shuffle(model_urls)
         while len(model_urls) > 0:
             try:
                 url = model_urls[0]
-                bt.logging.info("call standard model to url: " + str(url))
-                preds, success = self.call_standard_model_api(input_data, url)
+                bt.logging.info("call servers to url: " + str(url))
+                preds, success = self.call_server_api(input_data, url)
                 if not success:
                     model_urls = self.handle_url_when_have_error(model_urls)
                     continue
-                preds = [el > 0.5 for el in preds]
-                self.log_prediction_result(pred_type='standard_model', pred_list=preds)
+                self.log_prediction_result(pred_type='call_server', pred_list=preds)
                 bt.logging.info(f"Made standard_model_pred predictions in {int(time.time() - start_time)}s")
                 return preds
             except Exception as e:
@@ -120,49 +77,6 @@ class RequestHandler(ABC):
         arr = url.split(':')
         return arr[1][2:]
 
-    def current_model_50_50_pred(self, input_data, result=None):
-        bt.logging.info("start current_model_50_50_pred")
-        start_time = time.time()
-        bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        model_urls = self.app_config.get_model_url()
-        random.shuffle(model_urls)
-        while len(model_urls) > 0:
-            try:
-                url = model_urls[0]
-                bt.logging.info("call to model at url: " + str(url))
-                prob_list, success = self.call_standard_model_api(input_data, url)
-                if not success:
-                    model_urls = self.handle_url_when_have_error(model_urls)
-                    continue
-                pred_list = jackie_upgrade.order_prob(prob_list)
-                self.log_prediction_result(pred_type='current_model_50_50', pred_list=pred_list, result=result)
-                bt.logging.info(f"current_model_50_50_pred Made predictions in {int(time.time() - start_time)}s")
-                return pred_list
-            except Exception as e:
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-                model_urls = self.handle_url_when_have_error(model_urls)
-
-        bt.logging.info(f"current_model_50_50_pred Made predictions in {int(time.time() - start_time)}s")
-        return [False] * len(input_data)
-
-    def head_tail_api_pred(self, input_data, result=None):
-        bt.logging.info("start head_tail_api_pred")
-        start_time = time.time()
-        pred_list = head_tail_api_pred_human(list_text=input_data, urls=self.app_config.get_redis_urls(),
-                                             timeout=self.app_config.get_redis_timeout())
-        pred_list = [not pred for pred in pred_list]
-        # Make some prediction incorrect to downgrade incentive
-        num_incorrect = min(self.app_config.get_number_predict_incorrect(), len(pred_list))
-        bt.logging.info("num_incorrect: " + str(num_incorrect))
-        for i in range(num_incorrect):
-            bt.logging.info("make pred at {} incorrect".format(str(i)))
-            pred_list[i] = not pred_list[i]
-
-        self.log_prediction_result(pred_type='head_tail', pred_list=pred_list, result=result)
-        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
-        return pred_list
-
     def log_prediction_result(self, pred_type, pred_list, result=None):
         try:
             bt.logging.info(pred_type + " pred_list: " + str(pred_list))
@@ -184,7 +98,7 @@ class RequestHandler(ABC):
             bt.logging.error(e)
             traceback.print_exc()
 
-    def call_standard_model_api(self, list_text, url):
+    def call_server_api(self, list_text, url):
         # bt.logging.info("call_standard_model_api list_text :" + str(list_text))
         body_data = {"list_text": list_text}
         headers = {
@@ -198,7 +112,7 @@ class RequestHandler(ABC):
         else:
             print('Failed to post data:status_code', response.status_code)
             print('Failed to post data:', response.content)
-            return [0] * len(list_text), False
+            return [False] * len(list_text), False
 
 
 if __name__ == '__main__':

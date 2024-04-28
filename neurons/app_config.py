@@ -276,6 +276,13 @@ class AppConfig(ABC):
         finally:
             bt.logging.info("finish load_app_config " + str(self.value))
 
+    def get_server_urls(self):
+        try:
+            return self.value['application']['miner']['server']['urls']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
 
 if __name__ == '__main__':
     app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
@@ -302,5 +309,7 @@ if __name__ == '__main__':
     print('get_model_timeout', app_config.get_model_timeout())
 
     print('allow_predict_for_validator_change', app_config.allow_predict_for_validator_change(300))
-    while True:
+    print('get_server_urls', app_config.get_server_urls())
+
+while True:
         ...
