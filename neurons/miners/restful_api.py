@@ -50,6 +50,20 @@ def verify_data():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
+@app.route('/save_cached', methods=['POST'])
+def verify_data():
+    start_time = time.time_ns()
+    if request.is_json:
+        data = request.get_json()
+        hash_key = data['hash_key']
+        preds = data['preds']
+
+
+        bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
+        return jsonify({"message": "check exists successfully", "result": result}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
 if __name__ == '__main__':
     try:
         arg1 = sys.argv[1]

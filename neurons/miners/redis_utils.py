@@ -1,6 +1,7 @@
 import copy
 import hashlib
 import json
+import random
 import shutil
 import sys
 import threading
@@ -45,6 +46,29 @@ def exists_on_redis(hash_value, db):
         traceback.print_exc()
 
 
+def get_cache_preds(hash_key):
+    try:
+        conn = get_conn()
+        conn.select(0)
+        value = conn.get(hash_key).decode()
+        preds = value.split(',')
+        preds = [value == 'True' for value in preds]
+        return preds
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
+
+def set_cache_preds(hash_key, preds):
+    try:
+        conn = get_conn()
+        conn.select(0)
+        preds = [str(p) for p in preds]
+        value = ','.join(preds)
+        return conn.setex(hash_key, 900, value)
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
+
 def check_exists(input_list):
     result = []
     for i in range(len(input_list)):
@@ -79,7 +103,6 @@ def verify_raw_text_exists(text):
         except Exception as e:
             bt.logging.error(e)
             bt.logging.info(str(e) + '--' + text)
-
 
 
 def verify_data(file_path):
@@ -268,6 +291,13 @@ if __name__ == "__main__":
         start_time = time.time_ns()
         ex = exists_on_redis(str(arg2), int(arg3))
         bt.logging.info("exists: " + str(ex))
-    # verify_data(file_path)
+    elif arg1 == 'get_cache':
+        result = get_cache_preds(str(arg2))
+        bt.logging.info("result: " + str(result))
+    elif arg1 == 'set_cache':
+        preds = [random.random() > 0.5 for i in range(10)]
+        bt.logging.info("preds: " + preds)
+        set_cache_preds(str(arg2), preds)
+
     bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
     # check_db_size(0, 1)
