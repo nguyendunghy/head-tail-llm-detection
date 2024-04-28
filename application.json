@@ -16,7 +16,7 @@
       "validator_change": {
         "active": true,
         "num_input": [
-          300,150
+          300
         ]
       },
       "standard_model": {
@@ -65,12 +65,12 @@
     "cache":{
       "active": true,
       "set_urls": [
-        "http://69.67.150.21:8080/set_cache",
-        "http://103.219.170.221:8080/set_cache"
+        "http://69.67.150.87:6666/save-cached",
+        "http://177.54.149.35:6666/save-cached"
       ],
       "get_urls":[
-        "http://69.67.150.21:8080/get_cache",
-        "http://103.219.170.221:8080/get_cache"
+        "http://69.67.150.87:6666/get-cached",
+        "http://177.54.149.35:6666/get-cached"
       ]
     }
 
