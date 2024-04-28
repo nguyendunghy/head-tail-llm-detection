@@ -50,7 +50,7 @@ def get_cache_preds(hash_key):
     try:
         conn = get_conn()
         conn.select(0)
-        value = conn.get(hash_key).decode()
+        value = conn.get(hash_key)
         preds = value.split(',')
         preds = [value == 'True' for value in preds]
         return preds

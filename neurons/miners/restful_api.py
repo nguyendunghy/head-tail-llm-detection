@@ -50,7 +50,7 @@ def verify_data():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-@app.route('/get_cached', methods=['POST'])
+@app.route('/get-cached', methods=['POST'])
 def get_cached():
     start_time = time.time_ns()
     if request.is_json:
@@ -63,7 +63,7 @@ def get_cached():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-@app.route('/save_cached', methods=['POST'])
+@app.route('/save-cached', methods=['POST'])
 def save_cached():
     start_time = time.time_ns()
     if request.is_json:
