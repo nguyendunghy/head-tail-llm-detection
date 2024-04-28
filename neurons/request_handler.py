@@ -56,6 +56,7 @@ class RequestHandler(ABC):
             try:
                 hash_key = gen_hash(str(input_data))
                 body_data = {"hash_key": hash_key, "preds": preds}
+                bt.logging.info("body_data: " + str(body_data))
                 headers = {
                     'Content-Type': 'application/json'
                 }
@@ -74,6 +75,7 @@ class RequestHandler(ABC):
             try:
                 hash_key = gen_hash(str(input_data))
                 body_data = {"hash_key": hash_key}
+                bt.logging.info("body_data: " + str(body_data))
                 headers = {
                     'Content-Type': 'application/json'
                 }
