@@ -1,20 +1,18 @@
 import copy
+import random
 import time
 import traceback
 from abc import ABC
-import random
+
 import bittensor as bt
 import requests
 
-from neurons import jackie_upgrade
 from neurons.app_config import AppConfig
-from neurons.miners.head_tail_index import head_tail_api_pred_human
 
 
 class RequestHandler(ABC):
-    def __init__(self, model=None, app_config=None):
+    def __init__(self, app_config=None):
         self.app_config = AppConfig() if app_config is None else app_config
-        self.model = model
 
     def handle(self, input_data):
         start_time = time.time()
