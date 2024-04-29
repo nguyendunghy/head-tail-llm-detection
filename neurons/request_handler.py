@@ -88,6 +88,7 @@ class RequestHandler(ABC):
     def save_pred_to_reds(self, input_data, preds, urls, hash=None):
         bt.logging.info("start save_pred_to_reds {}".format(str(urls)))
         hash_key = hash if hash is not None else gen_hash(str(input_data))
+        random.shuffle(urls)
         for url in urls:
             try:
                 body_data = {"hash_key": hash_key, "preds": preds}
@@ -106,6 +107,7 @@ class RequestHandler(ABC):
     def check_key_exist(self, input_data, urls, hash=None):
         bt.logging.info("start check_key_exist {}".format(str(urls)))
         hash_key = hash if hash is not None else gen_hash(str(input_data))
+        random.shuffle(urls)
         for url in urls:
             try:
                 body_data = {"hash_key": hash_key, "preds": []}
