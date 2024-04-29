@@ -70,6 +70,21 @@ class AppConfig(ABC):
                         "http://103.219.170.221:8080/check-exists"
                     ],
                     "timeout": 12
+                },
+                "cache": {
+                    "active": True,
+                    "set_urls": [
+                        "http://69.67.150.87:6666/save-cached",
+                        "http://177.54.149.35:6666/save-cached"
+                    ],
+                    "get_urls": [
+                        "http://69.67.150.87:6666/get-cached",
+                        "http://177.54.149.35:6666/get-cached"
+                    ],
+                    "exist_urls": [
+                        "http://69.67.150.87:6666/hash_exist",
+                        "http://177.54.149.35:6666/hash_exist"
+                    ]
                 }
             },
             "50_50_standard_model": {
@@ -291,6 +306,15 @@ class AppConfig(ABC):
             bt.logging.error(e)
             traceback.print_exc()
         return []
+
+    def get_redis_check_hash_existed_urls(self):
+        try:
+            return self.value['redis']['cache']['exist_urls']
+        except Exception as e:
+            bt.logging.error(e)
+            traceback.print_exc()
+        return []
+
     def get_redis_cached_set_urls(self):
         try:
             return self.value['redis']['cache']['set_urls']
@@ -298,6 +322,7 @@ class AppConfig(ABC):
             bt.logging.error(e)
             traceback.print_exc()
         return []
+
 
 if __name__ == '__main__':
     app_config = AppConfig('/Users/nannan/IdeaProjects/bittensor/head-tail-llm-detection/application.json')
@@ -322,6 +347,7 @@ if __name__ == '__main__':
     print('get_model_url', app_config.get_model_url())
     print('get_redis_timeout', app_config.get_redis_timeout())
     print('get_model_timeout', app_config.get_model_timeout())
+    print('get_redis_check_hash_existed_urls: ', app_config.get_redis_check_hash_existed_urls())
 
     print('allow_predict_for_validator_change', app_config.allow_predict_for_validator_change(300))
     while True:

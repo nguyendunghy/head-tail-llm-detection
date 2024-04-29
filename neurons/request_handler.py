@@ -30,7 +30,7 @@ class RequestHandler(ABC):
         key_hash = gen_hash(str(input_data))
         # check in cache first
         if self.app_config.allow_using_cache_redis():
-            exist = self.check_key_exist(input_data, self.app_config.get_redis_cached_get_urls(), hash=key_hash)
+            exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(), hash=key_hash)
             if exist == 'EXISTED_VALUE_NULL':
                 bt.logging.info("start waiting value from hash: " + str(key_hash))
                 count = 0
@@ -39,7 +39,7 @@ class RequestHandler(ABC):
                         break
                     bt.logging.info("wait for value from hash: {}  count: {}".format(str(key_hash), str(count)))
                     time.sleep(0.5)
-                    exist = self.check_key_exist(input_data, self.app_config.get_redis_cached_get_urls(), hash=key_hash)
+                    exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(), hash=key_hash)
                     count = count + 1
 
                 if exist == 'EXISTED_VALUE_NOT_NULL':
