@@ -65,16 +65,16 @@
     "cache":{
       "active": true,
       "set_urls": [
-        "http://69.67.150.87:6666/save-cached",
-        "http://177.54.149.35:6666/save-cached"
+        "http://177.54.149.35:9000/save-cached",
+        "http://69.67.150.87:9000/save-cached"
       ],
       "get_urls":[
-        "http://69.67.150.87:6666/get-cached",
-        "http://177.54.149.35:6666/get-cached"
+        "http://177.54.149.35:9000/get-cached",
+        "http://69.67.150.87:9000/get-cached"
       ],
       "exist_urls": [
-        "http://69.67.150.87:6666/hash_exist",
-        "http://177.54.149.35:6666/hash_exist"
+        "http://177.54.149.35:9000/hash_exist",
+        "http://69.67.150.87:9000/hash_exist"
       ]
     }
 
