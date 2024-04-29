@@ -70,9 +70,9 @@ def check_exist(hash_key):
         else:
             value = conn.get(hash_key)
             if value == '':
-                return 'EXIST_VALUE_NULL'
+                return 'EXISTED_VALUE_NULL'
             else:
-                return 'EXIST_VALUE_NOT_NULL'
+                return 'EXISTED_VALUE_NOT_NULL'
 
     except Exception as e:
         bt.logging.error(e)
