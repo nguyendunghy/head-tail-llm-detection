@@ -30,6 +30,12 @@ class RequestHandler(ABC):
         key_hash = gen_hash(str(input_data))
         # check in cache first
         if self.app_config.allow_using_cache_redis():
+            # get first because 90% cache hit
+            cached_pred = self.get_redis_cached(input_data, self.app_config.get_redis_cached_get_urls())
+            bt.logging.info("existed cache: " + str(cached_pred))
+            if cached_pred is not None and len(cached_pred) == len(input_data):
+                return cached_pred
+
             exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(), hash=key_hash)
             if exist == 'EXISTED_VALUE_NULL':
                 bt.logging.info("key existed, value null, start waiting value inserted from hash: " + str(key_hash))
@@ -39,7 +45,8 @@ class RequestHandler(ABC):
                         break
                     bt.logging.info("wait for value from hash: {}  count: {}".format(str(key_hash), str(count)))
                     time.sleep(0.5)
-                    exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(), hash=key_hash)
+                    exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(),
+                                                 hash=key_hash)
                     count = count + 1
 
                 bt.logging.info("value filled to key {}, start getting cache. existed state: {}"
@@ -53,7 +60,7 @@ class RequestHandler(ABC):
 
             elif exist == 'EXISTED_VALUE_NOT_NULL':
                 cached_pred = self.get_redis_cached(input_data, self.app_config.get_redis_cached_get_urls())
-                bt.logging.info("existed cache: " + str(cached_pred))
+                bt.logging.info("cache in memory: " + str(cached_pred))
                 if cached_pred is not None and len(cached_pred) == len(input_data):
                     return cached_pred
 
