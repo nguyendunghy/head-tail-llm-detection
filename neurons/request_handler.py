@@ -32,7 +32,7 @@ class RequestHandler(ABC):
         if self.app_config.allow_using_cache_redis():
             exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(), hash=key_hash)
             if exist == 'EXISTED_VALUE_NULL':
-                bt.logging.info("start waiting value from hash: " + str(key_hash))
+                bt.logging.info("key existed, value null, start waiting value inserted from hash: " + str(key_hash))
                 count = 0
                 while exist != 'EXISTED_VALUE_NOT_NULL':
                     if count > 2 * self.app_config.get_model_timeout():
@@ -42,16 +42,18 @@ class RequestHandler(ABC):
                     exist = self.check_key_exist(input_data, self.app_config.get_redis_check_hash_existed_urls(), hash=key_hash)
                     count = count + 1
 
+                bt.logging.info("value filled to key {}, start getting cache. existed state: {}"
+                                .format(str(key_hash), str(exist)))
                 if exist == 'EXISTED_VALUE_NOT_NULL':
                     cached_pred = self.get_redis_cached(input_data, self.app_config.get_redis_cached_get_urls(),
                                                         hash=key_hash)
-                    bt.logging.info("cached_pred: " + str(cached_pred))
+                    bt.logging.info("prediction in cache: " + str(cached_pred))
                     if cached_pred is not None and len(cached_pred) == len(input_data):
                         return cached_pred
 
             elif exist == 'EXISTED_VALUE_NOT_NULL':
                 cached_pred = self.get_redis_cached(input_data, self.app_config.get_redis_cached_get_urls())
-                bt.logging.info("cached_pred: " + str(cached_pred))
+                bt.logging.info("existed cache: " + str(cached_pred))
                 if cached_pred is not None and len(cached_pred) == len(input_data):
                     return cached_pred
 
@@ -116,7 +118,7 @@ class RequestHandler(ABC):
         return 'NOT_EXISTED'
 
     def get_redis_cached(self, input_data, urls, hash=None):
-        bt.logging.info("start check_redis_cached urls {} ".format(str(urls)))
+        bt.logging.info("start get_redis_cached urls {} ".format(str(urls)))
         random.shuffle(urls)
         hash_key = hash if hash is not None else gen_hash(str(input_data))
         for url in urls:
