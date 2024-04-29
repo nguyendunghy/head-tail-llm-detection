@@ -59,6 +59,7 @@ def get_cache_preds(hash_key):
         traceback.print_exc()
     return None
 
+
 def set_cache_preds(hash_key, preds):
     try:
         conn = get_conn()
@@ -68,11 +69,19 @@ def set_cache_preds(hash_key, preds):
         bt.logging.info("value: " + value)
         saved_if_not_exists = preds is None or len(preds) == 0
         bt.logging.info("saved_if_not_exists: " + str(saved_if_not_exists))
-        return conn.set(hash_key, value, ex=900, nx=saved_if_not_exists)
+        result = conn.set(hash_key, value, ex=900, nx=saved_if_not_exists)
+        if result:
+            if saved_if_not_exists:
+                return 'NOT_EXISTED'
+            else:
+                return 'EXISTED_VALUE_NOT_NULL'
+        else:
+            return 'EXISTED_VALUE_NULL'
     except Exception as e:
         bt.logging.error(e)
         traceback.print_exc()
-    return False
+    return 'NOT_EXISTED'
+
 
 def check_exists(input_list):
     result = []
