@@ -68,6 +68,27 @@ class RequestHandler(ABC):
                 bt.logging.error(e)
                 traceback.print_exc()
 
+    def check_key_exist(self, hash_key, urls):
+        bt.logging.info("start check_key_exist {}".format(str(urls)))
+        for url in urls:
+            try:
+                body_data = {"hash_key": hash_key, "preds": []}
+                bt.logging.info("body_data: " + str(body_data))
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                response = requests.request("POST", url, headers=headers, json=body_data, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    result = data['result']
+                    if result == 'EXISTED_VALUE_NULL' or result == 'EXISTED_VALUE_NOT_NULL' or result == 'NOT_EXISTED':
+                        return result
+            except Exception as e:
+                bt.logging.error(e)
+                traceback.print_exc()
+        return 'NOT_EXISTED'
+
+
     def check_redis_cached(self, input_data, urls):
         bt.logging.info("start check_redis_cached urls {} ".format(str(urls)))
         random.shuffle(urls)
