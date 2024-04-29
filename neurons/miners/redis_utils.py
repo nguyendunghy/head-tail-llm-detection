@@ -60,27 +60,37 @@ def get_cache_preds(hash_key):
     return None
 
 
+def check_exist(hash_key):
+    try:
+        conn = get_conn()
+        conn.select(0)
+        exist = conn.set(hash_key, '', ex=900, nx=True)
+        if exist:
+            return 'NOT_EXISTED'
+        else:
+            value = conn.get(hash_key)
+            if value == '':
+                return 'EXIST_VALUE_NULL'
+            else:
+                return 'EXIST_VALUE_NOT_NULL'
+
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
+    return 'NOT_EXISTED'
+
+
 def set_cache_preds(hash_key, preds):
     try:
         conn = get_conn()
         conn.select(0)
         preds = [str(p) for p in preds]
         value = ','.join(preds)
-        bt.logging.info("value: " + value)
-        saved_if_not_exists = preds is None or len(preds) == 0
-        bt.logging.info("saved_if_not_exists: " + str(saved_if_not_exists))
-        result = conn.set(hash_key, value, ex=900, nx=saved_if_not_exists)
-        if result:
-            if saved_if_not_exists:
-                return 'NOT_EXISTED'
-            else:
-                return 'EXISTED_VALUE_NOT_NULL'
-        else:
-            return 'EXISTED_VALUE_NULL'
+        return conn.setex(hash_key, 900, value)
     except Exception as e:
         bt.logging.error(e)
         traceback.print_exc()
-    return 'NOT_EXISTED'
+    return None
 
 
 def check_exists(input_list):

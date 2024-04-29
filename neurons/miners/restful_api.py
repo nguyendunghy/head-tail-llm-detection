@@ -5,7 +5,8 @@ import traceback
 from flask import Flask, request, jsonify
 import bittensor as bt
 
-from neurons.miners.redis_utils import check_exists, verify_raw_text_exists, set_cache_preds, get_cache_preds
+from neurons.miners.redis_utils import check_exists, verify_raw_text_exists, set_cache_preds, get_cache_preds, \
+    check_exist
 
 app = Flask(__name__)
 
@@ -73,6 +74,19 @@ def save_cached():
         result = set_cache_preds(hash_key, preds)
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
         return jsonify({"message": "save cache success", "result": result}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+
+@app.route('/hash_exist', methods=['POST'])
+def hash_exist():
+    start_time = time.time_ns()
+    if request.is_json:
+        data = request.get_json()
+        hash_key = data['hash_key']
+        result = check_exist(hash_key)
+        bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
+        return jsonify({"message": "check hash exists success", "result": result}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
