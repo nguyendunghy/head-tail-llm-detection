@@ -57,6 +57,7 @@ def get_cache_preds(hash_key):
     except Exception as e:
         bt.logging.error(e)
         traceback.print_exc()
+    return None
 
 def set_cache_preds(hash_key, preds):
     try:
@@ -64,7 +65,8 @@ def set_cache_preds(hash_key, preds):
         conn.select(0)
         preds = [str(p) for p in preds]
         value = ','.join(preds)
-        return conn.setex(hash_key, 900, value)
+        saved_if_not_exists = preds is None or len(preds) == 0
+        return conn.set(hash_key, value, ex=900, nx=saved_if_not_exists)
     except Exception as e:
         bt.logging.error(e)
         traceback.print_exc()

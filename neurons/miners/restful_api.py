@@ -58,7 +58,7 @@ def get_cached():
         hash_key = data['hash_key']
         preds = get_cache_preds(hash_key)
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
-        return jsonify({"message": "check exists successfully", "result": preds}), 200
+        return jsonify({"message": "get cache success", "result": preds}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
@@ -70,9 +70,9 @@ def save_cached():
         data = request.get_json()
         hash_key = data['hash_key']
         preds = data['preds']
-        set_cache_preds(hash_key, preds)
+        result = set_cache_preds(hash_key, preds)
         bt.logging.info(f"time loading {int(time.time_ns() - start_time):,} nanosecond")
-        return jsonify({"message": "check exists successfully", "result": "OK"}), 200
+        return jsonify({"message": "save cache success", "result": result}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
