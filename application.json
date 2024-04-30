@@ -8,7 +8,7 @@
         "5FKstHjZkh4v3qAMSBa1oJcHCLjxYZ8SNTSz1opTv4hR7gVB"
       ],
       "custom_model": {
-        "active": true,
+        "active": false,
         "num_input": [
           50
         ]
@@ -16,7 +16,7 @@
       "validator_change": {
         "active": true,
         "num_input": [
-          300
+          300,50
         ]
       },
       "standard_model": {
