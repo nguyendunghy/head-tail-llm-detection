@@ -113,7 +113,7 @@ def add_args(cls, parser):
             "--neuron.sample_size",
             type=int,
             help="The number of miners to query in a single step.",
-            default=50,
+            default=256,
         )
 
         parser.add_argument(
@@ -134,7 +134,7 @@ def add_args(cls, parser):
             "--neuron.moving_average_alpha",
             type=float,
             help="Moving average alpha parameter, how much to add of the new observation.",
-            default=0.1,
+            default=0.15,
         )
 
         parser.add_argument(
@@ -156,13 +156,6 @@ def add_args(cls, parser):
 
     else:
         parser.add_argument(
-            "--blacklist.force_validator_permit",
-            action="store_true",
-            help="If set, we will force incoming requests to have a permit.",
-            default=False,
-        )
-
-        parser.add_argument(
             "--blacklist.minimum_stake_requirement",
             type=int,
             help="Minimum amount of stake needed to send request to miners.",
@@ -170,10 +163,31 @@ def add_args(cls, parser):
         )
 
         parser.add_argument(
-            "--blacklist.allow_non_registered",
-            action="store_true",
-            help="If set, miners will accept queries from non registered entities. (Dangerous!)",
-            default=False,
+            "--neuron.deberta_foundation_model_path",
+            type=str,
+            help="Path to foundation model, which is using in deberta classifier",
+            default="models/deberta-v3-large-hf-weights",
+        )
+
+        parser.add_argument(
+            "--neuron.deberta_model_path",
+            type=str,
+            help="Path to finetuned model, which is using in deberta classifier",
+            default="models/deberta-large-ls03-ctx1024.pth",
+        )
+
+        parser.add_argument(
+            "--neuron.ppl_model_path",
+            type=str,
+            help="Path to ppl_model.pk, which is using in PPL classifier",
+            default="models/ppl_model.pk",
+        )
+
+        parser.add_argument(
+            "--neuron.model_type",
+            type=str,
+            help="Which model use, on of ['deberta', 'ppl']",
+            default="deberta",
         )
 
 

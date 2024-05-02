@@ -12,6 +12,7 @@ Otherwise ollama service won't be restarting automatically and you'll have to re
 1. Clone the repo
 
 ```bash
+apt update && apt upgrade -y
 git clone https://github.com/It-s-AI/llm-detection
 ```  
 
@@ -61,11 +62,6 @@ curl -fsSL https://ollama.com/install.sh | sh
 Run ollama service in background (make sure that you don't have any running instances of ollama before running this command)
 ```
 pm2 start --name ollama "ollama serve"
-```
-
-Then download models
-```
-ollama pull vicuna && ollama pull mistral && ollama pull neural-chat && ollama pull gemma:7b && ollama pull zephyr:7b-beta
 ```
 
 
