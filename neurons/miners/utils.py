@@ -4,3 +4,8 @@ def hash_code(string) -> int:
         for i in range(0, len(string)):
             h = 31 * h + ord(string[i])
     return h
+
+
+def write(data, file_path):
+    with open(file_path, 'a') as file:
+        file.writelines(data)

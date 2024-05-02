@@ -7,33 +7,32 @@ import bittensor as bt
 from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.deberta_classifier import DebertaClassifier
 from neurons.miners.gpt_zero import PPLModel
+from neurons.miners.utils import write
 
 
 class FakeMiner:
     def __init__(self):
         self.device = 'cuda:0'
         self.ppl_model = PPLModel(device=self.device)
-        self.ppl_model.load_pretrained('neurons/miners/ppl_model.pk')
-        self.deberta_model = DebertaClassifier(foundation_model_path='',
-                                               model_path='',
+        self.ppl_model.load_pretrained('models/ppl_model.pk')
+        self.deberta_model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
+                                               model_path='models/deberta-large-ls03-ctx1024.pth',
                                                device=self.device)
+        self.human_data_path = ''
+        self.ai_data_path = ''
 
-    def fake_miner(self, texts):
-        bt.logging.info(f"All of texts received: {str(texts)}")
-        input_data = copy.deepcopy(texts)
-        for i in range(len(input_data)):
-            input_data[i] = input_data[i][3:]
-
+    def fake_miner(self, input_data):
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        preds = []
-        if len(input_data) == 50:
-            # self.head_tail_api_pred(input_data)
-            # preds = self.calculate_pred(input_data)
+        if len(input_data) == 300:
             self.ppl_model_pred(input_data)
-            # self.consider_text_length(input_data)
-        else:
-            preds = self.ppl_model_pred(input_data)
+            self.deberta_model_pred(input_data)
+            self.jackie_upgrade_ppl_model_pred(input_data)
+            self.jackie_upgrade_deberta_model_pred(input_data)
+            self.combine_ppl_deberta_pred(input_data)
+
+            write(str(input_data[:150]), self.ai_data_path)
+            write(str(input_data[150:]), self.human_data_path)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
 
@@ -91,11 +90,11 @@ class FakeMiner:
         bt.logging.info("jackie_upgrade_deberta_model_pred prob_list: " + str(prob_list))
         pred_list = jackie_upgrade.order_prob(prob_list)
         bt.logging.info("jackie_upgrade_deberta_model_pred pred_list: " + str(pred_list))
-        self.accuracy_monitor(pred_list, 'jackie_upgrade_deberta_model_pred', input_data)
+        self.accuracy_monitor(pred_list, '50_50_deberta_model_pred', input_data)
         return pred_list, prob_list
 
-    def calculate_pred(self, input_data):
-        bt.logging.info("start calculate_pred")
+    def combine_ppl_deberta_pred(self, input_data):
+        bt.logging.info("start combine_ppl_deberta_pred")
         ppl_model_pred, ppl_model_prob = self.jackie_upgrade_ppl_model_pred(input_data)
         deberta_model_pred, deberta_model_prob = self.jackie_upgrade_deberta_model_pred(input_data)
         not_agree_list = []
@@ -126,20 +125,20 @@ class FakeMiner:
         bt.logging.info(model_type + " correct count_true: " + str(count_true))
         bt.logging.info(model_type + " correct count_false: " + str(count_false))
 
-        fail_hu_pred = []
         fail_ai_pred = []
+        fail_hu_pred = []
         for i in range(len(pred_list)):
             if i < len(pred_list) // 2:
                 if not pred_list[i]:
-                    fail_hu_pred.append(input_list[i])
+                    fail_ai_pred.append(input_list[i])
             else:
                 if pred_list[i]:
-                    fail_ai_pred.append(input_list[i])
-        bt.logging.info(model_type + " fail_hu_pred: " + str(fail_hu_pred))
+                    fail_hu_pred.append(input_list[i])
         bt.logging.info(model_type + " fail_ai_pred: " + str(fail_ai_pred))
+        bt.logging.info(model_type + " fail_hu_pred: " + str(fail_hu_pred))
 
         input_string = str(input_list)
         sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
         sha128_hash = sha256_hash[:32]
-        restful_api.call_insert(text_hash=sha128_hash, model_type=model_type, count_human=count_true,
-                                count_ai=count_false)
+        restful_api.call_insert(text_hash=sha128_hash, model_type=model_type, count_human=count_false,
+                                count_ai=count_true)
