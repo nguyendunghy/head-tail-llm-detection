@@ -1,20 +1,22 @@
 import copy
 import hashlib
 import time
+
 import bittensor as bt
-from neurons.miners.gpt_zero import PPLModel
+
 from neurons.miners import jackie_upgrade, restful_api
-from neurons.miners.gpt_zero_api import is_human_generated_files
-from neurons.miners.head_tail_index import head_tail_api_pred_human
-from neurons.miners.old_gpt_zero import GPT2PPL
+from neurons.miners.deberta_classifier import DebertaClassifier
+from neurons.miners.gpt_zero import PPLModel
 
 
 class FakeMiner:
     def __init__(self):
         self.device = 'cuda:0'
-        self.model = PPLModel(device=self.device)
-        self.model.load_pretrained('neurons/miners/ppl_model.pk')
-        self.old_model = GPT2PPL(device=self.device)
+        self.ppl_model = PPLModel(device=self.device)
+        self.ppl_model.load_pretrained('neurons/miners/ppl_model.pk')
+        self.deberta_model = DebertaClassifier(foundation_model_path='',
+                                               model_path='',
+                                               device=self.device)
 
     def fake_miner(self, texts):
         bt.logging.info(f"All of texts received: {str(texts)}")
@@ -26,79 +28,93 @@ class FakeMiner:
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         preds = []
         if len(input_data) == 50:
-            self.head_tail_api_pred(input_data)
-            preds = self.calculate_pred(input_data)
-            self.standard_current_model_pred(input_data)
-            self.consider_text_length(input_data)
+            # self.head_tail_api_pred(input_data)
+            # preds = self.calculate_pred(input_data)
+            self.ppl_model_pred(input_data)
+            # self.consider_text_length(input_data)
         else:
-            preds = self.standard_model_pred(input_data)
+            preds = self.ppl_model_pred(input_data)
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
 
-    def head_tail_api_pred(self, input_data):
-        pred_list = head_tail_api_pred_human(input_data)
-        self.accuracy_monitor(pred_list, 'head_tail_human', input_data)
+    def deberta_model_pred(self, input_data):
+        bt.logging.info("start deberta_model_pred")
+        try:
+            preds = self.deberta_model.predict_batch(input_data)
+            preds = [el > 0.5 for el in preds]
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            preds = [0] * len(input_data)
+        bt.logging.info("deberta_model_pred preds: " + str(preds))
+        self.accuracy_monitor(preds, 'deberta_model_pred', input_data)
+        return preds
 
-    def gpt_zero_api_pred(self, input_data):
-        bt.logging.info("start gpt_zero_api_pred")
-        pred_list = is_human_generated_files(input_data)
-        self.accuracy_monitor(pred_list, 'gpt_zero_api', input_data)
-        return pred_list
+    def ppl_model_pred(self, input_data):
+        bt.logging.info("start ppl_model_pred")
+        try:
+            preds = self.ppl_model.predict_batch(input_data)
+            preds = [el > 0.5 for el in preds]
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            preds = [0] * len(input_data)
 
-    def jackie_old_model_pred(self, input_data):
-        bt.logging.info("start jackie_old_model_pred")
-        prob_list = []
-        for text in input_data:
-            try:
-                pred_prob = self.old_model(text)
-            except Exception as e:
-                pred_prob = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-            prob_list.append(pred_prob)
+        bt.logging.info("ppl_model_pred preds: " + str(preds))
+        self.accuracy_monitor(preds, 'ppl_model_pred', input_data)
+        return preds
 
-        bt.logging.info("jackie_old_model_pred prob_list: " + str(prob_list))
-        tmp_pred_list = jackie_upgrade.order_prob(prob_list)
-        pred_list = [not value for value in tmp_pred_list]
-        bt.logging.info("jackie_old_model_pred pred_list: " + str(pred_list))
-        self.accuracy_monitor(pred_list, '50_50_old_model', input_data)
+    def jackie_upgrade_ppl_model_pred(self, input_data):
+        bt.logging.info("start jackie_upgrade_ppl_model_pred")
+        try:
+            prob_list = self.ppl_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            prob_list = [0] * len(input_data)
+
+        bt.logging.info("jackie_upgrade_ppl_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_upgrade_ppl_model_pred pred_list: " + str(pred_list))
+        self.accuracy_monitor(pred_list, '50_50_ppl_model_pred', input_data)
         return pred_list, prob_list
 
-    def standard_model_pred(self, input_data):
-        bt.logging.info("start standard_model_pred")
-        preds = []
-        for text in input_data:
-            try:
-                prob = self.model(text)
-                pred_prob = prob <= 0.5
-            except Exception as e:
-                pred_prob = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-            preds.append(pred_prob)
-        return preds
+    def jackie_upgrade_deberta_model_pred(self, input_data):
+        bt.logging.info("start jackie_upgrade_deberta_model_pred")
+        try:
+            prob_list = self.deberta_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            prob_list = [0] * len(input_data)
+
+        bt.logging.info("jackie_upgrade_deberta_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_upgrade_deberta_model_pred pred_list: " + str(pred_list))
+        self.accuracy_monitor(pred_list, 'jackie_upgrade_deberta_model_pred', input_data)
+        return pred_list, prob_list
 
     def calculate_pred(self, input_data):
         bt.logging.info("start calculate_pred")
-        curr_model_pred, curr_model_prob = self.jackie_current_model_pred(input_data)
-        old_model_pred, old_model_prob = self.jackie_old_model_pred(input_data)
+        ppl_model_pred, ppl_model_prob = self.jackie_upgrade_ppl_model_pred(input_data)
+        deberta_model_pred, deberta_model_prob = self.jackie_upgrade_deberta_model_pred(input_data)
         not_agree_list = []
         not_agree_point = []
         arr_len = len(input_data)
         for i in range(arr_len):
-            if curr_model_pred[i] != old_model_pred[i]:
+            if ppl_model_pred[i] != deberta_model_pred[i]:
                 not_agree_list.append(i)
-                not_agree_point.append(curr_model_prob[i] + old_model_prob[i])
+                not_agree_point.append(ppl_model_prob[i] + deberta_model_prob[i])
         bt.logging.info("not_agree_list: " + str(not_agree_list))
         bt.logging.info("not_agree_point: " + str(not_agree_point))
 
         agree_pred = jackie_upgrade.order_prob(not_agree_point)
         pt = 0
         for i in not_agree_list:
-            curr_model_pred[i] = agree_pred[pt]
+            ppl_model_pred[i] = agree_pred[pt]
             pt += 1
-        self.accuracy_monitor(curr_model_pred, '50_50_combine_models', input_data)
-        return curr_model_pred
+        self.accuracy_monitor(ppl_model_pred, '50_50_combine_ppl_deberta', input_data)
+        return ppl_model_pred
 
     def accuracy_monitor(self, pred_list, model_type, input_list):
         bt.logging.info("start accuracy_monitor")
@@ -127,57 +143,3 @@ class FakeMiner:
         sha128_hash = sha256_hash[:32]
         restful_api.call_insert(text_hash=sha128_hash, model_type=model_type, count_human=count_true,
                                 count_ai=count_false)
-
-    def standard_current_model_pred(self, input_data):
-        pred_list = []
-        for text in input_data:
-            try:
-                # true is human, false is ai
-                pred = self.model(text) <= 0.5
-            except Exception as e:
-                pred = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-            pred_list.append(pred)
-
-        self.accuracy_monitor(pred_list, 'standard_current_model', input_data)
-        return pred_list
-
-    def consider_text_length(self, input_data):
-        pred_list = []
-        short_text_list = []
-        for i in range(len(input_data)):
-            text = input_data[i]
-            try:
-                if len(text) < 250:
-                    short_text_list.append(i)
-                    pred = True
-                else:
-                    pred = self.model(text) <= 0.5
-            except Exception as e:
-                pred = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-            pred_list.append(pred)
-        bt.logging.info('short_text_list: ' + str(short_text_list) + str(len(short_text_list)))
-        self.accuracy_monitor(pred_list, 'consider_text_length', input_data)
-        return pred_list
-
-    def jackie_current_model_pred(self, input_data):
-        bt.logging.info("start jackie_current_model_pred")
-        prob_list = []
-        for text in input_data:
-            try:
-                pred_prob = self.model(text)
-            except Exception as e:
-                pred_prob = 0
-                bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-                bt.logging.error(e)
-            prob_list.append(pred_prob)
-
-        bt.logging.info("jackie_current_model_pred prob_list: " + str(prob_list))
-        tmp_pred_list = jackie_upgrade.order_prob(prob_list)
-        pred_list = [not value for value in tmp_pred_list]
-        bt.logging.info("jackie_current_model_pred pred_list: " + str(pred_list))
-        self.accuracy_monitor(pred_list, '50_50_current_model', input_data)
-        return pred_list, prob_list
