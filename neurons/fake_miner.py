@@ -71,6 +71,17 @@ class FakeMiner:
         self.accuracy_monitor(preds, 'deberta_model_pred', input_data)
         return preds
 
+    def deberta_model_prob(self, input_data):
+        bt.logging.info("start deberta_model_prob")
+        try:
+            probs = self.deberta_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            probs = [0] * len(input_data)
+        bt.logging.info("deberta_model_prob prob: " + str(probs))
+        return probs
+
     def ppl_model_pred(self, input_data):
         bt.logging.info("start ppl_model_pred")
         try:
@@ -85,6 +96,18 @@ class FakeMiner:
         self.accuracy_monitor(preds, 'ppl_model_pred', input_data)
         return preds
 
+    def ppl_model_prob(self, input_data):
+        bt.logging.info("start ppl_model_prob")
+        try:
+            probs = self.ppl_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text')
+            bt.logging.error(e)
+            probs = [0] * len(input_data)
+
+        bt.logging.info("ppl_model_prob probs: " + str(probs))
+        self.accuracy_monitor(probs, 'ppl_model_prob', input_data)
+        return probs
     def jackie_upgrade_ppl_model_pred(self, input_data):
         bt.logging.info("start jackie_upgrade_ppl_model_pred")
         try:
@@ -137,6 +160,28 @@ class FakeMiner:
         self.accuracy_monitor(ppl_model_pred, '50_50_combine_ppl_deberta', input_data)
         return ppl_model_pred
 
+    def combine_ppl_for_human_pred(self, input_data):
+        bt.logging.info("start combine_ppl_for_human_pred")
+        ppl_model_pred, ppl_model_prob = self.jackie_upgrade_ppl_model_pred(input_data)
+        deberta_model_pred, deberta_model_prob = self.jackie_upgrade_deberta_model_pred(input_data)
+        not_agree_list = []
+        not_agree_point = []
+        arr_len = len(input_data)
+        for i in range(arr_len):
+            if ppl_model_pred[i] != deberta_model_pred[i]:
+                not_agree_list.append(i)
+                not_agree_point.append(ppl_model_prob[i] + deberta_model_prob[i])
+        bt.logging.info("not_agree_list: " + str(not_agree_list))
+        bt.logging.info("not_agree_point: " + str(not_agree_point))
+
+        agree_pred = jackie_upgrade.order_prob(not_agree_point)
+        pt = 0
+        for i in not_agree_list:
+            ppl_model_pred[i] = agree_pred[pt]
+            pt += 1
+        self.accuracy_monitor(ppl_model_pred, '50_50_combine_ppl_deberta', input_data)
+        return ppl_model_pred
+
     def accuracy_monitor(self, pred_list, model_type, input_list):
         bt.logging.info("start accuracy_monitor")
         tmp_pred_list = copy.deepcopy(pred_list)
@@ -156,8 +201,8 @@ class FakeMiner:
             else:
                 if pred_list[i]:
                     fail_hu_pred.append(input_list[i])
-        bt.logging.info(model_type + " fail_ai_pred: " + str(fail_ai_pred))
-        bt.logging.info(model_type + " fail_hu_pred: " + str(fail_hu_pred))
+        bt.logging.info(model_type + " fail_ai_pred: " + str(len(fail_ai_pred)))
+        bt.logging.info(model_type + " fail_hu_pred: " + str(len(fail_hu_pred)))
 
         input_string = str(input_list)
         sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
