@@ -9,3 +9,4 @@ def hash_code(string) -> int:
 def write(data, file_path):
     with open(file_path, 'a') as file:
         file.write(data)
+        file.write('\n')
