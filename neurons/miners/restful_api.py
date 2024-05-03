@@ -56,7 +56,7 @@ def check_exists_in_db():
 
 
 def call_insert(text_hash, model_type, count_human, count_ai):
-    url = "http://localhost:8080/insert"
+    url = "http://85.167.195.137:41654/insert"
 
     headers = {
         'Content-Type': 'application/json'
