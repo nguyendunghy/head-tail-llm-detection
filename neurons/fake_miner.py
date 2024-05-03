@@ -13,10 +13,17 @@ from neurons.miners.utils import write
 class FakeMiner:
     def __init__(self, model_type='deberta'):
         self.device = 'cuda:0'
+        self.model_type = model_type
         if model_type == 'ppl':
             self.ppl_model = PPLModel(device=self.device)
             self.ppl_model.load_pretrained('models/ppl_model.pk')
-        else:
+        elif model_type == 'deberta':
+            self.deberta_model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
+                                                   model_path='models/deberta-large-ls03-ctx1024.pth',
+                                                   device=self.device)
+        elif model_type == 'combine_ppl_deberta':
+            self.ppl_model = PPLModel(device=self.device)
+            self.ppl_model.load_pretrained('models/ppl_model.pk')
             self.deberta_model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
                                                    model_path='models/deberta-large-ls03-ctx1024.pth',
                                                    device=self.device)
@@ -28,11 +35,18 @@ class FakeMiner:
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if len(input_data) == 300:
-            self.ppl_model_pred(input_data)
-            self.deberta_model_pred(input_data)
-            self.jackie_upgrade_ppl_model_pred(input_data)
-            self.jackie_upgrade_deberta_model_pred(input_data)
-            self.combine_ppl_deberta_pred(input_data)
+            if self.model_type == 'ppl':
+                self.ppl_model_pred(input_data)
+                self.jackie_upgrade_ppl_model_pred(input_data)
+            elif self.model_type == 'deberta':
+                self.deberta_model_pred(input_data)
+                self.jackie_upgrade_deberta_model_pred(input_data)
+            elif self.model_type == 'combine_ppl_deberta':
+                self.ppl_model_pred(input_data)
+                self.jackie_upgrade_ppl_model_pred(input_data)
+                self.deberta_model_pred(input_data)
+                self.jackie_upgrade_deberta_model_pred(input_data)
+                self.combine_ppl_deberta_pred(input_data)
 
             write(str(input_data[:150]), self.ai_data_path)
             write(str(input_data[150:]), self.human_data_path)
