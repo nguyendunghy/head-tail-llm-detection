@@ -56,16 +56,6 @@ def check_exists_in_db():
         return jsonify({"error": "Request must be JSON"}), 400
 
 
-@app.route('/fake-miner', methods=['POST'])
-def fake_miner():
-    if request.is_json:
-        data = request.get_json()
-        input = data['input_data']
-        fake_miner.fake_miner(input_data=input)
-        return jsonify({"message": "check exists successfully", "result": 'OK'}), 200
-    else:
-        return jsonify({"error": "Request must be JSON"}), 400
-
 
 def call_insert(text_hash, model_type, count_human, count_ai):
     url = "http://localhost:8080/insert"
