@@ -1,5 +1,6 @@
 import copy
 import hashlib
+import sys
 import time
 
 import bittensor as bt
@@ -27,9 +28,13 @@ class FakeMiner:
             self.deberta_model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
                                                    model_path='models/deberta-large-ls03-ctx1024.pth',
                                                    device=self.device)
+        else:
+            bt.logging.error("invalid model type : " + str(model_type))
+            sys.exit(1)
 
         self.human_data_path = '/root/head-tail-llm-detection/human_data.txt'
         self.ai_data_path = '/root/head-tail-llm-detection/ai_data.txt'
+
 
     def fake_miner(self, input_data):
         start_time = time.time()
@@ -72,7 +77,7 @@ class FakeMiner:
             preds = self.ppl_model.predict_batch(input_data)
             preds = [el > 0.5 for el in preds]
         except Exception as e:
-            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error('Could not proceed text')
             bt.logging.error(e)
             preds = [0] * len(input_data)
 
@@ -85,7 +90,7 @@ class FakeMiner:
         try:
             prob_list = self.ppl_model.predict_batch(input_data)
         except Exception as e:
-            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error('Could not proceed text')
             bt.logging.error(e)
             prob_list = [0] * len(input_data)
 
@@ -100,7 +105,7 @@ class FakeMiner:
         try:
             prob_list = self.deberta_model.predict_batch(input_data)
         except Exception as e:
-            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error('Could not proceed text "{}..."')
             bt.logging.error(e)
             prob_list = [0] * len(input_data)
 

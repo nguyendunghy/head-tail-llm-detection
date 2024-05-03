@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify
 from neurons.fake_miner import FakeMiner
 
 app = Flask(__name__)
-MODEL_TYPE = 'ppl'
+MODEL_TYPE = ''
 fm = FakeMiner(MODEL_TYPE)
 
 
