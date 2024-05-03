@@ -27,7 +27,7 @@ def fake_miner():
 
 if __name__ == '__main__':
     arg = sys.argv
-    port = int(arg[0])
-    MODEL_TYPE = str(arg[1])
+    port = int(arg[1])
+    MODEL_TYPE = str(arg[2])
 
     app.run(host='0.0.0.0', debug=True, port=port)
