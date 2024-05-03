@@ -8,4 +8,4 @@ def hash_code(string) -> int:
 
 def write(data, file_path):
     with open(file_path, 'a') as file:
-        file.writelines(data)
+        file.write(data)

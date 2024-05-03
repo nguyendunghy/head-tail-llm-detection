@@ -34,12 +34,17 @@ class FakeMiner:
 
         self.human_data_path = '/root/jackie-dir/head-tail-llm-detection/human_data.txt'
         self.ai_data_path = '/root/jackie-dir/head-tail-llm-detection/ai_data.txt'
+        self.combine_data_path = '/root/jackie-dir/head-tail-llm-detection/combine_data.txt'
 
 
     def fake_miner(self, input_data):
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if len(input_data) == 300:
+            write(str(input_data[:150]), self.ai_data_path)
+            write(str(input_data[150:]), self.human_data_path)
+            write(str(input_data), self.combine_data_path)
+
             if self.model_type == 'ppl':
                 self.ppl_model_pred(input_data)
                 self.jackie_upgrade_ppl_model_pred(input_data)
@@ -53,8 +58,7 @@ class FakeMiner:
                 # self.jackie_upgrade_deberta_model_pred(input_data)
                 self.combine_ppl_deberta_pred(input_data)
 
-            write(str(input_data[:150]), self.ai_data_path)
-            write(str(input_data[150:]), self.human_data_path)
+
 
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
 
