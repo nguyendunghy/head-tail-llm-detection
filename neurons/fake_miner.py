@@ -48,9 +48,9 @@ class FakeMiner:
                 self.jackie_upgrade_deberta_model_pred(input_data)
             elif self.model_type == 'combine_ppl_deberta':
                 self.ppl_model_pred(input_data)
-                self.jackie_upgrade_ppl_model_pred(input_data)
+                # self.jackie_upgrade_ppl_model_pred(input_data)
                 self.deberta_model_pred(input_data)
-                self.jackie_upgrade_deberta_model_pred(input_data)
+                # self.jackie_upgrade_deberta_model_pred(input_data)
                 self.combine_ppl_deberta_pred(input_data)
 
             write(str(input_data[:150]), self.ai_data_path)
