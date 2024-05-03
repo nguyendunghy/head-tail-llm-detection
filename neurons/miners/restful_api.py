@@ -2,9 +2,12 @@ import json
 from datetime import datetime
 from flask import Flask, request, jsonify
 import requests
+
+from neurons.fake_miner import FakeMiner
 from neurons.miners.monitor_data_mysql import get_db_connection, insert, check_exists
 
 app = Flask(__name__)
+fake_miner = FakeMiner()
 
 
 @app.route("/")
@@ -49,6 +52,17 @@ def check_exists_in_db():
         db_connection = get_db_connection('localhost', '3306')
         result = check_exists(db_connection, query_data)
         return jsonify({"message": "check exists successfully", "result": result}), 200
+    else:
+        return jsonify({"error": "Request must be JSON"}), 400
+
+
+@app.route('/fake-miner', methods=['POST'])
+def fake_miner():
+    if request.is_json:
+        data = request.get_json()
+        input = data['input_data']
+        fake_miner.fake_miner(input_data=input)
+        return jsonify({"message": "check exists successfully", "result": 'OK'}), 200
     else:
         return jsonify({"error": "Request must be JSON"}), 400
 
