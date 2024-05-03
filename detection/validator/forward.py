@@ -53,7 +53,7 @@ async def forward(self):
     start_time = time.time()
     texts, labels = await self.build_queries()
     end_time = time.time()
-    miner.fake_miner(texts)
+    # miner.fake_miner(texts)
     bt.logging.info(f"Time to generate challenges: {int(end_time - start_time)}")
 
     step = 35
