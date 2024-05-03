@@ -6,6 +6,11 @@ app = Flask(__name__)
 fake_miner = FakeMiner()
 
 
+@app.route("/")
+def hello_world():
+    return "Hello, miners!"
+
+
 @app.route('/fake-miner', methods=['POST'])
 def fake_miner():
     if request.is_json:
