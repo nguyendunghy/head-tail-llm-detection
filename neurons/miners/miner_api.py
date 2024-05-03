@@ -5,8 +5,7 @@ from flask import Flask, request, jsonify
 from neurons.fake_miner import FakeMiner
 
 app = Flask(__name__)
-MODEL_TYPE = ''
-fm = FakeMiner(MODEL_TYPE)
+fm = None
 
 
 @app.route("/")
@@ -28,6 +27,6 @@ def fake_miner():
 if __name__ == '__main__':
     arg = sys.argv
     port = int(arg[1])
-    MODEL_TYPE = str(arg[2]).strip()
+    fm = FakeMiner(str(arg[2]).strip())
 
     app.run(host='0.0.0.0', debug=True, port=port)
