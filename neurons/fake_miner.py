@@ -11,13 +11,16 @@ from neurons.miners.utils import write
 
 
 class FakeMiner:
-    def __init__(self):
+    def __init__(self, model_type='deberta'):
         self.device = 'cuda:0'
-        self.ppl_model = PPLModel(device=self.device)
-        self.ppl_model.load_pretrained('models/ppl_model.pk')
-        self.deberta_model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
-                                               model_path='models/deberta-large-ls03-ctx1024.pth',
-                                               device=self.device)
+        if model_type == 'ppl':
+            self.ppl_model = PPLModel(device=self.device)
+            self.ppl_model.load_pretrained('models/ppl_model.pk')
+        else:
+            self.deberta_model = DebertaClassifier(foundation_model_path='models/deberta-v3-large-hf-weights',
+                                                   model_path='models/deberta-large-ls03-ctx1024.pth',
+                                                   device=self.device)
+
         self.human_data_path = '/root/head-tail-llm-detection/human_data.txt'
         self.ai_data_path = '/root/head-tail-llm-detection/ai_data.txt'
 
