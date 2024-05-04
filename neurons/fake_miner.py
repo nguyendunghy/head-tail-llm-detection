@@ -41,9 +41,9 @@ class FakeMiner:
         start_time = time.time()
         bt.logging.info(f"Amount of texts received: {len(input_data)}")
         if len(input_data) == 300:
-            write(str(input_data[:150]), self.ai_data_path)
-            write(str(input_data[150:]), self.human_data_path)
-            write(str(input_data), self.combine_data_path)
+            write(input_data[:150], self.ai_data_path)
+            write(input_data[150:], self.human_data_path)
+            write(input_data, self.combine_data_path)
 
             if self.model_type == 'ppl':
                 self.ppl_model_pred(input_data)
