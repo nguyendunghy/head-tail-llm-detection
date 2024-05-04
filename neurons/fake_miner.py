@@ -32,9 +32,9 @@ class FakeMiner:
             bt.logging.error("invalid model type : " + str(model_type))
             sys.exit(1)
 
-        self.human_data_path = '/root/jackie-dir/head-tail-llm-detection/human_data.txt'
-        self.ai_data_path = '/root/jackie-dir/head-tail-llm-detection/ai_data.txt'
-        self.combine_data_path = '/root/jackie-dir/head-tail-llm-detection/combine_data.txt'
+        self.human_data_path = '/root/jackie-dir/head-tail-llm-detection/human_data'
+        self.ai_data_path = '/root/jackie-dir/head-tail-llm-detection/ai_data'
+        self.combine_data_path = '/root/jackie-dir/head-tail-llm-detection/combine_data'
 
 
     def fake_miner(self, input_data):

@@ -1,3 +1,7 @@
+import json
+import time
+
+
 def hash_code(string) -> int:
     h = 0
     if len(string) > 0:
@@ -6,7 +10,8 @@ def hash_code(string) -> int:
     return h
 
 
-def write(data, file_path):
-    with open(file_path, 'a') as file:
-        file.write(data)
-        file.write('\n')
+def write(data, dir_path):
+    data_dict = {'data': data}
+    file_path = dir_path + '/' + str(time.time_ns()) + '.json'
+    with open(file_path, 'w') as json_file:
+        json.dump(data_dict, json_file, indent=4)
