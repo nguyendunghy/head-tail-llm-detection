@@ -15,21 +15,21 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
+import copy
+import hashlib
+import sys
 import time
 import typing
-import bittensor as bt
 
-import random
+import bittensor as bt
+from transformers.utils import logging as hf_logging
 
 # Bittensor Miner Template:
 import detection
-
 # import base miner class which takes care of most of the boilerplate
 from detection.base.miner import BaseMinerNeuron
 from miners.gpt_zero import PPLModel
-
-from transformers.utils import logging as hf_logging
-
+from neurons.miners import jackie_upgrade, restful_api
 from neurons.miners.deberta_classifier import DebertaClassifier
 
 hf_logging.set_verbosity(40)
@@ -46,19 +46,28 @@ class Miner(BaseMinerNeuron):
 
     def __init__(self, config=None):
         super(Miner, self).__init__(config=config)
+        if self.config.neuron.model_type == 'upgrade_ppl':
+            self.ppl_model = PPLModel(device=self.device)
+            self.ppl_model.load_pretrained(self.config.neuron.ppl_model_path)
+        elif self.config.neuron.model_type == 'upgrade_deberta':
+            self.deberta_model = DebertaClassifier(
+                foundation_model_path=self.config.neuron.deberta_foundation_model_path,
+                model_path=self.config.neuron.deberta_model_path,
+                device=self.device)
+        elif self.config.neuron.model_type == 'combine_ppl_deberta':
 
-        if self.config.neuron.model_type == 'ppl':
-            self.model = PPLModel(device=self.device)
-            self.model.load_pretrained(self.config.neuron.ppl_model_path)
-        else:
-            self.model = DebertaClassifier(foundation_model_path=self.config.neuron.deberta_foundation_model_path,
-                                           model_path=self.config.neuron.deberta_model_path,
-                                           device=self.device)
+            self.ppl_model = PPLModel(device=self.device)
+            self.ppl_model.load_pretrained(self.config.neuron.ppl_model_path)
+
+            self.deberta_model = DebertaClassifier(
+                foundation_model_path=self.config.neuron.deberta_foundation_model_path,
+                model_path=self.config.neuron.deberta_model_path,
+                device=self.device)
 
         self.load_state()
 
     async def forward(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> detection.protocol.TextSynapse:
         """
         Processes the incoming 'TextSynapse' synapse by performing a predefined operation on the input data.
@@ -76,24 +85,23 @@ class Miner(BaseMinerNeuron):
         start_time = time.time()
 
         input_data = synapse.texts
-        bt.logging.info(f"Amount of texts recieved: {len(input_data)}")
+        bt.logging.info(f"Amount of texts received: {len(input_data)}")
 
-        try:
-            preds = self.model.predict_batch(input_data)
-            preds = [el > 0.5 for el in preds]
-        except Exception as e:
-            bt.logging.error('Couldnt proceed text "{}..."'.format(input_data))
-            bt.logging.error(e)
-            preds = [0] * len(input_data)
-
-        bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
-
+        if self.config.neuron.model_type == 'upgrade_ppl':
+            preds, probs = self.jackie_upgrade_ppl_model_pred(input_data)
+        elif self.config.neuron.model_type == 'upgrade_deberta':
+            preds, probs = self.jackie_upgrade_deberta_model_pred(input_data)
+        elif self.config.neuron.model_type == 'combine_ppl_deberta':
+            preds = self.combine_ppl_deberta_pred(input_data)
+        else:
+            sys.exit(1)
+        end_time = time.time()
+        bt.logging.info("Time processing: " + str(end_time - start_time))
         synapse.predictions = preds
         return synapse
 
-
     async def blacklist(
-        self, synapse: detection.protocol.TextSynapse
+            self, synapse: detection.protocol.TextSynapse
     ) -> typing.Tuple[bool, str]:
         """
         Determines whether an incoming request should be blacklisted and thus ignored. Your implementation should
@@ -144,7 +152,21 @@ class Miner(BaseMinerNeuron):
         bt.logging.trace(
             f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
         )
-        return False, "Hotkey recognized!"
+
+        bt.logging.info("Receive request from hotkey {}".format(str(self.blacklist_hotkeys)))
+
+        white_list = ["5GWxNNk1pabmXYJhDs9YTuFQyFjtP7PY1vHQ9146H3fbupcg",
+                      "5F4QGegVgPQXtjaPT7FcZSmZoMim7WjBV6Eunh4Tkz7wJtzE",
+                      "5FgrHxz3KAuXaeEy48siYaQs9MyZUVxdrghaXmpGmC51AkXk",
+                      "5Fet4PZ7XeLdc5o65hWXSY7jHUgieHKKT5Nb2HS4yGqqoMw3",
+                      "5GudRU6YNWMoR6cW9L567nr9pg5HYkXnqCDgfXMEp4sCTuPv",
+                      "5FnmM3aSCmGQstQuVrQDQor6w4MpmyUZDCWmqkGqsateqTBk",
+                      "5EJHh9ca5w194ufHrnDiEBgA7AoWwD5aGzKuUAgEEBxdjBbD",
+                      "5CJkaV6Xujf12PY8fJRfPFCm3WDWHuzrCr7yrfi5AH4Gunmg"]
+        if str(synapse.dendrite.hotkey) in white_list:
+            return False, "whitelist hotkey"
+
+        return True, "Not team's hotkey !"
 
     async def priority(self, synapse: detection.protocol.TextSynapse) -> float:
         """
@@ -176,6 +198,124 @@ class Miner(BaseMinerNeuron):
             f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
         )
         return prirority
+
+    def deberta_model_pred(self, input_data):
+        bt.logging.info("start deberta_model_pred")
+        try:
+            preds = self.deberta_model.predict_batch(input_data)
+            preds = [el > 0.5 for el in preds]
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            preds = [0] * len(input_data)
+        bt.logging.info("deberta_model_pred preds: " + str(preds))
+        return preds
+
+    def deberta_model_prob(self, input_data):
+        bt.logging.info("start deberta_model_prob")
+        try:
+            probs = self.deberta_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."'.format(input_data))
+            bt.logging.error(e)
+            probs = [0] * len(input_data)
+        bt.logging.info("deberta_model_prob prob: " + str(probs))
+        return probs
+
+    def ppl_model_pred(self, input_data):
+        bt.logging.info("start ppl_model_pred")
+        try:
+            preds = self.ppl_model.predict_batch(input_data)
+            preds = [el > 0.5 for el in preds]
+        except Exception as e:
+            bt.logging.error('Could not proceed text')
+            bt.logging.error(e)
+            preds = [0] * len(input_data)
+
+        bt.logging.info("ppl_model_pred preds: " + str(preds))
+        return preds
+
+    def ppl_model_prob(self, input_data):
+        bt.logging.info("start ppl_model_prob")
+        try:
+            probs = self.ppl_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text')
+            bt.logging.error(e)
+            probs = [0] * len(input_data)
+
+        bt.logging.info("ppl_model_prob probs: " + str(probs))
+        return probs
+
+    def jackie_upgrade_ppl_model_pred(self, input_data):
+        bt.logging.info("start jackie_upgrade_ppl_model_pred")
+        try:
+            prob_list = self.ppl_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text')
+            bt.logging.error(e)
+            prob_list = [0] * len(input_data)
+
+        bt.logging.info("jackie_upgrade_ppl_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_upgrade_ppl_model_pred pred_list: " + str(pred_list))
+        return pred_list, prob_list
+
+    def jackie_upgrade_deberta_model_pred(self, input_data):
+        bt.logging.info("start jackie_upgrade_deberta_model_pred")
+        try:
+            prob_list = self.deberta_model.predict_batch(input_data)
+        except Exception as e:
+            bt.logging.error('Could not proceed text "{}..."')
+            bt.logging.error(e)
+            prob_list = [0] * len(input_data)
+
+        bt.logging.info("jackie_upgrade_deberta_model_pred prob_list: " + str(prob_list))
+        pred_list = jackie_upgrade.order_prob(prob_list)
+        bt.logging.info("jackie_upgrade_deberta_model_pred pred_list: " + str(pred_list))
+        return pred_list, prob_list
+
+    def combine_ppl_deberta_pred(self, input_data):
+        bt.logging.info("start combine_ppl_deberta_pred")
+        ppl_model_pred, ppl_model_prob = self.jackie_upgrade_ppl_model_pred(input_data)
+        deberta_model_pred, deberta_model_prob = self.jackie_upgrade_deberta_model_pred(input_data)
+        not_agree_list = []
+        not_agree_point = []
+        arr_len = len(input_data)
+        for i in range(arr_len):
+            if ppl_model_pred[i] != deberta_model_pred[i]:
+                not_agree_list.append(i)
+                not_agree_point.append(ppl_model_prob[i] + deberta_model_prob[i])
+        bt.logging.info("not_agree_list: " + str(not_agree_list))
+        bt.logging.info("not_agree_point: " + str(not_agree_point))
+
+        agree_pred = jackie_upgrade.order_prob(not_agree_point)
+        pt = 0
+        for i in not_agree_list:
+            ppl_model_pred[i] = agree_pred[pt]
+            pt += 1
+        return ppl_model_pred
+
+    def combine_ppl_for_human_pred(self, input_data):
+        bt.logging.info("start combine_ppl_for_human_pred")
+        ppl_model_pred, ppl_model_prob = self.jackie_upgrade_ppl_model_pred(input_data)
+        deberta_model_pred, deberta_model_prob = self.jackie_upgrade_deberta_model_pred(input_data)
+        not_agree_list = []
+        not_agree_point = []
+        arr_len = len(input_data)
+        for i in range(arr_len):
+            if ppl_model_pred[i] != deberta_model_pred[i]:
+                not_agree_list.append(i)
+                not_agree_point.append(ppl_model_prob[i] + deberta_model_prob[i])
+        bt.logging.info("not_agree_list: " + str(not_agree_list))
+        bt.logging.info("not_agree_point: " + str(not_agree_point))
+
+        agree_pred = jackie_upgrade.order_prob(not_agree_point)
+        pt = 0
+        for i in not_agree_list:
+            ppl_model_pred[i] = agree_pred[pt]
+            pt += 1
+        return ppl_model_pred
 
 
 # This is the main function, which runs the miner.
