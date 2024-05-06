@@ -162,7 +162,8 @@ class Miner(BaseMinerNeuron):
                       "5GudRU6YNWMoR6cW9L567nr9pg5HYkXnqCDgfXMEp4sCTuPv",
                       "5FnmM3aSCmGQstQuVrQDQor6w4MpmyUZDCWmqkGqsateqTBk",
                       "5EJHh9ca5w194ufHrnDiEBgA7AoWwD5aGzKuUAgEEBxdjBbD",
-                      "5CJkaV6Xujf12PY8fJRfPFCm3WDWHuzrCr7yrfi5AH4Gunmg"]
+                      "5CJkaV6Xujf12PY8fJRfPFCm3WDWHuzrCr7yrfi5AH4Gunmg",
+                      "5DPdXPrYCTnsUDh2nYZMCAUb3d6h8eouDCF3zhdw8ru3czSm"]
         if str(synapse.dendrite.hotkey) in white_list:
             return False, "whitelist hotkey"
 
