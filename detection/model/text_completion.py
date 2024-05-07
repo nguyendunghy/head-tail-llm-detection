@@ -1,11 +1,9 @@
-import logging
 import time
 
-import bittensor as bt
 import numpy as np
 from langchain_community.llms import Ollama
 
-from detection.validator.text_postprocessing import TextCleaner
+from detection.model.text_postprocessing import TextCleaner
 import ollama
 
 
@@ -15,15 +13,15 @@ class OllamaModel:
         available models you can find on https://github.com/ollama/ollama
         before running model <model_name> install ollama and run 'ollama pull <model_name>'
         """
-        bt.logging.info(f'Initializing OllamaModel {model_name}')
+        print(f'Initializing OllamaModel {model_name}')
         if num_predict > 1000:
             raise Exception("You're trying to set num_predict to more than 1000, it can lead to context overloading and Ollama hanging")
 
         pulled_models = [el['name'] for el in ollama.list()['models']]
         if model_name not in pulled_models and model_name + ':latest' not in pulled_models:
-            bt.logging.info("Model {} cannot be found locally - downloading it...".format(model_name))
+            print("Model {} cannot be found locally - downloading it...".format(model_name))
             ollama.pull(model_name)
-            bt.logging.info("Successfully downloaded {}".format(model_name))
+            print("Successfully downloaded {}".format(model_name))
 
         self.model_name = model_name
         self.num_predict = num_predict
@@ -67,7 +65,7 @@ class OllamaModel:
 
                 return self.text_cleaner.clean_text(text)
             except Exception as e:
-                bt.logging.info("Couldn't get response from Ollama, probably it's restarting now: {}".format(e))
+                print("Couldn't get response from Ollama, probably it's restarting now: {}".format(e))
                 time.sleep(1)
 
     def __repr__(self) -> str:
@@ -75,7 +73,7 @@ class OllamaModel:
 
 
 if __name__ == '__main__':
-    bt.logging.info("started")
+    print("started")
     model = OllamaModel('llama2')
-    bt.logging.info("finished")
+    print("finished")
     print(model.model)

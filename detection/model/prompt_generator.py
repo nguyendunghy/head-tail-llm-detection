@@ -3,10 +3,9 @@ import sys
 import numpy as np
 from transformers import AutoTokenizer, Pipeline
 
-from detection.validator.text_completion import OllamaModel
+from detection.model.text_completion import OllamaModel
 from prompting.agent import HumanAgent
 from prompting.conversation import create_task
-import bittensor as bt
 
 
 class MyLLMPipeline:
@@ -42,7 +41,7 @@ class PromptGenerator:
 
     def get_challenge(self, task_name=None):
         while True:
-            bt.logging.debug(
+            print(
                 f"📋 Selecting task... from {self.tasks} with distribution {self.task_p}"
             )
 
@@ -53,18 +52,18 @@ class PromptGenerator:
             else:
                 cur_task = task_name
 
-            bt.logging.debug(f"📋 Creating {cur_task} task... ")
+            print(f"📋 Creating {cur_task} task... ")
 
             try:
                 task = create_task(llm_pipeline=self.llm_pipeline, task_name=cur_task)
                 break
             except Exception as e:
-                bt.logging.error(
+                print(
                     f"Failed to create {cur_task} task. {sys.exc_info()}. Skipping to next task."
                 )
                 continue
 
-        bt.logging.debug(f"🤖 Creating agent for {cur_task} task... ")
+        print(f"🤖 Creating agent for {cur_task} task... ")
         agent = HumanAgent(
             task=task, llm_pipeline=self.llm_pipeline, begin_conversation=True
         )

@@ -24,7 +24,7 @@ from neurons.validator import Neuron as Validator
 
 from detection.protocol import Dummy
 from detection.utils.uids import get_random_uids
-from detection.validator.reward import get_rewards
+from detection.model.reward import get_rewards
 from detection.base.validator import BaseValidatorNeuron
 
 

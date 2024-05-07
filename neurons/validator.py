@@ -26,11 +26,11 @@ import torch
 import numpy as np
 
 import detection
-from detection.validator import forward
+from detection.model import forward
 from detection.base.validator import BaseValidatorNeuron
 
-from detection.validator.data_generator import DataGenerator
-from detection.validator.text_completion import OllamaModel
+from detection.model.data_generator import DataGenerator
+from detection.model.text_completion import OllamaModel
 
 
 class Validator(BaseValidatorNeuron):

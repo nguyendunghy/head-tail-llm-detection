@@ -2,13 +2,11 @@ import logging
 import random
 import time
 
-import bittensor as bt
 import numpy as np
 from datasets import load_dataset
 from collections.abc import Iterator
-from pylatexenc.latex2text import LatexNodes2Text
 
-from detection.validator.prompt_generator import PromptGenerator
+from detection.model.prompt_generator import PromptGenerator
 
 
 class HumanDataset(Iterator):
@@ -72,10 +70,10 @@ class PilePromptDataset(Iterator):
                 return {'prompt': prompt, 'topic': el['meta']['pile_set_name'], 'real_completion': el['text'][context_len:]}
             except Exception as e:
                 if type(e) == StopIteration:
-                    bt.logging.info('PilePromptDataset ended: reinitializing it')
+                    print('PilePromptDataset ended: reinitializing it')
                 else:
-                    bt.logging.error("Got exception during loading data from PilePromptDataset, reinitializing it: {}".format(e))
-                    bt.logging.exception(e)
+                    print("Got exception during loading data from PilePromptDataset, reinitializing it: {}".format(e))
+                    print(e)
 
                 self.pile = self.init_dataset()
                 continue
@@ -113,10 +111,10 @@ class HC3PromptDataset(Iterator):
                         el = next(self.hc3)
             except Exception as e:
                 if type(e) == StopIteration:
-                    bt.logging.info('Prompt dataset ended: reinitializing it')
+                    print('Prompt dataset ended: reinitializing it')
                 else:
-                    bt.logging.error("Got exception during loading data from PilePromptDataset, reinitializing it: {}".format(e))
-                    bt.logging.exception(e)
+                    print("Got exception during loading data from PilePromptDataset, reinitializing it: {}".format(e))
+                    print(e)
 
                 self.hc3 = self.init_dataset()
                 continue
@@ -136,24 +134,24 @@ class PromptDataset(Iterator):
 
     def __next__(self) -> dict:
         while True:
-            # bt.logging.debug("Retrieving data from PromptDataset...")
+            # print("Retrieving data from PromptDataset...")
             res = {}
             p = random.random()
             if p < 0:
-                bt.logging.debug("Getting prompt from hc3")
+                print("Getting prompt from hc3")
                 el = next(self.hc3_prompt_dataset)
                 res['data_source'] = 'hc3'
             elif p < 0:
-                bt.logging.debug("Getting prompt from prompt_generator")
+                print("Getting prompt from prompt_generator")
                 el = self.prompt_generator.get_challenge(None)
                 res['data_source'] = 'prompt_generator'
             else:
-                bt.logging.debug("Getting prompt from pile")
+                print("Getting prompt from pile")
                 el = next(self.pile_prompt_dataset)
                 res['data_source'] = 'pile'
 
             if len(el['prompt']) > self.max_prompt_len:
-                bt.logging.info("Prompt has len {}, truncating it to {} chars".format(len(el['prompt']), self.max_prompt_len))
+                print("Prompt has len {}, truncating it to {} chars".format(len(el['prompt']), self.max_prompt_len))
 
             res['prompt'] = el["prompt"][:self.max_prompt_len]
             res['topic'] = el['task'] if res['data_source'] == 'prompt_generator' else el['topic']

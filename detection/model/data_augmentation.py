@@ -1,10 +1,12 @@
-import random
-
 import numpy as np
-from nltk import pos_tag
 
 import random
 import nltk
+import random
+
+import nltk
+import numpy as np
+
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
@@ -15,7 +17,6 @@ from spellchecker import SpellChecker
 # import jamspell
 from symspellpy import Verbosity, SymSpell
 import re
-import typo
 
 FIXED_ORDER_DATA_AUGMENTATION_STEPS = [
     {'name': 'SubsampleSentences', 'p': 1},
