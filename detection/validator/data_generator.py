@@ -88,7 +88,7 @@ class DataGenerator:
 
     def generate_data(self, n_human_samples, n_ai_samples) -> list[ValDataRow]:
         res = self.generate_ai_data(n_ai_samples) + self.generate_human_data(n_human_samples)
-        # random.shuffle(res)
+        random.shuffle(res)
         return res
 
 
