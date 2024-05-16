@@ -1,6 +1,10 @@
 # The MIT License (MIT)
- # Copyright © 2024 It's AI 
- 
+# Copyright © 2024 It's AI
+import copy
+import json
+import os
+import traceback
+
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -48,6 +52,7 @@ async def forward(self):
     start_time = time.time()
     texts, labels = await self.build_queries()
     end_time = time.time()
+    write_request_data_to_file('/root/head-tail-llm-detection/sample_data', texts, labels)
     bt.logging.info(f"Time to generate challenges: {int(end_time - start_time)}")
 
     step = 35
@@ -80,3 +85,22 @@ async def forward(self):
     self.update_scores(rewards_tensor, uids_tensor)
 
     self.log_step(miner_uids, metrics, rewards)
+
+
+def write_request_data_to_file(dir_path, texts, labels):
+    try:
+        result = []
+        for lb in labels:
+            result.append(str(lb) == '1')
+
+        datas = {'texts': texts, 'labels': result}
+        if not os.path.exists(dir_path):
+            os.makedirs(dir_path)
+        file_name = 'sample_data_' + str(time.time_ns()) + '.json'
+        file_path = dir_path + '/' + file_name
+        with open(file_path, 'w') as file:
+            json.dump(datas, file, indent=4)
+        # bt.logging.info("write content:: {} to file {} success".format(str(datas), file_path))
+    except Exception as e:
+        bt.logging.error(e)
+        traceback.print_exc()
