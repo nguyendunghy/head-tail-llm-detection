@@ -160,11 +160,3 @@ class PromptDataset(Iterator):
             if res['prompt'].strip():
                 return res
 
-
-if __name__ == '__main__':
-    dataset = HumanDataset()
-    print(next(dataset))
-
-    dataset = PromptDataset()
-    for i in range(15):
-        print(next(dataset))

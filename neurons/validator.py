@@ -16,19 +16,11 @@
 # DEALINGS IN THE SOFTWARE.
 
 
-import time
-import os
-import random
 from typing import List
 
-import bittensor as bt
-import torch
 import numpy as np
 
-import detection
-from detection.model import forward
 from detection.base.validator import BaseValidatorNeuron
-
 from detection.model.data_generator import DataGenerator
 from detection.model.text_completion import OllamaModel
 
@@ -43,11 +35,8 @@ class Validator(BaseValidatorNeuron):
     """
 
     def __init__(self, config=None):
-        bt.logging.info("Initializing Validator")
-
         super(Validator, self).__init__(config=config)
 
-        bt.logging.info("load_state()")
         self.load_state()
 
         models = [OllamaModel(model_name='mistral:text'),
@@ -67,40 +56,13 @@ class Validator(BaseValidatorNeuron):
                   OllamaModel(model_name='solar'),
                   OllamaModel(model_name='llama2:13b'),]
 
-        bt.logging.info(f"Models loaded{models}")
 
         self.generator = DataGenerator(models, None)
-        bt.logging.info(f"Generator initialized {self.generator}")
 
     async def build_queries(self) -> tuple[List[str], np.array]:
-        bt.logging.info(f"Generating texts for challenges...")
         data = self.generator.generate_data(n_human_samples=150, n_ai_samples=150)
         texts = [el.text for el in data]
         labels = np.array([int(el.label) for el in data])
         return texts, labels
 
-    async def forward(self):
-        """
-        Validator forward pass. Consists of:
-        - Generating the query
-        - Querying the miners
-        - Getting the responses
-        - Rewarding the miners
-        - Updating the scores
-        """
 
-        try:
-            res = await forward(self)
-            return res
-        except Exception as e:
-            bt.logging.error("Got error in forward function")
-            bt.logging.exception(e)
-            return None
-
-
-# The main function parses the configuration and runs the validator.
-if __name__ == "__main__":
-    with Validator() as validator:
-        while True:
-            # bt.logging.info("Validator running...", time.time())
-            time.sleep(60)
