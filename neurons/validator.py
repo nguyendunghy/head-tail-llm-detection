@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 # Copyright © 2024 It's AI
-
+import json
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the “Software”), to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
@@ -65,7 +65,7 @@ class Validator(BaseValidatorNeuron):
                   OllamaModel(model_name='openchat:7b'),
                   OllamaModel(model_name='dolphin-mistral'),
                   OllamaModel(model_name='solar'),
-                  OllamaModel(model_name='llama2:13b'),]
+                  OllamaModel(model_name='llama2:13b'), ]
 
         bt.logging.info(f"Models loaded{models}")
 
@@ -74,10 +74,32 @@ class Validator(BaseValidatorNeuron):
 
     async def build_queries(self) -> tuple[List[str], np.array]:
         bt.logging.info(f"Generating texts for challenges...")
-        data = self.generator.generate_data(n_human_samples=150, n_ai_samples=150)
+        data = self.read_content_random_file('/root/head-tail-llm-detection/sample_data')
         texts = [el.text for el in data]
         labels = np.array([int(el.label) for el in data])
         return texts, labels
+
+    def read_content_random_file(self, dir_path):
+        from pathlib import Path
+        directory = Path(dir_path)
+        file_names = [file.name for file in directory.iterdir() if file.is_file()]
+        random.shuffle(file_names)
+        f_path = dir_path + '/' + file_names[0]
+        data = self.read_file(f_path)
+        texts = data['texts']
+        result = data['labels']
+        return texts, result
+
+    def read_file(self, file_path):
+        try:
+            # Open the file and read the content
+            with open(file_path, 'r') as file:
+                data = json.load(file)  # Convert JSON content to a dictionary
+                return data
+        except FileNotFoundError:
+            print(f"Error: The file {file_path} was not found.")
+        except json.JSONDecodeError:
+            print(f"Error: The file {file_path} is not valid JSON.")
 
     async def forward(self):
         """
