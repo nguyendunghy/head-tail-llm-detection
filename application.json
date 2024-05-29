@@ -1,7 +1,7 @@
 {
   "application": {
     "miner": {
-      "show_input": false,
+      "show_input": true,
       "black_list_enable": true,
       "blacklist_hotkeys": [],
       "whitelist_hotkeys": [

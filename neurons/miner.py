@@ -66,6 +66,8 @@ class Miner(BaseMinerNeuron):
         input_data = synapse.texts
         result = None
         self.app_config.load_app_config()
+        if self.app_config.allow_show_input():
+            bt.logging.info(f"find validator with validator hotkey {str(synapse.dendrite.hotkey)} and text: " + str(input_data))
 
         # For testing. Reading input from file
         if self.app_config.enable_miner_get_input_from_file():
@@ -75,7 +77,6 @@ class Miner(BaseMinerNeuron):
             if len(temp_input_data) > 0:
                 input_data = temp_input_data
                 result = temp_result
-
         handler = RequestHandler(self.app_config)
         synapse.predictions = handler.handle(input_data=input_data, result=result)
         return synapse

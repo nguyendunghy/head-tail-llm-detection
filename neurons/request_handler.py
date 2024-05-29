@@ -16,12 +16,7 @@ class RequestHandler(ABC):
 
     def handle(self, input_data, result=None):
         start_time = time.time()
-        bt.logging.info(f"Amount of texts received: {len(input_data)}")
-        if self.app_config.allow_show_input():
-            bt.logging.info("input_data: " + str(input_data))
-
         preds = self.call_servers(input_data)
-
         bt.logging.info(f"Made predictions in {int(time.time() - start_time)}s")
         return preds
 
