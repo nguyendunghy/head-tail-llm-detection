@@ -77,11 +77,9 @@ class Validator(BaseValidatorNeuron):
         bt.logging.info(f"Generating texts for challenges...")
         data = self.generator.generate_data(n_human_samples=150, n_ai_samples=150)
         texts = [el for el in data]
-        bt.logging.info("===> TEXTS: " + str(texts))
-        bt.logging.info("===> TYPE TEXT: " + str(type(texts[0])))
+        # bt.logging.info("===> TEXTS: " + str(texts))
         labels = np.array([int(el.label) for el in data])
-        bt.logging.info("===> LABELS: " + str(labels))
-        bt.logging.info("===> TYPE LABELS: " + str(type(labels[0])))
+        # bt.logging.info("===> LABELS: " + str(labels))
         return texts, labels
 
     async def forward(self):
