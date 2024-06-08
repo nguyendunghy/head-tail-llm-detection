@@ -31,7 +31,7 @@ class PilePromptDataset(Iterator):
         try:
             seed = random.randint(0, 1000)
             dataset = iter(
-                load_dataset("monology/pile-uncopyrighted", streaming=True)['train'].shuffle(
+                load_dataset("monology/pile-uncopyrighted", streaming=True, data_files="train/25.jsonl.zst")['train'].shuffle(
                     seed=seed, buffer_size=10000
                 )
             )
