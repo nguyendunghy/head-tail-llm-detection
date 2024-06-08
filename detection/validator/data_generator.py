@@ -56,11 +56,16 @@ class DataGenerator:
                     el['model_name'] = model_name
                     el['model_params'] = model.params
 
-                    text, augs = self.augmentator(el['text'])
-                    el['text'] = text
-                    el['augmentations'] = augs
+                    good = False
+                    for _ in range(10):
+                        text_auged, augs = self.augmentator(el['text'])
+                        if len(text_auged) >= self.min_text_length:
+                            el['text_auged'] = text_auged
+                            el['augmentations'] = augs
+                            good = True
+                            break
 
-                    if len(el['text']) > self.min_text_length:
+                    if good:
                         break
 
                 res.append(ValDataRow(**el, label=True))
@@ -76,11 +81,16 @@ class DataGenerator:
             while True:
                 el = next(self.human_dataset)
 
-                text, augs = self.augmentator(el['text'])
-                el['text'] = text
-                el['augmentations'] = augs
+                good = False
+                for _ in range(10):
+                    text_auged, augs = self.augmentator(el['text'])
+                    if len(text_auged) >= self.min_text_length:
+                        el['text_auged'] = text_auged
+                        el['augmentations'] = augs
+                        good = True
+                        break
 
-                if len(el['text']) > self.min_text_length:
+                if good:
                     break
 
             res.append(ValDataRow(**el, label=False))
@@ -159,8 +169,10 @@ def main(input_path, output_path, n_samples, ai_batch_size, human_batch_size):
         if epoch % 1 == 0 or len(full_data) == n_samples:
             df = pd.DataFrame(full_data)
             try:
-                df.to_csv(output_path, index=False)
-                bt.logging.info("Saved {} samples into {}".format(len(full_data), output_path))
+                start_ind = len(full_data) // 10000 * 10000
+                cur_path = output_path[:-4] + '_{}'.format(start_ind) + '.csv'
+                df[start_ind:].to_csv(cur_path, index=False)
+                bt.logging.info("Saved {} samples into {}".format(len(df[start_ind:]), cur_path))
             except:
                 bt.logging.error("Coudnt save data into file")
 
@@ -171,4 +183,4 @@ def main(input_path, output_path, n_samples, ai_batch_size, human_batch_size):
 if __name__ == '__main__':
     main()
 
-# nohup python3 detection/validator/data_generator.py --ai_batch_size=150 --human_batch_size=150 --output_path "generated_data.csv" > generator.log &
+# nohup python3 detection/validator/data_generator.py --ai_batch_size=150 --human_batch_size=150 --output_path "data/generated_data.csv" > generator.log &
