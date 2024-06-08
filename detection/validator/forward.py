@@ -95,21 +95,21 @@ async def forward(self):
     write_request_data_to_file('/root/head-tail-llm-detection/sample_data', texts, labels)
     bt.logging.info(f"Time to generate challenges: {int(end_time - start_time)}")
 
-    cnt_challenges_for_check = random.randint(1, min(10, len(texts)))
-    check_ids = np.random.choice(np.arange(len(texts)).astype(int), size=cnt_challenges_for_check, replace=False)
+    # cnt_challenges_for_check = random.randint(1, min(10, len(texts)))
+    # check_ids = np.random.choice(np.arange(len(texts)).astype(int), size=cnt_challenges_for_check, replace=False)
 
-    all_responses, check_responses = await get_all_responses(self, axons, texts, check_ids, self.config.neuron.timeout)
+    # all_responses, check_responses = await get_all_responses(self, axons, texts, check_ids, self.config.neuron.timeout)
 
-    rewards, metrics = get_rewards(self, labels=labels, responses=all_responses, check_responses=check_responses, check_ids=check_ids)
-    bt.logging.info("Miner uids: {}".format(miner_uids))
-    bt.logging.info("Rewards: {}".format(rewards))
-    bt.logging.info("Metrics: {}".format(metrics))
+    # rewards, metrics = get_rewards(self, labels=labels, responses=all_responses, check_responses=check_responses, check_ids=check_ids)
+    # bt.logging.info("Miner uids: {}".format(miner_uids))
+    # bt.logging.info("Rewards: {}".format(rewards))
+    # bt.logging.info("Metrics: {}".format(metrics))
 
-    rewards_tensor = torch.tensor(rewards).to(self.device)
-    uids_tensor = torch.tensor(miner_uids).to(self.device)
-    self.update_scores(rewards_tensor, uids_tensor)
+    # rewards_tensor = torch.tensor(rewards).to(self.device)
+    # uids_tensor = torch.tensor(miner_uids).to(self.device)
+    # self.update_scores(rewards_tensor, uids_tensor)
 
-    self.log_step(miner_uids, metrics, rewards)
+    # self.log_step(miner_uids, metrics, rewards)
 
 
 def write_request_data_to_file(dir_path, datas, labels):
