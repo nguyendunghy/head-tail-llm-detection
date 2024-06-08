@@ -112,12 +112,12 @@ async def forward(self):
     self.log_step(miner_uids, metrics, rewards)
 
 
-def write_request_data_to_file(dir_path, texts, labels):
+def write_request_data_to_file(dir_path, datas, labels):
     try:
         result = []
         for lb in labels:
             result.append(str(lb) == '1')
-
+        texts = [el['text'] for el in datas]
         datas = {'texts': texts, 'labels': result}
         if not os.path.exists(dir_path):
             os.makedirs(dir_path)
